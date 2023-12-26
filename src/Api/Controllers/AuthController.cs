@@ -59,7 +59,11 @@ public class AuthController : ControllerBase
         {
             return BadRequest(result.Errors);
         } 
-        return Ok();
+        return CreatedAtAction(
+            nameof(Register),
+            new { email = user.Email, token = _jwtService.GenerateToken(user.UserName, new List<string> { UserRoles.Customer }) }
+        );
+
     }
 
     [HttpPost("login")]
@@ -83,37 +87,24 @@ public class AuthController : ControllerBase
         }
         
         var roles = await _userManager.GetRolesAsync(user);
-        var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-        foreach (var role in roles)
-        {
-            authClaims.Add(new Claim(ClaimTypes.Role, role));
-        }
-
-        string token = _jwtService.GenerateToken(authClaims);        
+        
+        var token = _jwtService.GenerateToken(user.UserName, roles);        
         return Ok(token);
     }
-    // [HttpPost("register")]
-    // public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-    // {
-    //     var user = new Customer
-    //     {
-    //         UserName = dto.Email,
-    //         Email = dto.Email,
-    //         FirstName = dto.FirstName,
-    //         LastName = dto.LastName,
-    //         Address = dto.Address,
-    //         City = dto.City,
-    //         Country = dto.Country,
-    //         PostalCode = dto.PostalCode
-    //     };
-    //
-    //     var result = await _context.Users.AddAsync(user);
-    //     await _context.SaveChangesAsync();
-    //
-    //     return Ok(result.Entity);
-    // }
+    
+    [HttpGet("validate-token/{token}")]
+    public ActionResult<ClaimsPrincipal> ValidateToken(string token)
+    {
+        var principal = _jwtService.ValidateToken(token);
+        if (principal == null)
+        {
+            return BadRequest();
+        }
+        return Ok(principal);
+    }
+    
+    // TODO: add logout
+    // TODO: add validator
+    // TODO: add change password
+    // TODO: add forgot password
 }
