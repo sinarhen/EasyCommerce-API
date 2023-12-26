@@ -9,5 +9,6 @@ public class MappingProfiles: Profile
     public MappingProfiles()
     {
         CreateMap<RegisterDto, Customer>();
+        CreateMap<LoginDto, Customer>();
     }
 }

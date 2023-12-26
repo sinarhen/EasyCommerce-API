@@ -1,7 +1,11 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using AutoMapper;
+using ECommerce.Config;
 using Ecommerce.Data;
 using Ecommerce.DTOs;
 using Ecommerce.Entities;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -16,19 +20,19 @@ public class AuthController : ControllerBase
     private readonly IMapper _mapper;
     private readonly UserManager<Customer> _userManager;
     private readonly SignInManager<Customer> _signInManager;
-    private readonly RoleManager<CustomerRole> _roleManager;
+    private readonly JwtService _jwtService;
 
     public AuthController(
-        IMapper _mapper,
-        UserManager<Customer> _userManager, 
-        SignInManager<Customer> _signInManager,
-        RoleManager<CustomerRole> _roleManager
+        IMapper mapper,
+        UserManager<Customer> userManager, 
+        SignInManager<Customer> signInManager,
+        JwtService jwtService
     )
     {
-        this._mapper = _mapper;
-        this._userManager = _userManager;
-        this._signInManager = _signInManager;
-        this._roleManager = _roleManager;
+        _mapper = mapper;
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _jwtService = jwtService;
     }
 
     [HttpPost("register")]
@@ -50,10 +54,48 @@ public class AuthController : ControllerBase
         {
             return BadRequest(result.Errors);
         }
-        
+        var roleResult = await _userManager.AddToRoleAsync(user, UserRoles.Customer);
+        if (!roleResult.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        } 
         return Ok();
     }
-    
+
+    [HttpPost("login")]
+    public async Task<ActionResult<JwtSecurityToken>> Login([FromBody] LoginDto dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest("Empty data");
+        }
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
+        if (!passwordIsCorrect)
+        {
+            return Unauthorized("Password is incorrect");
+        }
+        
+        var roles = await _userManager.GetRolesAsync(user);
+        var authClaims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+        foreach (var role in roles)
+        {
+            authClaims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        string token = _jwtService.GenerateToken(authClaims);        
+        return Ok(token);
+    }
     // [HttpPost("register")]
     // public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     // {

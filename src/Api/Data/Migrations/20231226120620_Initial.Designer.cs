@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Ecommerce.Migrations
+namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20231225202709_Initial")]
+    [Migration("20231226120620_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

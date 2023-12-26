@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Ecommerce.Migrations
+namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
     partial class ProductDbContextModelSnapshot : ModelSnapshot

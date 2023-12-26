@@ -1,18 +1,19 @@
 using System.Text;
+using ECommerce.Config;
 using Ecommerce.Data;
 using Ecommerce.Entities;
+using ECommerce.Services;
 using Lib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-// Load env vars from .env
+
 Env.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
-var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,7 +22,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ProductDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("POSTGRES_CONNECTION"));
+    var connString = Secrets.DbConnectionString;
+    options.UseNpgsql(connString);
 });
 builder.Services.AddIdentity<Customer, CustomerRole>(options =>
     {
@@ -47,14 +49,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            ValidIssuer = Secrets.JwtIssuer,
+            ValidAudience = Secrets.JwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secrets.JwtKey))
         };       
     });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-// Inside Configure method
+
+builder.Services.AddSingleton<JwtService>(provider =>
+{
+    var jwtSecrets = new JwtSecrets(
+        Issuer: Secrets.JwtIssuer,
+        Key: Secrets.JwtKey,
+        Audience: Secrets.JwtAudience
+    );
+    return new JwtService(jwtSecrets);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,14 +81,16 @@ app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
+
+try
 {
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ProductDbContext>();
-    var userManager = services.GetRequiredService<UserManager<Customer>>();
-    var roleManager = services.GetRequiredService<RoleManager<CustomerRole>>();
-    context.Database.Migrate();
-    // SeedData(context, userManager, roleManager).InitDb();   
+    // Seeding data to database if not exists 
+    InitDb.Initialize(app);
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Error happened while seeding data: ", ex.Message);
+    throw;
 }
 
 app.Run();
