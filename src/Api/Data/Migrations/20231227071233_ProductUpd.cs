@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ProductUpd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -199,6 +199,7 @@ namespace ECommerce.Data.Migrations
                     ColorId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ImageUrl = table.Column<string>(type: "text", nullable: true),
                     InStock = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

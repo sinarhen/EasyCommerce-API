@@ -1,12 +1,10 @@
-﻿
-namespace Ecommerce.Entities;
+﻿namespace Ecommerce.DTOs;
 
-public class Product
+public class ProductDto
 {
     public Guid Id { get; set; }
     
-    public Category Category { get; set; }
-    public Guid CategoryId { get; set; }
+    public string CategoryName { get; set; }
     
     public string Name { get; set; }
 
@@ -14,13 +12,13 @@ public class Product
 
     public string Price { get; set; }
 
-    public Color Color { get; set; }
+    public string ColorName { get; set; }
     
     public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
     
     public string ImageUrl { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
     
     public int InStock { get; set; }
 }

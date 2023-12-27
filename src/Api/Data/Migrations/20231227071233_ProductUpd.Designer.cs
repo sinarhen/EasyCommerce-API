@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20231226120620_Initial")]
-    partial class Initial
+    [Migration("20231227071233_ProductUpd")]
+    partial class ProductUpd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -210,6 +210,9 @@ namespace ECommerce.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
                     b.Property<int>("InStock")
