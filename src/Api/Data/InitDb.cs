@@ -1,5 +1,5 @@
 ﻿using ECommerce.Config;
-using Ecommerce.Entities;
+using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

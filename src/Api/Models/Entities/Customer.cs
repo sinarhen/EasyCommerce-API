@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Ecommerce.Entities;
+namespace ECommerce.Models.Entities;
 
 public class Customer : IdentityUser
 {

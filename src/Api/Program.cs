@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using ECommerce.Config;
 using Ecommerce.Data;
-using Ecommerce.Entities;
+using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

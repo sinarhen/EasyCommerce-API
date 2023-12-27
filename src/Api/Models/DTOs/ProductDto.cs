@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.DTOs;
+﻿namespace ECommerce.Models.DTOs;
 
 public class ProductDto
 {

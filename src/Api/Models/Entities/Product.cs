@@ -1,5 +1,5 @@
 ﻿
-namespace Ecommerce.Entities;
+namespace ECommerce.Models.Entities;
 
 public class Product
 {

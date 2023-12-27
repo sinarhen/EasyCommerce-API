@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Ecommerce.DTOs;
-using Ecommerce.Entities;
+using ECommerce.Models.DTOs;
+using ECommerce.Models.Entities;
 
 namespace Ecommerce.RequestHelpers;
 

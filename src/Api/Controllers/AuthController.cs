@@ -3,8 +3,8 @@ using System.Security.Claims;
 using AutoMapper;
 using ECommerce.Config;
 using Ecommerce.Data;
-using Ecommerce.DTOs;
-using Ecommerce.Entities;
+using ECommerce.Models.DTOs;
+using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -116,9 +116,7 @@ public class AuthController : ControllerBase
 
         return Ok(principal);
     }
-
-
-    // TODO: add change password
+    
     [HttpPost("change-password")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
@@ -158,5 +156,43 @@ public class AuthController : ControllerBase
     }
 
 
-// TODO: add forgot password
+    // TODO: add change email
+    [HttpPost("change-email")]
+    public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest("Empty data");
+        }
+
+        var user = await _userManager.FindByEmailAsync(dto.OldEmail);
+        if (user == null)
+        {
+            return BadRequest("User with such email does not exist");
+        }
+
+        var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
+        if (!passwordIsCorrect)
+        {
+            return Unauthorized("Password is incorrect");
+        }
+
+        var result = await _userManager.SetEmailAsync(user, dto.NewEmail);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        
+        var token = _jwtService.GenerateToken(username: user.UserName, roles: await _userManager.GetRolesAsync(user));
+        
+        return CreatedAtAction(nameof(ChangePassword),
+            new
+            {
+                token = _jwtService.WriteToken(token),
+                expiration = token.ValidTo,
+            });
+
+    }
+    
 }
