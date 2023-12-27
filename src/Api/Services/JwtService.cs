@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Ecommerce.Entities;
 using Microsoft.IdentityModel.Tokens;
 namespace ECommerce.Services;
 
@@ -16,15 +14,15 @@ public class JwtService
 {
     private readonly JwtSecrets _jwtSecrets;
 
-    private const string UserNameClaim = "UserName";
-    private const string RoleClaim = "Role"; 
+    private const string UserNameClaim = "username";
+    private const string RoleClaim = "role"; 
     
     public JwtService(JwtSecrets jwtSecrets)
     {
         _jwtSecrets = jwtSecrets ?? throw new ArgumentNullException(nameof(jwtSecrets));
     }
 
-    public string GenerateToken(string username, IEnumerable<string> roles)
+    public JwtSecurityToken GenerateToken(string username, IEnumerable<string> roles)
     {
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecrets.Key));
@@ -48,7 +46,13 @@ public class JwtService
             signingCredentials: credentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(jwt);
+        return jwt;
+    }
+    
+    public string WriteToken(JwtSecurityToken token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(token);
     }
 
     public ClaimsPrincipal ValidateToken(string token)

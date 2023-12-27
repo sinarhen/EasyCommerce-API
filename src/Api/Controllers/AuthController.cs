@@ -19,19 +19,16 @@ public class AuthController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly UserManager<Customer> _userManager;
-    private readonly SignInManager<Customer> _signInManager;
     private readonly JwtService _jwtService;
 
     public AuthController(
         IMapper mapper,
         UserManager<Customer> userManager, 
-        SignInManager<Customer> signInManager,
         JwtService jwtService
     )
     {
         _mapper = mapper;
         _userManager = userManager;
-        _signInManager = signInManager;
         _jwtService = jwtService;
     }
 
@@ -58,10 +55,19 @@ public class AuthController : ControllerBase
         if (!roleResult.Succeeded)
         {
             return BadRequest(result.Errors);
-        } 
+        }
+
+        var token = _jwtService.GenerateToken(user.UserName, new List<string> { UserRoles.Customer });
+        var tokenAsString = _jwtService.WriteToken(token);
+        
         return CreatedAtAction(
             nameof(Register),
-            new { email = user.Email, token = _jwtService.GenerateToken(user.UserName, new List<string> { UserRoles.Customer }) }
+            new
+            {
+                email = user.Email, 
+                token = tokenAsString,
+                expiresTo = token.ValidTo,
+            }
         );
 
     }
@@ -88,11 +94,16 @@ public class AuthController : ControllerBase
         
         var roles = await _userManager.GetRolesAsync(user);
         
-        var token = _jwtService.GenerateToken(user.UserName, roles);        
-        return Ok(token);
+        var token = _jwtService.GenerateToken(user.UserName, roles);
+        var tokenAsString = _jwtService.WriteToken(token);
+        return Ok(new
+        {
+            token = tokenAsString,
+            expiration = token.ValidTo,
+        });
     }
     
-    [HttpGet("validate-token/{token}")]
+    [HttpGet("validate/{token}")]
     public ActionResult<ClaimsPrincipal> ValidateToken(string token)
     {
         var principal = _jwtService.ValidateToken(token);
@@ -103,8 +114,7 @@ public class AuthController : ControllerBase
         return Ok(principal);
     }
     
-    // TODO: add logout
-    // TODO: add validator
+    
     // TODO: add change password
     // TODO: add forgot password
 }
