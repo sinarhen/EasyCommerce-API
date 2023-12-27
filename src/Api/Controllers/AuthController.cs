@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
 
     public AuthController(
         IMapper mapper,
-        UserManager<Customer> userManager, 
+        UserManager<Customer> userManager,
         JwtService jwtService
     )
     {
@@ -44,13 +44,14 @@ public class AuthController : ControllerBase
         {
             return BadRequest("Empty data");
         }
-                
+
         var user = _mapper.Map<Customer>(dto);
         var result = await _userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
+
         var roleResult = await _userManager.AddToRoleAsync(user, UserRoles.Customer);
         if (!roleResult.Succeeded)
         {
@@ -59,12 +60,12 @@ public class AuthController : ControllerBase
 
         var token = _jwtService.GenerateToken(user.UserName, new List<string> { UserRoles.Customer });
         var tokenAsString = _jwtService.WriteToken(token);
-        
+
         return CreatedAtAction(
             nameof(Register),
             new
             {
-                email = user.Email, 
+                email = user.Email,
                 token = tokenAsString,
                 expiresTo = token.ValidTo,
             }
@@ -79,8 +80,9 @@ public class AuthController : ControllerBase
         {
             return BadRequest("Empty data");
         }
+
         var user = await _userManager.FindByEmailAsync(dto.Email);
-        
+
         if (user == null)
         {
             return Unauthorized();
@@ -91,9 +93,9 @@ public class AuthController : ControllerBase
         {
             return Unauthorized("Password is incorrect");
         }
-        
+
         var roles = await _userManager.GetRolesAsync(user);
-        
+
         var token = _jwtService.GenerateToken(user.UserName, roles);
         var tokenAsString = _jwtService.WriteToken(token);
         return Ok(new
@@ -102,7 +104,7 @@ public class AuthController : ControllerBase
             expiration = token.ValidTo,
         });
     }
-    
+
     [HttpGet("validate/{token}")]
     public ActionResult<ClaimsPrincipal> ValidateToken(string token)
     {
@@ -111,10 +113,50 @@ public class AuthController : ControllerBase
         {
             return BadRequest();
         }
+
         return Ok(principal);
     }
-    
-    
+
+
     // TODO: add change password
-    // TODO: add forgot password
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+    {
+        if (dto == null)
+        {
+            return BadRequest("Empty data");
+        }
+
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user == null)
+        {
+            return BadRequest("User with such email does not exist");
+        }
+
+        var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.OldPassword);
+        if (!passwordIsCorrect)
+        {
+            return Unauthorized("Password is incorrect");
+        }
+
+        var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        
+        var token = _jwtService.GenerateToken(username: user.UserName, roles: await _userManager.GetRolesAsync(user));
+        
+        return CreatedAtAction(nameof(ChangePassword),
+        new
+        {
+            token = _jwtService.WriteToken(token),
+            expiration = token.ValidTo,
+        });
+        
+    }
+
+
+// TODO: add forgot password
 }
