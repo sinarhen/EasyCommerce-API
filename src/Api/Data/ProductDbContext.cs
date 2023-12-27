@@ -15,6 +15,7 @@ public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string
     public DbSet<Category> Categories { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Color> Colors { get; set; }
+    public DbSet<ProductColorQuantity> ProductColorQuantities { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

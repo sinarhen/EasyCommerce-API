@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ProductUpd : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,7 +62,9 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,7 +76,8 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    HexCode = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -195,12 +198,11 @@ namespace ECommerce.Data.Migrations
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<string>(type: "text", nullable: true),
-                    ColorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    InStock = table.Column<int>(type: "integer", nullable: false)
+                    InStock = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -211,11 +213,6 @@ namespace ECommerce.Data.Migrations
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Products_Colors_ColorId",
-                        column: x => x.ColorId,
-                        principalTable: "Colors",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -240,6 +237,31 @@ namespace ECommerce.Data.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Orders_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductColorQuantities",
+                columns: table => new
+                {
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ColorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductColorQuantities", x => new { x.ProductId, x.ColorId });
+                    table.ForeignKey(
+                        name: "FK_ProductColorQuantities_Colors_ColorId",
+                        column: x => x.ColorId,
+                        principalTable: "Colors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductColorQuantities_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -294,14 +316,14 @@ namespace ECommerce.Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductColorQuantities_ColorId",
+                table: "ProductColorQuantities",
+                column: "ColorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_ColorId",
-                table: "Products",
-                column: "ColorId");
         }
 
         /// <inheritdoc />
@@ -326,19 +348,22 @@ namespace ECommerce.Data.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
+                name: "ProductColorQuantities");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Colors");
+
+            migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "Colors");
         }
     }
 }

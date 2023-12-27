@@ -12,13 +12,12 @@ public class ProductDto
 
     public string Price { get; set; }
 
-    public string ColorName { get; set; }
     
     public DateTime CreatedAt { get; set; }
     
     public string ImageUrl { get; set; }
 
     public DateTime UpdatedAt { get; set; }
-    
-    public int InStock { get; set; }
+
+    public Dictionary<string, int> Quantities { get; set; } = new Dictionary<string, int>();
 }

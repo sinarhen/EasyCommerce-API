@@ -22,25 +22,34 @@ namespace ECommerce.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Ecommerce.Entities.Category", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Color", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Color", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("HexCode")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -50,7 +59,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Colors");
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Customer", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Customer", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -132,7 +141,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.CustomerRole", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.CustomerRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -158,7 +167,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Order", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -191,16 +200,13 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Product", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ColorId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -212,14 +218,14 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
-                    b.Property<int>("InStock")
-                        .HasColumnType("integer");
+                    b.Property<bool>("InStock")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<string>("Price")
-                        .HasColumnType("text");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -228,9 +234,27 @@ namespace ECommerce.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.ProductColorQuantity", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("ColorId")
+                        .HasColumnType("uuid")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProductId", "ColorId");
+
                     b.HasIndex("ColorId");
 
-                    b.ToTable("Products");
+                    b.ToTable("ProductColorQuantities");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -339,13 +363,13 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Order", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Order", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.Customer", "Customer")
+                    b.HasOne("ECommerce.Models.Entities.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId");
 
-                    b.HasOne("Ecommerce.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Models.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -356,26 +380,39 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Product", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.Category", "Category")
+                    b.HasOne("ECommerce.Models.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ecommerce.Entities.Color", "Color")
-                        .WithMany()
-                        .HasForeignKey("ColorId");
-
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.ProductColorQuantity", b =>
+                {
+                    b.HasOne("ECommerce.Models.Entities.Color", "Color")
+                        .WithMany()
+                        .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Models.Entities.Product", "Product")
+                        .WithMany("ColorQuantities")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Color");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.CustomerRole", null)
+                    b.HasOne("ECommerce.Models.Entities.CustomerRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -384,7 +421,7 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.Customer", null)
+                    b.HasOne("ECommerce.Models.Entities.Customer", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -393,7 +430,7 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.Customer", null)
+                    b.HasOne("ECommerce.Models.Entities.Customer", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -402,13 +439,13 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.CustomerRole", null)
+                    b.HasOne("ECommerce.Models.Entities.CustomerRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ecommerce.Entities.Customer", null)
+                    b.HasOne("ECommerce.Models.Entities.Customer", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -417,16 +454,21 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Ecommerce.Entities.Customer", null)
+                    b.HasOne("ECommerce.Models.Entities.Customer", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Ecommerce.Entities.Customer", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.Customer", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
+                {
+                    b.Navigation("ColorQuantities");
                 });
 #pragma warning restore 612, 618
         }

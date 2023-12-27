@@ -1,6 +1,12 @@
-﻿using ECommerce.Models.DTOs;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using ECommerce.Config;
+using Ecommerce.Data;
+using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Controllers;
 
@@ -8,11 +14,22 @@ namespace Ecommerce.Controllers;
 [Route("api/products")]
 public class ProductController : ControllerBase
 {
+    private readonly ProductDbContext _dbContext;
+    private readonly IMapper _mapper;
+
+    public ProductController(ProductDbContext dbContext, IMapper mapper)
+    {
+        _dbContext = dbContext;
+        _mapper = mapper;
+    }
 
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetProducts()
     {
-        return Ok();
+        var products = await _dbContext.Products
+            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+        return Ok(products);
     }
 
     [HttpGet("{id}")]

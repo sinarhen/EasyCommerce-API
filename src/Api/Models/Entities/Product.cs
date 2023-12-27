@@ -12,15 +12,15 @@ public class Product
 
     public string Description { get; set; }
 
-    public string Price { get; set; }
+    public decimal Price { get; set; }
 
-    public Color Color { get; set; }
-    
+    public ICollection<ProductColorQuantity> ColorQuantities { get; set; } = new List<ProductColorQuantity>();
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
     
     public string ImageUrl { get; set; }
     
-    public int InStock { get; set; }
+    public bool InStock { get; set; }
 }

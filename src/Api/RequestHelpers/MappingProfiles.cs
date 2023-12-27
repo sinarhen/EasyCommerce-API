@@ -12,6 +12,6 @@ public class MappingProfiles: Profile
         CreateMap<LoginDto, Customer>();
         CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
-            .ForMember(dest => dest.ColorName, opt => opt.MapFrom(src => src.Color.Name));
+            .ForMember(dest => dest.Quantities, opt => opt.MapFrom(src => src.ColorQuantities.ToDictionary(x => x.Color.Name, x => x.Quantity)));
     }
 }
