@@ -3,20 +3,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
-[PrimaryKey("ProductId", "ColorId")]
-public class ProductImage
+[PrimaryKey("ProductId", "MaterialId")]
+public class ProductMaterials
 {
-    
-    public Product Product { get; set; }
     [Key]
     public Guid ProductId { get; set; }
-
-    public Color Color { get; set; }
-    [Key]
-    public Guid ColorId { get; set; }
     
-    public string Url { get; set; }
+    [Key]
+    public Guid MaterialId { get; set; }
+    
+    
+    public int Percentage { get; set; }
     
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    // Navigation properties
+    public Material Material { get; set; }
+    public Product Product { get; set; }
+
 }

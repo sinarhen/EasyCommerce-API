@@ -25,6 +25,7 @@ public class ProductStock
 
 public enum Size
 {
+    XXS, 
     XS,
     S,
     M,

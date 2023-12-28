@@ -122,89 +122,97 @@ public static class InitDb
 
     private static IEnumerable<Product> GetInitialProducts()
     {
-
-        var categoriesProductNames = new Dictionary<string, string[]>
-        {
-
-        };
+        var white = new Color { Name = "White", HexCode = "#FFFFFF", Id = Guid.NewGuid() };
+        var black = new Color { Name = "Black", HexCode = "#000000", Id = Guid.NewGuid() };
+        var red = new Color { Name = "Red", HexCode = "#FF0000", Id = Guid.NewGuid() };
+        var green = new Color { Name = "Green", HexCode = "#00FF00", Id = Guid.NewGuid() };
+        var blue = new Color { Name = "Blue", HexCode = "#0000FF", Id = Guid.NewGuid() };
+        var yellow = new Color { Name = "Yellow", HexCode = "#FFFF00", Id = Guid.NewGuid() };
+        var cyan = new Color { Name = "Cyan", HexCode = "#00FFFF", Id = Guid.NewGuid() };
+        var magenta = new Color { Name = "Magenta", HexCode = "#FF00FF", Id = Guid.NewGuid() };
+        var silver = new Color { Name = "Silver", HexCode = "#C0C0C0", Id = Guid.NewGuid() };
+        var purple = new Color { Name = "Purple", HexCode = "#800080", Id = Guid.NewGuid() };
+        var orange = new Color { Name = "Orange", HexCode = "#FFA500", Id = Guid.NewGuid() };
+        
+        
         var shirtsCategory = new Category { Name = "Shirts", Id = Guid.NewGuid() };
         var shoesCategory = new Category { Name = "Shoes", Id = Guid.NewGuid() };
         var pantsCategory = new Category { Name = "Pants", Id = Guid.NewGuid() };
         var accessoriesCategory = new Category { Name = "Accessories", Id = Guid.NewGuid() };
-        
-        var shirtsProducts = new List<Product>
+
+        var productOne = new Product
+        {
+            Id = Guid.Parse("88febf1c-f5f3-4df8-98bb-09e5fee18195"),
+            Category = shirtsCategory,
+            Name = "Men's Casual Shirt",
+            Description = "A comfortable and stylish shirt for everyday wear.",
+            Price = (decimal)29.99,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow, 
+        };
+        productOne.Images = new List<ProductImage>
+        {
+            new ProductImage
             {
-                new Product
-                {
-                    Id = Guid.Parse("88febf1c-f5f3-4df8-98bb-09e5fee18195"),
-                    Category = shirtsCategory,
-                    Name = "Men's Casual Shirt",
-                    Description = "A comfortable and stylish shirt for everyday wear.",
-                    Price = (decimal)29.99,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    ImagesUrl = new List<string>
-                    {
-                        
-                    },
-                },
-                new Product
-                {
-                    Id = Guid.Parse("a0e3b6a0-0b0a-4b0a-9b0a-0b0a0b0a0b0a"),
-                    Category = shirtsCategory,
-                    Name = "Women's Formal Blouse",
-                    Description = "Elegant blouse for formal occasions.",
-                    Price = (decimal)39.99,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    ImagesUrl = new List<string>
-                    {
-                        
-                    },
-                },
-                new Product
-                {
-                    Id = Guid.Parse("b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0"),
-                    Category = shirtsCategory,
-                    Name = "Men's Striped Polo Shirt",
-                    Description = "Casual polo shirt with stripes for a sporty look.",
-                    Price = (decimal)24.99,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    ImagesUrl = new List<string>
-                    {
-                        
-                    },
-                },
-                new Product
-                {
-                    Id = Guid.Parse("c0c0c0c0-c0c0-c0c0-c0c0-c0c0c0c0c0c0"),
-                    Category = shirtsCategory,
-                    Name = "Women's Denim Shirt",
-                    Description = "Denim shirt for a trendy and casual appearance.",
-                    Price = (decimal)44.99,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    ImagesUrl = new List<string>
-                    {
-                        
-                    },
-                },
-                new Product
-                {
-                    Id = Guid.Parse("d0d0d0d0-d0d0-d0d0-d0d0-d0d0d0d0d0d0"),
-                    Category = shirtsCategory,
-                    Name = "Men's Oxford Dress Shirt",
-                    Description = "Classic dress shirt for a polished and sophisticated look.",
-                    Price = (decimal)54.99,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    ImagesUrl = new List<string>
-                    {
-                        
-                    },
-                },
-            };
+                Color = black,
+                Product = productOne,
+                Url = "https://i.pinimg.com/736x/94/0d/72/940d72d716ba0063347add99973bc85c.jpg"
+            },
+            new ProductImage
+            {
+                Color = white,
+                Product = productOne,
+                Url = "https://i.pinimg.com/736x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg"
+            },
+        };
+        
+        
+        var shirtsProducts = new List<Product>();
+        shirtsProducts.Add(productOne);
+        shirtsProducts.Add(new Product
+        {
+            Id = Guid.Parse("a0e3b6a0-0b0a-4b0a-9b0a-0b0a0b0a0b0a"),
+            Category = shirtsCategory,
+            Name = "Women's Formal Blouse",
+            Description = "Elegant blouse for formal occasions.",
+            Price = (decimal)39.99,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+                    
+        });
+        shirtsProducts.Add(new Product
+        {
+            Id = Guid.Parse("b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0"),
+            Category = shirtsCategory,
+            Name = "Men's Striped Polo Shirt",
+            Description = "Casual polo shirt with stripes for a sporty look.",
+            Price = (decimal)24.99,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+                    
+        });
+        shirtsProducts.Add(new Product
+        {
+            Id = Guid.Parse("c0c0c0c0-c0c0-c0c0-c0c0-c0c0c0c0c0c0"),
+            Category = shirtsCategory,
+            Name = "Women's Denim Shirt",
+            Description = "Denim shirt for a trendy and casual appearance.",
+            Price = (decimal)44.99,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+                    
+        });
+        shirtsProducts.Add(new Product
+        {
+            Id = Guid.Parse("d0d0d0d0-d0d0-d0d0-d0d0-d0d0d0d0d0d0"),
+            Category = shirtsCategory,
+            Name = "Men's Oxford Dress Shirt",
+            Description = "Classic dress shirt for a polished and sophisticated look.",
+            Price = (decimal)54.99,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+                    
+        });
 
         var shoesProducts = new List<Product>
         {
