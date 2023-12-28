@@ -4,20 +4,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
-[PrimaryKey("ProductId", "ColorId")]
-public class ProductColorQuantity
+public class ProductStock
 {
     [Key]
-    [Column(Order = 1)]
     public Guid ProductId { get; set; }
-
+    
     [Key]
-    [Column(Order = 2)]
     public Guid ColorId { get; set; }
-
-    public int Quantity { get; set; }
+    
+    public Size Size { get; set; }
+    
+    public int Stock { get; set; }
 
     // Navigation properties
     public Product Product { get; set; }
     public Color Color { get; set; }
+    
+    
+}
+
+public enum Size
+{
+    XS,
+    S,
+    M,
+    L,
+    XL,
+    XXL
 }

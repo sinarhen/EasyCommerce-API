@@ -14,11 +14,11 @@ public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Order> Orders { get; set; }
-    public DbSet<Color> Colors { get; set; }
-    public DbSet<ProductColorQuantity> ProductColorQuantities { get; set; }
+    public DbSet<ProductStock> ProductStocks { get; set; }
+    public DbSet<Cart> Carts { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+        // Maybe will be used later
     }
 }

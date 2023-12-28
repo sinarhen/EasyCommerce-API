@@ -14,13 +14,12 @@ public class Product
 
     public decimal Price { get; set; }
 
-    public ICollection<ProductColorQuantity> ColorQuantities { get; set; } = new List<ProductColorQuantity>();
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
     
-    public string ImageUrl { get; set; }
+    public List<string> ImagesUrl { get; set; } = new List<string>();
     
-    public bool InStock { get; set; }
+    // Navigation properties
+    public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
 }

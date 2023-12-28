@@ -17,3 +17,12 @@ public class Order
     public DateTime UpdatedAt { get; set; }
     public OrderStatus Status { get; set; }
 }
+
+public enum OrderStatus
+{
+    Pending,
+    Processing,
+    Shipped,
+    Delivered,
+    Cancelled
+}
