@@ -26,6 +26,5 @@ public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        // Maybe will be used later
     }
 }

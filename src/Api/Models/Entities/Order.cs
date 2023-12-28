@@ -1,18 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
+[PrimaryKey("Id")]
 public class Order
 {
     [Key]
     public Guid Id { get; set; }
     
-    public Guid CustomerId { get; set; }
+    [Key]
+    public string CustomerId { get; set; }
     
+    [Key]
     public Guid ProductId { get; set; }
 
+    [Key]
+    public Guid ColorId { get; set; }
+    
     public int Quantity { get; set; }
-    public Color Color { get; set; }
+    
+    
     public string Size { get; set; }
     
     public DateTime CreatedAt { get; set; }
@@ -20,7 +29,11 @@ public class Order
     public OrderStatus Status { get; set; }
     
     // Navigation properties
+    [ForeignKey("ColorId")]
+    public Color Color { get; set; }
+    [ForeignKey("CustomerId")]
     public Customer Customer { get; set; }
+    [ForeignKey("ProductId")]
     public Product Product { get; set; }
     
 }

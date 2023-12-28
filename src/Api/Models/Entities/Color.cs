@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
+[PrimaryKey("Id")]
 public class Color
 {
-    [Key] public Guid Id { get; set; }
+    [Key]
+    public Guid Id { get; set; }
 
     public string HexCode { get; set; }
 

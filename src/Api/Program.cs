@@ -25,7 +25,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ProductDbContext>(options =>
 {
     var connString = Secrets.DbConnectionString;
-    options.UseNpgsql(connString);
+    options.UseNpgsql(connString).EnableSensitiveDataLogging();
 });
 builder.Services.AddIdentity<Customer, CustomerRole>(options =>
     {
@@ -87,7 +87,7 @@ app.MapControllers();
 try
 {
     // Seeding data to database if not exists 
-    InitDb.Initialize(app);
+    await InitDb.InitializeAsync(app);
 }
 catch (Exception ex)
 {

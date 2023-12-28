@@ -1,7 +1,12 @@
-﻿namespace ECommerce.Models.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
+namespace ECommerce.Models.Entities;
+
+[PrimaryKey("Id")]
 public class Occasion
 {
+    [Key]
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
