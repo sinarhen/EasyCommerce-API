@@ -103,128 +103,459 @@ public static class InitDb
         }
     }
 
-    private static List<ProductStock> GetProductStocksForSeeding(Product product)
+    private static List<ProductStock> GetProductStocksForSeeding(Product product, IReadOnlyCollection<Color> colors, int price, IReadOnlyCollection<string> customSizes = null)
     {
-        var hexCodes = new [] { "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF", "#FF00FF", "#C0C0C0", "#800080", "#FFA500" };
-
         // Creating 10 product stocks for each size and color
-
-        return (from Size size in Enum.GetValues(typeof(Size))
-            from hexCode in hexCodes
+        var list = new List<ProductStock>();
+        // If customSizes is not null, create product stocks with custom sizes
+        if (customSizes != null)
+        {
+            list.AddRange(from color in colors
+            from customSize in customSizes
             select new ProductStock
             {
                 Product = product,
-                // HexCode = hexCode, // Define a method to generate random hex code
-                Stock = Random.Shared.Next(0, 25),
-                Size = size
-            }).ToList();
-    }
-
-    private static IEnumerable<Product> GetInitialProducts()
-    {
-        var white = new Color { Name = "White", HexCode = "#FFFFFF", Id = Guid.NewGuid() };
-        var black = new Color { Name = "Black", HexCode = "#000000", Id = Guid.NewGuid() };
-        var red = new Color { Name = "Red", HexCode = "#FF0000", Id = Guid.NewGuid() };
-        var green = new Color { Name = "Green", HexCode = "#00FF00", Id = Guid.NewGuid() };
-        var blue = new Color { Name = "Blue", HexCode = "#0000FF", Id = Guid.NewGuid() };
-        var yellow = new Color { Name = "Yellow", HexCode = "#FFFF00", Id = Guid.NewGuid() };
-        var cyan = new Color { Name = "Cyan", HexCode = "#00FFFF", Id = Guid.NewGuid() };
-        var magenta = new Color { Name = "Magenta", HexCode = "#FF00FF", Id = Guid.NewGuid() };
-        var silver = new Color { Name = "Silver", HexCode = "#C0C0C0", Id = Guid.NewGuid() };
-        var purple = new Color { Name = "Purple", HexCode = "#800080", Id = Guid.NewGuid() };
-        var orange = new Color { Name = "Orange", HexCode = "#FFA500", Id = Guid.NewGuid() };
-        
-        
-        var shirtsCategory = new Category { Name = "Shirts", Id = Guid.NewGuid() };
-        var shoesCategory = new Category { Name = "Shoes", Id = Guid.NewGuid() };
-        var pantsCategory = new Category { Name = "Pants", Id = Guid.NewGuid() };
-        var accessoriesCategory = new Category { Name = "Accessories", Id = Guid.NewGuid() };
-
-        var productOne = new Product
+                Color = color,
+                CustomSize = customSize,
+                Price = price,
+                Stock = 10,
+            });
+        }
+        else
         {
-            Id = Guid.Parse("88febf1c-f5f3-4df8-98bb-09e5fee18195"),
+            list.AddRange(from color in colors
+            from Size size in Enum.GetValues(typeof(Size))
+            select new ProductStock
+            {
+                Product = product,
+                Color = color,
+                Size = size,
+                Price = price,
+                Stock = 10,
+            });
+        }
+        return list;
+    }
+    
+    private static ProductImage CreateProductImageEntity(Product product, Color color, List<string> imagesUrl)
+    {
+        return new ProductImage
+        {
+            Product = product,
+            Color = color,
+            ImagesUrl = imagesUrl,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
+    private static Occasion CreateOccasionEntity(string name, string description)
+    {
+        return new Occasion
+        {
+            Name = name,
+            Description = description,
+            Id = Guid.NewGuid()
+        };
+    }
+    private static Color CreateColorEntity(string name, string hexCode)
+    {
+        return new Color
+        {
+            Name = name,
+            HexCode = hexCode,
+            Id = Guid.NewGuid()
+        };
+    }
+    private static Category CreateCategoryEntity(string name)
+    {
+        return new Category
+        {
+            Name = name,
+            Id = Guid.NewGuid()
+        };
+    }
+    
+    private static Material CreateMaterialEntity(string name)
+    {
+        return new Material
+        {
+            Name = name,
+            Id = Guid.NewGuid()
+        };
+    }
+    private static ProductMaterial CreateProductMaterialEntity(Product product, Material material, double percentage)
+    {
+        return new ProductMaterial
+        {
+            Product = product,
+            Material = material,
+            Percentage = percentage,
+        };
+    }
+    private static async Task SeedInitialProducts(ProductDbContext context)
+    {
+        // Colors
+        var white = CreateColorEntity("White", "#FFFFFF");
+        var black = CreateColorEntity("Black", "#000000");
+        var red = CreateColorEntity("Red", "#FF0000");
+        var green = CreateColorEntity("Green", "#008000");
+        var blue = CreateColorEntity("Blue", "#0000FF");
+        var yellow = CreateColorEntity("Yellow", "#FFFF00");
+        var cyan = CreateColorEntity("Cyan", "#00FFFF");
+        var silver = CreateColorEntity("Silver", "#C0C0C0");
+        var purple = CreateColorEntity("Purple", "#800080");
+        var orange = CreateColorEntity("Orange", "#FFA500");
+        var violet = CreateColorEntity("Violet", "#EE82EE");
+        var brown = CreateColorEntity("Brown", "#A52A2A");
+        var khaki = CreateColorEntity("Khaki", "#F0E68C");
+        
+        
+        context.Colors.AddRange(new []{white, black, red, green, blue, yellow, cyan, silver, purple, orange, violet, brown, khaki});
+        
+        // Occasions
+        var casualOccasion = CreateOccasionEntity("Casual", "Outfits for casual occasions");
+        
+        var formalOccasion = CreateOccasionEntity("Formal", "Outfits for formal occasions");
+        
+        var sportyOccasion = CreateOccasionEntity("Sporty", "Outfits for sporty occasions");
+        
+        var businessOccasion = CreateOccasionEntity("Business", "Outfits for business occasions");
+        
+        var streetOccasion = CreateOccasionEntity("Street", "Outfits for street occasions");
+        
+        // Categories
+        var shirtsCategory = CreateCategoryEntity("Shirts");
+        var shoesCategory = CreateCategoryEntity("Shoes");
+        var pantsCategory = CreateCategoryEntity("Pants");
+        var accessoriesCategory = CreateCategoryEntity("Accessories");
+        
+        // Materials
+        var cottonMaterial = CreateMaterialEntity("Cotton");
+        var leatherMaterial = CreateMaterialEntity("Leather");
+        var polyesterMaterial = CreateMaterialEntity("Polyester");
+        var silkMaterial = CreateMaterialEntity("Silk");
+        var woolMaterial = CreateMaterialEntity("Wool");
+        var rubberMaterial = CreateMaterialEntity("Rubber");
+        var suedeMaterial = CreateMaterialEntity("Suede");
+        
+        
+        // Products with category "Shirt"
+        var shirtsProducts = new List<Product>();
+        
+        // Shirts product one
+        var shirtsProductOne = new Product
+        {
+            Id = Guid.NewGuid(),
             Category = shirtsCategory,
             Name = "Men's Casual Shirt",
             Description = "A comfortable and stylish shirt for everyday wear.",
-            Price = (decimal)29.99,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow, 
+            Season = Season.Summer,
+            MainMaterial = cottonMaterial,
+            CollectionYear = 2021,
+            Gender = Gender.Unisex,
+            Occasion = casualOccasion
         };
-        productOne.Images = new List<ProductImage>
+        shirtsProductOne.Images = new List<ProductImage>
         {
-            new ProductImage
+            CreateProductImageEntity(shirtsProductOne, white, new List<string>
             {
-                Color = black,
-                Product = productOne,
-                Url = "https://i.pinimg.com/736x/94/0d/72/940d72d716ba0063347add99973bc85c.jpg"
-            },
-            new ProductImage
-            {
-                Color = white,
-                Product = productOne,
-                Url = "https://i.pinimg.com/736x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg"
-            },
+                "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg",
+
+            })
         };
-        
-        
-        var shirtsProducts = new List<Product>();
-        shirtsProducts.Add(productOne);
-        shirtsProducts.Add(new Product
+        shirtsProductOne.Materials = new List<ProductMaterial>
         {
-            Id = Guid.Parse("a0e3b6a0-0b0a-4b0a-9b0a-0b0a0b0a0b0a"),
+            CreateProductMaterialEntity(shirtsProductOne, cottonMaterial, 0.9),
+            CreateProductMaterialEntity(shirtsProductOne, polyesterMaterial, 0.1),
+        };
+        shirtsProductOne.Stocks = GetProductStocksForSeeding(shirtsProductOne, colors: new []{ white, black}, 30);
+        
+        shirtsProducts.Add(shirtsProductOne);
+
+        // Shirts product two
+        var shirtsProductTwo = new Product
+        {
+            Id = Guid.NewGuid(),
             Category = shirtsCategory,
-            Name = "Women's Formal Blouse",
-            Description = "Elegant blouse for formal occasions.",
-            Price = (decimal)39.99,
+            Name = "Women's Blouse",
+            Description = "Casual blouse for casual occasions.",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-                    
-        });
-        shirtsProducts.Add(new Product
+            UpdatedAt = DateTime.UtcNow, 
+            Season = Season.Summer,
+            MainMaterial = silkMaterial,
+            CollectionYear = 2021,
+            Gender = Gender.Female,
+            Occasion = formalOccasion
+        };
+        shirtsProductTwo.Images = new List<ProductImage>
         {
-            Id = Guid.Parse("b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0"),
+            CreateProductImageEntity(shirtsProductTwo, white, new List<string>
+            {
+                "https://i.pinimg.com/564x/f5/58/9d/f5589d631ab3686d469ec93ac23ebc9f.jpg",
+
+            }),
+            CreateProductImageEntity(shirtsProductTwo, black, new List<string>
+            {
+                "https://i.pinimg.com/564x/82/2a/ac/822aac770bc03449bfb85a7d63e276d4.jpg",
+            })
+        };
+        shirtsProductTwo.Materials = new List<ProductMaterial>
+        {
+            CreateProductMaterialEntity(shirtsProductTwo, silkMaterial, 0.9),
+            CreateProductMaterialEntity(shirtsProductTwo, woolMaterial, 0.1),
+        }; 
+            
+        shirtsProductTwo.Stocks = GetProductStocksForSeeding(shirtsProductTwo, colors: new []{black, white}, 40);
+        
+        // Shirts product three
+        var shirtsProductThree = new Product
+        {
+            Id = Guid.NewGuid(),
             Category = shirtsCategory,
             Name = "Men's Striped Polo Shirt",
             Description = "Casual polo shirt with stripes for a sporty look.",
-            Price = (decimal)24.99,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-                    
-        });
-        shirtsProducts.Add(new Product
+            Season = Season.Summer,
+            MainMaterial = cottonMaterial,
+            CollectionYear = 2021,
+            Gender = Gender.Male,
+            Occasion = casualOccasion,
+        };
+        shirtsProductThree.Images = new List<ProductImage>
         {
-            Id = Guid.Parse("c0c0c0c0-c0c0-c0c0-c0c0-c0c0c0c0c0c0"),
-            Category = shirtsCategory,
-            Name = "Women's Denim Shirt",
-            Description = "Denim shirt for a trendy and casual appearance.",
-            Price = (decimal)44.99,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-                    
-        });
-        shirtsProducts.Add(new Product
+            CreateProductImageEntity(shirtsProductThree, black, new List<string>
+            {
+                "https://i.pinimg.com/564x/70/da/dd/70dadd5f402821dcae83e7be32e29ce7.jpg",
+            })
+        };
+        shirtsProductThree.Materials = new List<ProductMaterial>
         {
-            Id = Guid.Parse("d0d0d0d0-d0d0-d0d0-d0d0-d0d0d0d0d0d0"),
-            Category = shirtsCategory,
-            Name = "Men's Oxford Dress Shirt",
-            Description = "Classic dress shirt for a polished and sophisticated look.",
-            Price = (decimal)54.99,
+            CreateProductMaterialEntity(shirtsProductThree, polyesterMaterial, 0.5),
+            CreateProductMaterialEntity(shirtsProductThree, cottonMaterial, 0.5),
+        };
+        shirtsProductThree.Stocks = GetProductStocksForSeeding(shirtsProductThree, colors: new []{black}, 25);
+        
+        shirtsProducts.Add(shirtsProductTwo);
+        
+        
+        // Products with category "Shoes"
+        var shoesProducts = new List<Product>();
+        
+        // Shoes product one
+        var shoesProductOne = new Product
+        {
+            Id = Guid.NewGuid(),
+            Category = shoesCategory,
+            Name = "Men's Running Shoes",
+            Description = "Comfortable running shoes for active individuals.",
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-                    
-        });
+            Season = Season.DemiSeason,
+            MainMaterial = polyesterMaterial,
+            CollectionYear = 2022,
+            Gender = Gender.Male,
+            Occasion = sportyOccasion,
+        };
+    
+        shoesProductOne.Images = new List<ProductImage>
+        {
+            CreateProductImageEntity(shoesProductOne, black, new List<string>
+            {
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61ZA59Q2OIL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61LHvwnjTDL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/616N2AANkvL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61kA6cVXMQL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61FL-ek2ySL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/613ZJpbNhkS._AC_SX395_.jpg"
+            }),
+            CreateProductImageEntity(shoesProductOne, white, new List<string>
+            {
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/51+49v7ksXL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/612UEFO7nlL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/51XONIw08vL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61iPFTm-nzL._AC_SY395_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61d6rLD8voL._AC_SX395_.jpg",
+            } )
+            
+        };
 
-        var shoesProducts = new List<Product>
+        shoesProductOne.Materials = new List<ProductMaterial>
         {
+            CreateProductMaterialEntity(shoesProductOne, rubberMaterial, 0.4),
+            CreateProductMaterialEntity(shoesProductOne, polyesterMaterial, 0.6),
+        };
+
+        shoesProductOne.Stocks = GetProductStocksForSeeding(shoesProductOne, colors: new []{black, white}, 80);
+
+        shoesProducts.Add(shoesProductOne);
+        
+        // Shoes product two
+        var shoesProductTwo = new Product
+        {
+            Id = Guid.NewGuid(),
+            Category = shoesCategory,
+            Name = "Unisex Casual Sneakers",
+            Description = "Comfortable and stylish casual sneakers for both men and women.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Season = Season.DemiSeason,
+            MainMaterial = cottonMaterial,
+            CollectionYear = 2022,
+            Gender = Gender.Unisex,
+            Occasion = streetOccasion,
+        };
+
+        shoesProductTwo.Images = new List<ProductImage>
+        {
+            CreateProductImageEntity(shoesProductTwo, violet, new List<string>
+            {
+                "https://www.nike.org.ua/files/resized/products/85_1.700x800.png",
+            }),
+            
+            CreateProductImageEntity(shoesProductTwo, white, new List<string>
+            {
+                "https://www.nike.org.ua/files/resized/products/84_1.700x800.png",
+            }),
+            CreateProductImageEntity(shoesProductTwo, black,  new List<string>
+            {
+                "https://www.nike.org.ua/files/resized/products/80_1.700x800.png",
+            })
+        };
+
+        shoesProductTwo.Materials = new List<ProductMaterial>
+        {
+            CreateProductMaterialEntity(shirtsProductTwo, cottonMaterial, 0.8),
+            CreateProductMaterialEntity(shirtsProductTwo, rubberMaterial, 0.2),
+        };
+
+        shoesProducts.Add(shoesProductTwo);
+
+        // Shoes product three
+        var shoesProductThree = new Product
+        {
+            Id = Guid.NewGuid(),
+            Category = shoesCategory,
+            Name = "Women's Casual Sneakers",
+            Description = "Stylish and comfortable casual sneakers for women.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Season = Season.DemiSeason,
+            Discount = 0.3,
+            MainMaterial = cottonMaterial,
+            CollectionYear = 2022,
+            Gender = Gender.Female,
+            Occasion = streetOccasion,
+        };
+
+        shoesProductThree.Images = new List<ProductImage>
+        {
+            CreateProductImageEntity(shirtsProductThree, black, new List<string>
+            {
+                "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/397549/01/sv01/fnd/UKR/w/1000/h/1000/fmt/png",
+
+            })
+        };
+
+        shoesProductThree.Materials = new List<ProductMaterial>
+        {
+            CreateProductMaterialEntity(shirtsProductThree, suedeMaterial, 0.8),
+            CreateProductMaterialEntity(shirtsProductThree, rubberMaterial, 0.2),
+        };
+
+        shoesProductThree.Stocks = GetProductStocksForSeeding(shoesProductThree, colors: new []{black}, 140);
+        
+        shoesProducts.Add(shoesProductThree);
+
+        // Products with category "Pants"
+        var pantsProducts = new List<Product>();
+        
+        // Pants product one
+        var pantsProductOne = new Product
+        {
+            Id = Guid.NewGuid(),
+            Category = pantsCategory,
+            Name = "Men's Casual Pants",
+            Description = "Comfortable and stylish pants for everyday wear.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Season = Season.DemiSeason,
+            MainMaterial = cottonMaterial,
+            CollectionYear = 2022,
+            Gender = Gender.Male,
+            Occasion = casualOccasion,
+            SizeChartImageUrl = "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61q0QLQ1EFL._AC_SX342_.jpg"
+        };
+
+        pantsProductOne.Images = new List<ProductImage>
+        {
+            CreateProductImageEntity(pantsProductOne, black,  new List<string>
+            {
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/81uCZWI6cUL._AC_SY445_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/71UQKwNyieL._AC_SY445_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/71obafsgPfL._AC_SY445_.jpg",
+            }),
+            CreateProductImageEntity(pantsProductOne, khaki,  new List<string>
+            {
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/81uoaWwCjuL._AC_SY445_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/81j44iOBYCL._AC_SY445_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/712wBPy9LkL._AC_SY445_.jpg",
+            }),
 
         };
-            
-            
-        foreach (var product in shirtsProducts)
+
+        pantsProductOne.Materials = new List<ProductMaterial>
         {
-            product.Stocks = GetProductStocksForSeeding(product);
-        }
-        return shirtsProducts.Concat(shoesProducts);
+            CreateProductMaterialEntity(pantsProductOne, woolMaterial, 1)
+            
+        };
+
+        pantsProductOne.Stocks = GetProductStocksForSeeding(pantsProductOne, colors: new []{ black, khaki}, 50);
+
+        pantsProducts.Add(pantsProductOne);
+
+        // Continue adding other products and categories...
+
+        // Products with category "Accessories"
+        var accessoriesProducts = new List<Product>();
+
+        // Accessories product one
+        var accessoriesProductOne = new Product
+        {
+            Id = Guid.NewGuid(),
+            Category = accessoriesCategory,
+            Name = "Leather Belt",
+            Description = "Stylish leather belt for men and women.",
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Season = Season.All,
+            MainMaterial = leatherMaterial,
+            CollectionYear = 2022,
+            Gender = Gender.Unisex,
+            Occasion = businessOccasion,
+        };
+
+        accessoriesProductOne.Images = new List<ProductImage>
+        {
+            CreateProductImageEntity(accessoriesProductOne, brown, new List<string>
+            {
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61u1DkV6u8L._AC_SX679_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61nfdjkLWwL._AC_SX385_.jpg",
+                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61uBafwoEGL._AC_SX342_.jpg",
+            })
+        };
+
+        accessoriesProductOne.Materials = new List<ProductMaterial>
+        {
+            CreateProductMaterialEntity(accessoriesProductOne, leatherMaterial, 1)
+        };
+
+        accessoriesProductOne.Stocks = GetProductStocksForSeeding(accessoriesProductOne, colors: new []{brown} , 100, new [] { "32", "34", "36", "38"});
+        
+        accessoriesProducts.Add(accessoriesProductOne);
+        await context.Products.AddRangeAsync(shirtsProducts.Concat(shoesProducts));
     }
     private static async Task EnsureInitialProductsAreCreated(ProductDbContext context)
     {
@@ -232,9 +563,7 @@ public static class InitDb
         if (!context.Products.Any())
         {
             // Add 10 products with new Color objects
-            var products = GetInitialProducts();        
-    
-            await context.Products.AddRangeAsync(products);
+            await SeedInitialProducts(context);        
         }
 
         // Save changes to persist the new products and their associated colors

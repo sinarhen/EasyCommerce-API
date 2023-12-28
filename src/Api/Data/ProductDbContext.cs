@@ -15,7 +15,14 @@ public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string
     public DbSet<Category> Categories { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<ProductStock> ProductStocks { get; set; }
+    public DbSet<Color> Colors { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<ProductMaterial> ProductMaterials { get; set; }
+    public DbSet<Material> Materials { get; set; }
+    public DbSet<Review> Reviews { get; set; }
+    public DbSet<Occasion> Occasions { get; set; }
     public DbSet<Cart> Carts { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

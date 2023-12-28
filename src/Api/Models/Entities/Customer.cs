@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace ECommerce.Models.Entities;
 
@@ -11,7 +10,7 @@ public class Customer : IdentityUser
     public string City { get; set; }
     public string Country { get; set; }
     public string PostalCode { get; set; }
-    
+
     // Navigation properties
     public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<Cart> Carts { get; set; } = new List<Cart>();
