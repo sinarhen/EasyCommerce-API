@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Ecommerce.RequestHelpers;
 
 public class MappingProfiles: Profile
 {
     public MappingProfiles()
+    {
+        MapProductProfiles();
+    }
+    private void MapProductProfiles()
     {
         CreateMap<RegisterDto, Customer>();
         CreateMap<LoginDto, Customer>();
@@ -39,10 +44,14 @@ public class MappingProfiles: Profile
                     },
                     Availability = g.Select(ps => new AvailabilityDto
                     {
-                        Size = ps.Size.Name, // assuming Size has a Name property
+                        // Get value from SizeEnum or return default value
+                        Size = ps.Size.Name,
+                        SizeValue = ps.Size.Value,
                         Quantity = ps.Stock,
                         Price = ps.Price
-                    }).ToList(),
+                    })
+                    .OrderBy(availability => availability.SizeValue)
+                    .ToList(),
                     ImageUrls = dest.Images
                     .Where(i => i.ColorId == g.Key)
                     .SelectMany(i => i.ImageUrls)
@@ -55,6 +64,8 @@ public class MappingProfiles: Profile
                     Name = pm.Material.Name,
                     Percentage = pm.Percentage
                 })))
-            ;
+                ;
+            
+
     }
 }

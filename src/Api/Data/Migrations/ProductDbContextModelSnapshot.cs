@@ -446,10 +446,18 @@ namespace ECommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
+                    b.Property<int>("Value")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Sizes");
                 });
@@ -724,6 +732,17 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ECommerce.Models.Entities.Size", b =>
+                {
+                    b.HasOne("ECommerce.Models.Entities.Category", "Category")
+                        .WithMany("Sizes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("ECommerce.Models.Entities.CustomerRole", null)
@@ -778,6 +797,8 @@ namespace ECommerce.Data.Migrations
             modelBuilder.Entity("ECommerce.Models.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+
+                    b.Navigation("Sizes");
 
                     b.Navigation("SubCategories");
                 });

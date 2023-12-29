@@ -43,27 +43,27 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetProduct(Guid id)
+    public ActionResult GetProduct(Guid id)
     {
         return Ok();
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProduct(Product product)
+    public IActionResult CreateProduct(Product product)
     {
         // TODO: Implement
         return Ok();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(Guid id, Product product)
+    public IActionResult UpdateProduct(Guid id, Product product)
     {
         // TODO: Implement
         return Ok();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(Guid id)
+    public IActionResult DeleteProduct(Guid id)
     {
         // TODO: Implement
         return Ok();

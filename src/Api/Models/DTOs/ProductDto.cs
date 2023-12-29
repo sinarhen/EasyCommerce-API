@@ -47,6 +47,7 @@ public class StockDto
 public class AvailabilityDto
 {
     public string Size { get; set; }
+    public int SizeValue { get; set; }
     public int Quantity { get; set; }
     public decimal Price { get; set; }
 }

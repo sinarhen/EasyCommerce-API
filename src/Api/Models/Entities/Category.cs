@@ -23,6 +23,10 @@ public class Category
     [ForeignKey("ParentCategoryId")]
     public Category ParentCategory { get; set; }
     
+    [InverseProperty("ParentCategory")]    
     public ICollection<Category> SubCategories { get; set; } = new List<Category>(); 
     public ICollection<Product> Products { get; set; } = new List<Product>();
+
+    public ICollection<Size> Sizes { get; set; } = new List<Size>();
+
 }

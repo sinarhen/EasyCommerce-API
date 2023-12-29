@@ -15,7 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var envFile = builder.Environment.IsDevelopment() ? ".env.local" : ".env";
+var envFile = builder.Environment.IsDevelopment() ? ".env.dev" : ".env";
 Env.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), envFile));
 
 

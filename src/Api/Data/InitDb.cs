@@ -215,9 +215,9 @@ public static class InitDb
         product.Stocks = GetProductStocksForSeeding(product, colors, price, sizes);
     }
 
-    private static IReadOnlyCollection<Size> CreateSizeEntitiesFromList(IReadOnlyCollection<string> sizes)
+    private static IReadOnlyCollection<Size> CreateSizeEntitiesFromList(IReadOnlyDictionary<string, int> sizes, Category category)
     {
-        return sizes.Select(size => new Size { Name = size }).ToList();
+        return sizes.Select(size => new Size { Name = size.Key, Value = size.Value, Category = category }).ToList();
     }
     
     private static async Task SeedInitialProducts(ProductDbContext context)
@@ -285,21 +285,61 @@ public static class InitDb
         
         var products = new List<Product>();
         // Specific Sizes for each category
-        var shoesSizes = CreateSizeEntitiesFromList(new []{"36", "37", "38", "39", "40", "41", "42", "43", "44", "45"});
-        var pantsSizes = CreateSizeEntitiesFromList(new [] { "32", "34", "36", "38", "40", "42", "44", "46", "48", "50" });
-        var accessoriesSizes = CreateSizeEntitiesFromList(new [] { "32", "34", "36", "38", "40", "42", "44", "46", "48", "50" });
-        var shirtsSizes = CreateSizeEntitiesFromList(new [] { "XS", "S", "M", "L", "XL", "XXL"});
-        
-        var allSizes = new List<Size>();
 
-        // Specific Sizes for each category
-        allSizes.AddRange(shoesSizes);
-        allSizes.AddRange(pantsSizes);
-        allSizes.AddRange(accessoriesSizes);
-        allSizes.AddRange(shirtsSizes);
 
+        var shirtsSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
+            {"XS", -6},
+            {"S", -5},
+            {"M", -4},
+            {"L", -3},
+            {"XL", -2},
+            {"XXL", -1},
+        }, shirtsCategory);
+
+        var shoesSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
+            {"36", 36},
+            {"37", 37},
+            {"38", 38},
+            {"39", 39},
+            {"40", 40},
+            {"41", 41},
+            {"42", 42},
+            {"43", 43},
+            {"44", 44},
+            {"45", 45},
+            {"46", 46},
+            {"47", 47},
+        }, shoesCategory);
+
+        var pantsSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
+            {"XS", 28},
+            {"S", 30},
+            {"M", 32},
+            {"L", 34},
+            {"XL", 36},
+            {"XXL", 38},
+        }, pantsCategory);
+
+        var accessoriesSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
+            {"XS", 28},
+            {"S", 30},
+            {"M", 32},
+            {"L", 34},
+            {"XL", 36},
+            {"XXL", 38},
+        }, accessoriesCategory);
+
+        var beltsSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
+            {"XS", 28},
+            {"S", 30},
+            {"M", 32},
+            {"L", 34},
+            {"XL", 36},
+            {"XXL", 38},
+        }, accessoriesCategory);
         // Add all sizes to the db
-        await context.Sizes.AddRangeAsync(allSizes);
+        await context.Sizes.AddRangeAsync(shirtsSizes);
+        await context.Sizes.AddRangeAsync(shoesSizes);
         
         // Products with category "Shirts"
 
@@ -383,7 +423,7 @@ public static class InitDb
             "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61uBafwoEGL._AC_SX342_.jpg",
         });
         AddMaterialsToProduct(accessoriesProductOne, leatherMaterial, 1);
-        AddStocksToProduct(accessoriesProductOne, new[] { brown }, 100, accessoriesSizes);
+        AddStocksToProduct(accessoriesProductOne, new[] { brown }, 100, beltsSizes);
         accessoriesProducts.Add(accessoriesProductOne);
 
         
