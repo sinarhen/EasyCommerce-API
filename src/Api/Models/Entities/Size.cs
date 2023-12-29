@@ -1,12 +1,14 @@
-﻿namespace ECommerce.Models.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
-public enum Size
+namespace ECommerce.Models.Entities;
+
+public class Size
 {
-    XXS,
-    XS,
-    S,
-    M,
-    L,
-    XL,
-    XXL
+    [Key]
+    public Guid Id { get; set; }
+    
+    public string Name { get; set; }
+    
+    // Navigation properties
+    public ICollection<Product> Stocks { get; set; } = new List<Product>();
 }

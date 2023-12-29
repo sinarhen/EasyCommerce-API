@@ -119,6 +119,18 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Sizes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sizes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -240,7 +252,8 @@ namespace ECommerce.Data.Migrations
                     MainMaterialId = table.Column<Guid>(type: "uuid", nullable: false),
                     CollectionYear = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SizeId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -261,6 +274,11 @@ namespace ECommerce.Data.Migrations
                         name: "FK_Products_Occasions_OccasionId",
                         column: x => x.OccasionId,
                         principalTable: "Occasions",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Products_Sizes_SizeId",
+                        column: x => x.SizeId,
+                        principalTable: "Sizes",
                         principalColumn: "Id");
                 });
 
@@ -382,16 +400,16 @@ namespace ECommerce.Data.Migrations
                 name: "ProductStocks",
                 columns: table => new
                 {
+                    ProductStockId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     ColorId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Size = table.Column<int>(type: "integer", nullable: true),
+                    SizeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    Stock = table.Column<int>(type: "integer", nullable: false),
-                    CustomSize = table.Column<string>(type: "text", nullable: true)
+                    Stock = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductStocks", x => new { x.ProductId, x.ColorId });
+                    table.PrimaryKey("PK_ProductStocks", x => x.ProductStockId);
                     table.ForeignKey(
                         name: "FK_ProductStocks_Colors_ColorId",
                         column: x => x.ColorId,
@@ -402,6 +420,12 @@ namespace ECommerce.Data.Migrations
                         name: "FK_ProductStocks_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductStocks_Sizes_SizeId",
+                        column: x => x.SizeId,
+                        principalTable: "Sizes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -523,9 +547,24 @@ namespace ECommerce.Data.Migrations
                 column: "OccasionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_SizeId",
+                table: "Products",
+                column: "SizeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductStocks_ColorId",
                 table: "ProductStocks",
                 column: "ColorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductStocks_ProductId",
+                table: "ProductStocks",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductStocks_SizeId",
+                table: "ProductStocks",
+                column: "SizeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_CustomerId",
@@ -594,6 +633,9 @@ namespace ECommerce.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Occasions");
+
+            migrationBuilder.DropTable(
+                name: "Sizes");
         }
     }
 }

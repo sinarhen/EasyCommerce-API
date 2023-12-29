@@ -16,6 +16,7 @@ public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string
     public DbSet<Order> Orders { get; set; }
     public DbSet<ProductStock> ProductStocks { get; set; }
     public DbSet<Color> Colors { get; set; }
+    public DbSet<Size> Sizes { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
     public DbSet<ProductMaterial> ProductMaterials { get; set; }
     public DbSet<Material> Materials { get; set; }

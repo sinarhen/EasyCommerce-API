@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20231228233028_Initial")]
+    [Migration("20231229110323_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -308,6 +308,9 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("SizeChartImageUrl")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("SizeId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -318,6 +321,8 @@ namespace ECommerce.Data.Migrations
                     b.HasIndex("MainMaterialId");
 
                     b.HasIndex("OccasionId");
+
+                    b.HasIndex("SizeId");
 
                     b.ToTable("Products");
                 });
@@ -372,27 +377,32 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.ProductStock", b =>
                 {
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("ProductStockId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ColorId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CustomSize")
-                        .HasColumnType("text");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("Size")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SizeId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
 
-                    b.HasKey("ProductId", "ColorId");
+                    b.HasKey("ProductStockId");
 
                     b.HasIndex("ColorId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SizeId");
 
                     b.ToTable("ProductStocks");
                 });
@@ -431,6 +441,20 @@ namespace ECommerce.Data.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.Size", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sizes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -610,6 +634,10 @@ namespace ECommerce.Data.Migrations
                         .WithMany("Products")
                         .HasForeignKey("OccasionId");
 
+                    b.HasOne("ECommerce.Models.Entities.Size", null)
+                        .WithMany("Stocks")
+                        .HasForeignKey("SizeId");
+
                     b.Navigation("Category");
 
                     b.Navigation("MainMaterial");
@@ -669,9 +697,17 @@ namespace ECommerce.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ECommerce.Models.Entities.Size", "Size")
+                        .WithMany()
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Color");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Review", b =>
@@ -777,6 +813,11 @@ namespace ECommerce.Data.Migrations
 
                     b.Navigation("Materials");
 
+                    b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.Size", b =>
+                {
                     b.Navigation("Stocks");
                 });
 #pragma warning restore 612, 618
