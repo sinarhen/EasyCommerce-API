@@ -14,7 +14,7 @@ public class ProductImage
     [Key]
     public Guid ColorId { get; set; }
     
-    public List<string> ImagesUrl { get; set; }
+    public List<string> ImageUrls { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

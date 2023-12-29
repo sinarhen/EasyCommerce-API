@@ -16,7 +16,7 @@ public class Review
     public string CustomerId { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-    public int Rating { get; set; } // 1 - 5
+    public Rating Rating { get; set; } // 1 - 5
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     
@@ -25,4 +25,14 @@ public class Review
     public Product Product { get; set; }
     [ForeignKey("CustomerId")]
     public Customer Customer { get; set; }
+}
+
+public enum Rating
+{
+    NoRating = 0,
+    Terrible = 1,
+    Bad = 2,
+    Average = 3,
+    Good = 4,
+    Excellent = 5
 }

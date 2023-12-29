@@ -117,7 +117,7 @@ public static class InitDb
                         Product = product,
                         Color = color,
                         Size = size,
-                        Price = Random.Shared.Next(price -5, price + 5),
+                        Price = Random.Shared.Next(price -5, price + 5) - (decimal)0.01,
                         Stock = 10,
                     }
                 );
@@ -132,7 +132,7 @@ public static class InitDb
         {
             Product = product,
             Color = color,
-            ImagesUrl = imagesUrl,
+            ImageUrls = imagesUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -202,17 +202,13 @@ public static class InitDb
     }
     private static void AddImagesToProduct(Product product, Color color, List<string> imagesUrl)
     {
-        product.Images = new List<ProductImage>
-        {
+        product.Images.Add(
             CreateProductImageEntity(product, color, imagesUrl)
-        };
+        );
     }
     private static void AddMaterialsToProduct(Product product, Material material, double percentage)
     {
-        product.Materials = new List<ProductMaterial>
-        {
-            CreateProductMaterialEntity(product, material, percentage)
-        };
+        product.Materials.Add(CreateProductMaterialEntity(product, material, percentage));
     }
     private static void AddStocksToProduct(Product product, IEnumerable<Color> colors, int price, IReadOnlyCollection<Size> sizes)
     {

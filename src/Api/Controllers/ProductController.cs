@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using ECommerce.Config;
 using Ecommerce.Data;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
+using Ecommerce.RequestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,12 +22,24 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ProductDto>>> GetProducts()
+    public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] SearchParams searchParams)
     {
         var products = await _dbContext.Products
-            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+            .Include(p => p.Category)
+            .Include(p => p.Occasion)
+            .Include(p => p.MainMaterial)
+            .Include(p => p.Stocks)
+            .ThenInclude(s => s.Color)
+            .Include(p => p.Stocks)
+            .ThenInclude(s => s.Size)
+            .Include(p => p.Images)
+            .Include(p => p.Materials)
+            .ThenInclude(m => m.Material)
             .ToListAsync();
-        return Ok(products);
+        
+        var productDto = _mapper.Map<List<ProductDto>>(products);
+        
+        return Ok(productDto);
     }
 
     [HttpGet("{id}")]

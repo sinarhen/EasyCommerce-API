@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
@@ -31,5 +29,6 @@ public class ProductStock
 
     [ForeignKey("SizeId")]
     public Size Size { get; set; }
+    
 
 }

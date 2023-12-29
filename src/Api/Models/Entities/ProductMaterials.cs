@@ -7,6 +7,7 @@ namespace ECommerce.Models.Entities;
 [PrimaryKey("ProductId", "MaterialId")]
 public class ProductMaterial
 {
+    
     [Key]
     public Guid ProductId { get; set; }
 

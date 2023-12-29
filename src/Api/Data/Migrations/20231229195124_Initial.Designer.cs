@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20231229110323_Initial")]
+    [Migration("20231229195124_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -338,7 +338,7 @@ namespace ECommerce.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<List<string>>("ImagesUrl")
+                    b.Property<List<string>>("ImageUrls")
                         .HasColumnType("text[]");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -604,7 +604,7 @@ namespace ECommerce.Data.Migrations
                         .HasForeignKey("CustomerId");
 
                     b.HasOne("ECommerce.Models.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -717,7 +717,7 @@ namespace ECommerce.Data.Migrations
                         .HasForeignKey("CustomerId");
 
                     b.HasOne("ECommerce.Models.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -812,6 +812,10 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Materials");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("Stocks");
                 });

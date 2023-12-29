@@ -1,23 +1,52 @@
-﻿namespace ECommerce.Models.DTOs;
+﻿using ECommerce.Models.Entities;
+
+namespace ECommerce.Models.DTOs;
 
 public class ProductDto
 {
     public Guid Id { get; set; }
-    
+    public Guid CategoryId { get; set; }
     public string CategoryName { get; set; }
-    
     public string Name { get; set; }
-
     public string Description { get; set; }
+    public double? Discount { get; set; }
+    public string OccasionName { get; set; }
+    public int? CollectionYear { get; set; }
+    public string MainMaterialName { get; set; }
+    public string Gender { get; set; }
+    public string Season { get; set; }
 
-    public string Price { get; set; }
-
-    
+    public int OrdersCount { get; set; }
+    public int OrdersCountLastMonth { get; set; }
+    public int ReviewsCount { get; set; }
+    public double AvgRating { get; set; }
+    public bool IsNew { get; set; }
+    public bool IsOnSale { get; set; }
+    public bool IsBestseller { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     
-    public string ImageUrl { get; set; }
+    public List<MaterialDto> Materials { get; set; }
+    public List<StockDto> Stocks { get; set; }
+}
 
-    public DateTime UpdatedAt { get; set; }
+public class MaterialDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public double Percentage { get; set; }
+}
 
-    public Dictionary<string, int> Quantities { get; set; } = new Dictionary<string, int>();
+public class StockDto
+{
+    public ColorDto Color { get; set; }
+    public List<AvailabilityDto> Availability { get; set; }
+    public List<string> ImageUrls { get; set; }
+}
+
+public class AvailabilityDto
+{
+    public string Size { get; set; }
+    public int Quantity { get; set; }
+    public decimal Price { get; set; }
 }
