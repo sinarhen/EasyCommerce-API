@@ -10,7 +10,7 @@ public record JwtSecrets(
     string Audience
 );
 
-public class JwtService
+public partial class JwtService
 {
     private readonly JwtSecrets _jwtSecrets;
 
@@ -55,7 +55,7 @@ public class JwtService
         return tokenHandler.WriteToken(token);
     }
 
-    public ClaimsPrincipal ValidateToken(string token)
+    public SimplePrincipal ValidateToken(string token)
     {
         try
         {
@@ -72,7 +72,14 @@ public class JwtService
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.ValidateToken(token, validations, out var _);
+            var principal = tokenHandler.ValidateToken(token, validations, out var _);
+
+            var simplePrincipal = new SimplePrincipal
+            {
+                Claims = principal.Claims.Select(c => new ClaimDto { Type = c.Type, Value = c.Value })
+            };
+
+            return simplePrincipal;
         }
         catch
         {

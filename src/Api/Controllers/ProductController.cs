@@ -25,6 +25,7 @@ public class ProductController : ControllerBase
     public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] SearchParams searchParams)
     {
         var products = await _dbContext.Products
+            .AsSplitQuery()
             .Include(p => p.Category)
             .Include(p => p.Occasion)
             .Include(p => p.MainMaterial)
@@ -35,9 +36,49 @@ public class ProductController : ControllerBase
             .Include(p => p.Images)
             .Include(p => p.Materials)
             .ThenInclude(m => m.Material)
+            .Include(product => product.Reviews)
+            .Include(product => product.Orders)
             .ToListAsync();
         
-        var productDto = _mapper.Map<List<ProductDto>>(products);
+        
+        // TODO: ORDER BY 
+        var query = searchParams.OrderBy switch
+        {
+            "price" => products.OrderBy(p => p.Stocks.Min(s => s.Price)),
+            "price_desc" => products.OrderByDescending(p => p.Stocks.Min(s => s.Price)),
+            "name" => products.OrderBy(p => p.Name),
+            "name_desc" => products.OrderByDescending(p => p.Name),
+            "newest" => products.OrderByDescending(p => p.CreatedAt),
+            "oldest" => products.OrderBy(p => p.CreatedAt),
+            "bestseller" => products.OrderBy(p => p.Orders.Count),
+            _ => products.OrderBy(p => p.Name)
+        };
+
+        // TODO: FILTER BY
+        var filteredQuery = searchParams.FilterBy switch
+        {
+            "in_stock" => query.Where(p => p.Stocks.Any(s => s.Stock > 0)),
+            "discount" => query.Where(p => p.Discount > 0),
+            "out_of_stock" => query.Where(p => p.Stocks.All(s => s.Stock == 0)),
+            "new" => query.Where(p => p.CreatedAt > DateTime.Now.AddDays(-7)),
+            _ => query,
+        };
+
+        
+        if (!string.IsNullOrEmpty(searchParams.Category))
+        {
+            var categories = searchParams.Category.ToLower().Split(',');
+            filteredQuery = filteredQuery.Where(p => categories.Contains(p.Category.Name.ToLower()));
+        }
+        // TODO: PAGINATION
+        if (searchParams.PageSize.HasValue && searchParams.PageNumber.HasValue)
+        {
+            filteredQuery = filteredQuery
+                .Skip(searchParams.PageSize.Value * (searchParams.PageNumber.Value - 1))
+                .Take(searchParams.PageSize.Value);
+        }
+        var productDto = _mapper.Map<List<ProductDto>>(filteredQuery);
+
         
         return Ok(productDto);
     }

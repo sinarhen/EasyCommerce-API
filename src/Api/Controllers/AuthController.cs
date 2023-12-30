@@ -106,7 +106,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("validate/{token}")]
-    public ActionResult<ClaimsPrincipal> ValidateToken(string token)
+    public ActionResult<SimplePrincipal> ValidateToken(string token)
     {
         var principal = _jwtService.ValidateToken(token);
         if (principal == null)
