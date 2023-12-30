@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class PCTriggerApproach : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -453,7 +453,6 @@ namespace ECommerce.Data.Migrations
                 name: "ProductStocks",
                 columns: table => new
                 {
-                    ProductStockId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     ColorId = table.Column<Guid>(type: "uuid", nullable: false),
                     SizeId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -462,7 +461,7 @@ namespace ECommerce.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductStocks", x => x.ProductStockId);
+                    table.PrimaryKey("PK_ProductStocks", x => new { x.ProductId, x.ColorId, x.SizeId });
                     table.ForeignKey(
                         name: "FK_ProductStocks_Colors_ColorId",
                         column: x => x.ColorId,
@@ -620,11 +619,6 @@ namespace ECommerce.Data.Migrations
                 column: "ColorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductStocks_ProductId",
-                table: "ProductStocks",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductStocks_SizeId",
                 table: "ProductStocks",
                 column: "SizeId");
@@ -643,7 +637,6 @@ namespace ECommerce.Data.Migrations
                 name: "IX_Sizes_CategoryId",
                 table: "Sizes",
                 column: "CategoryId");
-            
         }
 
         /// <inheritdoc />

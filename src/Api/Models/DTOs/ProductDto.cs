@@ -20,6 +20,7 @@ public class ProductDto
     public int OrdersCountLastMonth { get; set; }
     public int ReviewsCount { get; set; }
     public double AvgRating { get; set; }
+    public decimal MinPrice { get; set; }
     public bool IsNew { get; set; }
     public bool IsOnSale { get; set; }
     public bool IsBestseller { get; set; }

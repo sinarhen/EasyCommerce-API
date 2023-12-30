@@ -5,16 +5,16 @@ namespace ECommerce.Models.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[PrimaryKey("ProductStockId")]
+[PrimaryKey("ProductId", "ColorId", "SizeId")]
 public class ProductStock
 {
     [Key]
-    public Guid ProductStockId { get; set; }
-
     public Guid ProductId { get; set; }
 
+    [Key]
     public Guid ColorId { get; set; }
 
+    [Key]
     public Guid SizeId { get; set; }
 
     public decimal Price { get; set; }

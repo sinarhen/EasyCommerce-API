@@ -414,30 +414,24 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.ProductStock", b =>
                 {
-                    b.Property<Guid>("ProductStockId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ColorId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("SizeId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
 
-                    b.HasKey("ProductStockId");
+                    b.HasKey("ProductId", "ColorId", "SizeId");
 
                     b.HasIndex("ColorId");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("SizeId");
 

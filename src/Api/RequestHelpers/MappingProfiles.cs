@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Ecommerce.RequestHelpers;
 
@@ -70,8 +69,8 @@ public class MappingProfiles: Profile
                     Name = pm.Material.Name,
                     Percentage = pm.Percentage
                 })))
-                ;
-            
+            .ForMember(dest => dest.MinPrice, 
+                opt => opt.MapFrom(src => src.Stocks.Any() ? src.Stocks.Min(s => s.Price) : 0));
 
     }
 }

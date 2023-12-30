@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20231230221239_PCTriggerApproach")]
-    partial class PCTriggerApproach
+    [Migration("20231230230406_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -417,30 +417,24 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.ProductStock", b =>
                 {
-                    b.Property<Guid>("ProductStockId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ColorId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("SizeId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
 
-                    b.HasKey("ProductStockId");
+                    b.HasKey("ProductId", "ColorId", "SizeId");
 
                     b.HasIndex("ColorId");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("SizeId");
 

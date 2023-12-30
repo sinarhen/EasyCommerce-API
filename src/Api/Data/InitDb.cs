@@ -113,7 +113,6 @@ public static class InitDb
             {
                 list.Add(new ProductStock
                     {
-                        ProductStockId = Guid.NewGuid(),
                         Product = product,
                         Color = color,
                         Size = size,
