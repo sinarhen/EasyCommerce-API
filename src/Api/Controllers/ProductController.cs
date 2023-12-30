@@ -64,15 +64,7 @@ public class ProductController : ControllerBase
         
         if (!string.IsNullOrEmpty(searchParams.Category))
         {
-            var categories = searchParams.Category.ToLower().Split(',').ToList();
-            //
-            // foreach (var category in categories.ToList())
-            // {
-            //     categories.AddRange(GetAllChildCategories(category));
-            // }
-            //
-            // filteredQuery = filteredQuery.Where(p => categories.Contains(p.Category.Name.ToLower()));
-            filteredQuery = filteredQuery.Where(p => p.Categories.Any(c => categories.Contains(c.Category.Name.ToLower())));
+            filteredQuery.Where(p => p.Categories.Any(pc => string.Equals(pc.Category.Name, searchParams.Category, StringComparison.CurrentCultureIgnoreCase)));
         }
         
         // TODO: PAGINATION
@@ -83,8 +75,6 @@ public class ProductController : ControllerBase
                 .Take(searchParams.PageSize.Value);
         }
         var productDto = _mapper.Map<List<ProductDto>>(filteredQuery);
-
-        
         return Ok(productDto);
     }
     
