@@ -10,9 +10,10 @@ public class Product
     [Key]
     public Guid Id { get; set; }
     
-    [Key]
-    public Guid CategoryId { get; set; }
+    // [Key]
+    // public Guid CategoryId { get; set; }
 
+    
     public string Name { get; set; }
 
     public string Description { get; set; }
@@ -37,8 +38,8 @@ public class Product
     public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
-    [ForeignKey("CategoryId")]
-    public Category Category { get; set; }
+    // [ForeignKey("CategoryId")]
+    // public Category Category { get; set; }
     [ForeignKey("OccasionId")]
     public Occasion Occasion { get; set; }
 
@@ -50,6 +51,7 @@ public class Product
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
+    public ICollection<ProductCategory> Categories { get; set; } = new List<ProductCategory>();
 }
 
 public enum Gender

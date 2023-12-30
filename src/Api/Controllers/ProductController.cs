@@ -26,16 +26,13 @@ public class ProductController : ControllerBase
     {
         var products = await _dbContext.Products
             .AsSplitQuery()
-            .Include(p => p.Category)
+            .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
             .Include(p => p.Occasion)
             .Include(p => p.MainMaterial)
-            .Include(p => p.Stocks)
-            .ThenInclude(s => s.Color)
-            .Include(p => p.Stocks)
-            .ThenInclude(s => s.Size)
+            .Include(p => p.Stocks).ThenInclude(s => s.Color)
+            .Include(p => p.Stocks).ThenInclude(s => s.Size)
             .Include(p => p.Images)
-            .Include(p => p.Materials)
-            .ThenInclude(m => m.Material)
+            .Include(p => p.Materials).ThenInclude(m => m.Material)
             .Include(product => product.Reviews)
             .Include(product => product.Orders)
             .ToListAsync();
@@ -67,9 +64,17 @@ public class ProductController : ControllerBase
         
         if (!string.IsNullOrEmpty(searchParams.Category))
         {
-            var categories = searchParams.Category.ToLower().Split(',');
-            filteredQuery = filteredQuery.Where(p => categories.Contains(p.Category.Name.ToLower()));
+            var categories = searchParams.Category.ToLower().Split(',').ToList();
+            //
+            // foreach (var category in categories.ToList())
+            // {
+            //     categories.AddRange(GetAllChildCategories(category));
+            // }
+            //
+            // filteredQuery = filteredQuery.Where(p => categories.Contains(p.Category.Name.ToLower()));
+            filteredQuery = filteredQuery.Where(p => p.Categories.Any(c => categories.Contains(c.Category.Name.ToLower())));
         }
+        
         // TODO: PAGINATION
         if (searchParams.PageSize.HasValue && searchParams.PageNumber.HasValue)
         {
@@ -81,6 +86,21 @@ public class ProductController : ControllerBase
 
         
         return Ok(productDto);
+    }
+    
+    private IEnumerable<string> GetAllChildCategories(string parentCategory)
+    {
+        var childCategories = _dbContext.Categories
+            .Where(c => c.ParentCategory.Name.ToLower() == parentCategory)
+        .Select(c => c.Name.ToLower())
+            .ToList();
+
+        foreach (var childCategory in childCategories.ToList())
+        {
+            childCategories.AddRange(GetAllChildCategories(childCategory));
+        }
+
+        return childCategories;
     }
 
     [HttpGet("{id}")]

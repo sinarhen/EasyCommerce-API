@@ -16,8 +16,14 @@ public class MappingProfiles: Profile
         CreateMap<RegisterDto, Customer>();
         CreateMap<LoginDto, Customer>();
         CreateMap<Product, ProductDto>()
-            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(dest => dest.Category.Name))
-            .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(dest => dest.Category.Id))
+            .ForMember(dest => dest.Categories, opt => opt.MapFrom(dest => dest.Categories
+                .Select(pc => new CategoryDto
+                {
+                    Id = pc.Category.Id,
+                    Name = pc.Category.Name,
+                    Order = pc.Order
+                })
+                .OrderBy(pc => pc.Order)))
             .ForMember(dest => dest.OccasionName, opt => opt.MapFrom(dest => dest.Occasion.Name))
             .ForMember(dest => dest.MainMaterialName, opt => opt.MapFrom(dest => dest.MainMaterial.Name)) 
             .ForMember(dest => dest.OrdersCount, opt => opt.MapFrom(x => x.Orders.Count))

@@ -5,8 +5,8 @@ namespace ECommerce.Models.DTOs;
 public class ProductDto
 {
     public Guid Id { get; set; }
-    public Guid CategoryId { get; set; }
-    public string CategoryName { get; set; }
+    public CategoryDto[] Categories { get; set; }
+    
     public string Name { get; set; }
     public string Description { get; set; }
     public double? Discount { get; set; }
@@ -28,6 +28,14 @@ public class ProductDto
     
     public List<MaterialDto> Materials { get; set; }
     public List<StockDto> Stocks { get; set; }
+}
+
+public class CategoryDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    
+    public int Order { get; set; }
 }
 
 public class MaterialDto

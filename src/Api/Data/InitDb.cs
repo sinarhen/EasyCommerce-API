@@ -183,12 +183,12 @@ public static class InitDb
         };
     }
 
-    private static Product CreateProductEntity(Category category, string name, string description, Material mainMaterial, Gender gender, Occasion occasion, Season season, int collectionYear)
+    private static Product CreateProductEntity(string name, string description,
+        Material mainMaterial, Gender gender, Occasion occasion, Season season, int collectionYear)
     {
         return new Product
         {
             Id = Guid.NewGuid(),
-            Category = category,
             Name = name,
             Description = description,
             CreatedAt = DateTime.UtcNow,
@@ -210,6 +210,10 @@ public static class InitDb
     {
         product.Materials.Add(CreateProductMaterialEntity(product, material, percentage));
     }
+    private static void AddCategoriesToProduct(Product product, IEnumerable<Category> categories)
+    {
+        product.Categories = CreateProductCategoryEntitiesFromList(categories, product);
+    }
     private static void AddStocksToProduct(Product product, IEnumerable<Color> colors, int price, IReadOnlyCollection<Size> sizes)
     {
         product.Stocks = GetProductStocksForSeeding(product, colors, price, sizes);
@@ -218,6 +222,11 @@ public static class InitDb
     private static IReadOnlyCollection<Size> CreateSizeEntitiesFromList(IReadOnlyDictionary<string, int> sizes, Category category)
     {
         return sizes.Select(size => new Size { Name = size.Key, Value = size.Value, Category = category }).ToList();
+    }
+    
+    private static ICollection<ProductCategory> CreateProductCategoryEntitiesFromList(IEnumerable<Category> categories, Product product)
+    {
+        return categories.Select((category, index) => new ProductCategory { Category = category, Product = product, Order = index + 1}).ToList();
     }
     
     private static async Task SeedInitialProducts(ProductDbContext context)
@@ -342,29 +351,29 @@ public static class InitDb
         await context.Sizes.AddRangeAsync(shoesSizes);
         
         // Products with category "Shirts"
-
-        // Shirts product one
-        var shirtsProductOne = CreateProductEntity(tShirtsSubcategory, "Men's Casual Shirt", "A comfortable and stylish shirt for everyday wear.", cottonMaterial, Gender.Unisex, casualOccasion, Season.Summer, 2021);
+        var shirtsProductOne = CreateProductEntity( "Men's Casual Shirt", "A comfortable and stylish shirt for everyday wear.", cottonMaterial, Gender.Unisex, casualOccasion, Season.Summer, 2021);
         AddImagesToProduct(shirtsProductOne, white, new List<string> { "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg" });
         AddMaterialsToProduct(shirtsProductOne, cottonMaterial, 0.9);
         AddMaterialsToProduct(shirtsProductOne, polyesterMaterial, 0.1);
         AddStocksToProduct(shirtsProductOne, new[] { white, black }, 30, shirtsSizes);
-        tShirtsSubcategory.Products.Add(shirtsProductOne);
+        AddCategoriesToProduct(shirtsProductOne, new[] { shirtsCategory, tShirtsSubcategory });
         
         products.Add(shirtsProductOne);
-        var shirtsProductTwo = CreateProductEntity(blouseSubcategory, "Women's Blouse", "Casual blouse for casual occasions.", silkMaterial, Gender.Female, formalOccasion, Season.Summer, 2021);
+        var shirtsProductTwo = CreateProductEntity("Women's Blouse", "Casual blouse for casual occasions.", silkMaterial, Gender.Female, formalOccasion, Season.Summer, 2021);
         AddImagesToProduct(shirtsProductTwo, white, new List<string> { "https://i.pinimg.com/564x/f5/58/9d/f5589d631ab3686d469ec93ac23ebc9f.jpg" });
         AddImagesToProduct(shirtsProductTwo, black, new List<string> { "https://i.pinimg.com/564x/82/2a/ac/822aac770bc03449bfb85a7d63e276d4.jpg" });
         AddMaterialsToProduct(shirtsProductTwo, silkMaterial, 0.9);
         AddMaterialsToProduct(shirtsProductTwo, woolMaterial, 0.1);
         AddStocksToProduct(shirtsProductTwo, new[] { black, white }, 40, shirtsSizes);
+        AddCategoriesToProduct(shirtsProductTwo, new[] { shirtsCategory, blouseSubcategory });
         products.Add(shirtsProductTwo);
 
-        var shirtsProductThree = CreateProductEntity(poloShirtSubcategory, "Men's Striped Polo Shirt", "Casual polo shirt with stripes for a sporty look.", cottonMaterial, Gender.Male, casualOccasion, Season.Summer, 2021);
+        var shirtsProductThree = CreateProductEntity("Men's Striped Polo Shirt", "Casual polo shirt with stripes for a sporty look.", cottonMaterial, Gender.Male, casualOccasion, Season.Summer, 2021);
         AddImagesToProduct(shirtsProductThree, black, new List<string> { "https://i.pinimg.com/564x/70/da/dd/70dadd5f402821dcae83e7be32e29ce7.jpg" });
         AddMaterialsToProduct(shirtsProductThree, polyesterMaterial, 0.5);
         AddMaterialsToProduct(shirtsProductThree, cottonMaterial, 0.5);
         AddStocksToProduct(shirtsProductThree, new[] { black }, 25, shirtsSizes);
+        AddCategoriesToProduct(shirtsProductThree, new[] { shirtsCategory, poloShirtSubcategory });
         products.Add(shirtsProductThree);
 
 
@@ -374,7 +383,7 @@ public static class InitDb
         var accessoriesProducts = new List<Product>();
 
         // Shoes product one
-        var shoesProductOne = CreateProductEntity(runningShoesSubcategory, "Men's Running Shoes", "Comfortable running shoes for active individuals.", polyesterMaterial, Gender.Male, sportyOccasion, Season.DemiSeason, 2022);
+        var shoesProductOne = CreateProductEntity("Men's Running Shoes", "Comfortable running shoes for active individuals.", polyesterMaterial, Gender.Male, sportyOccasion, Season.DemiSeason, 2022);
         AddImagesToProduct(shoesProductOne, black, new List<string> { "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61ZA59Q2OIL._AC_SY395_.jpg", /*...other urls...*/ });
         AddImagesToProduct(shoesProductOne, white, new List<string> { "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/51+49v7ksXL._AC_SY395_.jpg", /*...other urls...*/ });
         AddMaterialsToProduct(shoesProductOne, rubberMaterial, 0.4);
@@ -382,22 +391,24 @@ public static class InitDb
         AddStocksToProduct(shoesProductOne, new[] { black, white }, 80, shoesSizes);
         shoesProducts.Add(shoesProductOne);
 
-        var shoesProductTwo = CreateProductEntity(casualShoesSubcategory, "Unisex Casual Sneakers", "Comfortable and stylish casual sneakers for both men and women.", cottonMaterial, Gender.Unisex, streetOccasion, Season.DemiSeason, 2022);
+        var shoesProductTwo = CreateProductEntity( "Unisex Casual Sneakers", "Comfortable and stylish casual sneakers for both men and women.", cottonMaterial, Gender.Unisex, streetOccasion, Season.DemiSeason, 2022);
         AddImagesToProduct(shoesProductTwo, violet, new List<string> { "https://www.nike.org.ua/files/resized/products/85_1.700x800.png" });
         AddImagesToProduct(shoesProductTwo, white, new List<string> { "https://www.nike.org.ua/files/resized/products/84_1.700x800.png" });
         AddImagesToProduct(shoesProductTwo, black, new List<string> { "https://www.nike.org.ua/files/resized/products/80_1.700x800.png" });
         AddMaterialsToProduct(shoesProductTwo, cottonMaterial, 0.8);
         AddMaterialsToProduct(shoesProductTwo, rubberMaterial, 0.2);
+        AddCategoriesToProduct(shoesProductTwo, new[] { shoesCategory, casualShoesSubcategory });
         shoesProducts.Add(shoesProductTwo);
 
-        var shoesProductThree = CreateProductEntity(casualShoesSubcategory, "Women's Casual Sneakers", "Stylish and comfortable casual sneakers for women.", cottonMaterial, Gender.Female, streetOccasion, Season.DemiSeason, 2022);
+        var shoesProductThree = CreateProductEntity("Women's Casual Sneakers", "Stylish and comfortable casual sneakers for women.", cottonMaterial, Gender.Female, streetOccasion, Season.DemiSeason, 2022);
         AddImagesToProduct(shoesProductThree, black, new List<string> { "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/397549/01/sv01/fnd/UKR/w/1000/h/1000/fmt/png" });
         AddMaterialsToProduct(shoesProductThree, suedeMaterial, 0.8);
         AddMaterialsToProduct(shoesProductThree, rubberMaterial, 0.2);
         AddStocksToProduct(shoesProductThree, new[] { black }, 140, shoesSizes);
+        AddCategoriesToProduct(shoesProductThree, new[] { shoesCategory, casualShoesSubcategory });
         shoesProducts.Add(shoesProductThree);
 
-        var pantsProductOne = CreateProductEntity(chinosSubcategory, "Men's Casual Pants", "Comfortable and stylish pants for everyday wear.", cottonMaterial, Gender.Male, casualOccasion, Season.DemiSeason, 2022);
+        var pantsProductOne = CreateProductEntity( "Men's Casual Pants", "Comfortable and stylish pants for everyday wear.", cottonMaterial, Gender.Male, casualOccasion, Season.DemiSeason, 2022);
         pantsProductOne.SizeChartImageUrl = "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61q0QLQ1EFL._AC_SX342_.jpg";
         AddImagesToProduct(pantsProductOne, black, new List<string> 
         {
@@ -413,9 +424,10 @@ public static class InitDb
         });
         AddMaterialsToProduct(pantsProductOne, woolMaterial, 1);
         AddStocksToProduct(pantsProductOne, new[] { black, khaki }, 50, pantsSizes);
+        AddCategoriesToProduct(pantsProductOne, new[] { pantsCategory, chinosSubcategory });
         pantsProducts.Add(pantsProductOne);
 
-        var accessoriesProductOne = CreateProductEntity(beltsSubcategory, "Leather Belt", "Stylish leather belt for men and women.", leatherMaterial, Gender.Unisex, businessOccasion, Season.All, 2022);
+        var accessoriesProductOne = CreateProductEntity( "Leather Belt", "Stylish leather belt for men and women.", leatherMaterial, Gender.Unisex, businessOccasion, Season.All, 2022);
         AddImagesToProduct(accessoriesProductOne, brown, new List<string> 
         {
             "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61u1DkV6u8L._AC_SX679_.jpg",
@@ -424,6 +436,7 @@ public static class InitDb
         });
         AddMaterialsToProduct(accessoriesProductOne, leatherMaterial, 1);
         AddStocksToProduct(accessoriesProductOne, new[] { brown }, 100, beltsSizes);
+        AddCategoriesToProduct(accessoriesProductOne, new[] { accessoriesCategory, beltsSubcategory });
         accessoriesProducts.Add(accessoriesProductOne);
 
         

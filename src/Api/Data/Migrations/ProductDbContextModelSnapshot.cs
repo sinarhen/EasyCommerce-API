@@ -290,16 +290,13 @@ namespace ECommerce.Data.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("OrderDetail");
+                    b.ToTable("OrderDetails");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
                     b.Property<int?>("CollectionYear")
@@ -340,8 +337,6 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("MainMaterialId");
 
                     b.HasIndex("OccasionId");
@@ -349,6 +344,24 @@ namespace ECommerce.Data.Migrations
                     b.HasIndex("SizeId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.ProductCategory", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProductId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.ProductImage", b =>
@@ -669,12 +682,6 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
                 {
-                    b.HasOne("ECommerce.Models.Entities.Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ECommerce.Models.Entities.Material", "MainMaterial")
                         .WithMany()
                         .HasForeignKey("MainMaterialId")
@@ -689,11 +696,28 @@ namespace ECommerce.Data.Migrations
                         .WithMany("Stocks")
                         .HasForeignKey("SizeId");
 
-                    b.Navigation("Category");
-
                     b.Navigation("MainMaterial");
 
                     b.Navigation("Occasion");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.ProductCategory", b =>
+                {
+                    b.HasOne("ECommerce.Models.Entities.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Models.Entities.Product", "Product")
+                        .WithMany("Categories")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.ProductImage", b =>
@@ -880,6 +904,8 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Images");
 
                     b.Navigation("Materials");
