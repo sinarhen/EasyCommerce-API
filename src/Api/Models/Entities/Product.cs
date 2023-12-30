@@ -48,8 +48,8 @@ public class Product
     public ICollection<ProductMaterial> Materials { get; set; } = new List<ProductMaterial>();
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
-    public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
 }
 
 public enum Gender
