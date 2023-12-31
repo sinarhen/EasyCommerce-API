@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
-[PrimaryKey("ProductId", "MaterialId")]
+[PrimaryKey("ProductId", "Id")]
 public class ProductMaterial
 {
     
@@ -20,7 +20,7 @@ public class ProductMaterial
     public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
-    [ForeignKey("MaterialId")]
+    [ForeignKey("Id")]
     public Material Material { get; set; }
     
     [ForeignKey("ProductId")]

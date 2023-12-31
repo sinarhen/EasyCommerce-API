@@ -16,7 +16,7 @@ public class Review
     public string CustomerId { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
-    public Rating Rating { get; set; } // 1 - 5
+    public int Rating { get; set; } // 1 - 5
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     

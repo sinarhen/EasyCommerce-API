@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20231231110322_CategorySizes")]
-    partial class CategorySizes
+    [Migration("20231231144439_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -411,11 +411,14 @@ namespace ECommerce.Data.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("MaterialId")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("MaterialId")
+                        .HasColumnType("uuid");
 
                     b.Property<double>("Percentage")
                         .HasColumnType("double precision");
@@ -423,9 +426,9 @@ namespace ECommerce.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ProductId", "MaterialId");
+                    b.HasKey("ProductId", "Id");
 
-                    b.HasIndex("MaterialId");
+                    b.HasIndex("Id");
 
                     b.ToTable("ProductMaterials");
                 });
@@ -769,7 +772,7 @@ namespace ECommerce.Data.Migrations
                 {
                     b.HasOne("ECommerce.Models.Entities.Material", "Material")
                         .WithMany("Products")
-                        .HasForeignKey("MaterialId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

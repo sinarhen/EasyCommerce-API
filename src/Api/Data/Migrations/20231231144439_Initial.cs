@@ -119,6 +119,19 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Sizes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Value = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sizes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -245,21 +258,25 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sizes",
+                name: "CategorySizes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Value = table.Column<int>(type: "integer", nullable: false)
+                    SizeId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sizes", x => x.Id);
+                    table.PrimaryKey("PK_CategorySizes", x => new { x.CategoryId, x.SizeId });
                     table.ForeignKey(
-                        name: "FK_Sizes_Categories_CategoryId",
+                        name: "FK_CategorySizes_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategorySizes_Sizes_SizeId",
+                        column: x => x.SizeId,
+                        principalTable: "Sizes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -427,6 +444,7 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     MaterialId = table.Column<Guid>(type: "uuid", nullable: false),
                     Percentage = table.Column<double>(type: "double precision", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -434,10 +452,10 @@ namespace ECommerce.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductMaterials", x => new { x.ProductId, x.MaterialId });
+                    table.PrimaryKey("PK_ProductMaterials", x => new { x.ProductId, x.Id });
                     table.ForeignKey(
-                        name: "FK_ProductMaterials_Materials_MaterialId",
-                        column: x => x.MaterialId,
+                        name: "FK_ProductMaterials_Materials_Id",
+                        column: x => x.Id,
                         principalTable: "Materials",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -559,6 +577,11 @@ namespace ECommerce.Data.Migrations
                 column: "ParentCategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CategorySizes_SizeId",
+                table: "CategorySizes",
+                column: "SizeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ColorId",
                 table: "OrderDetails",
                 column: "ColorId");
@@ -594,9 +617,9 @@ namespace ECommerce.Data.Migrations
                 column: "ColorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductMaterials_MaterialId",
+                name: "IX_ProductMaterials_Id",
                 table: "ProductMaterials",
-                column: "MaterialId");
+                column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_MainMaterialId",
@@ -632,11 +655,6 @@ namespace ECommerce.Data.Migrations
                 name: "IX_Reviews_ProductId",
                 table: "Reviews",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sizes_CategoryId",
-                table: "Sizes",
-                column: "CategoryId");
         }
 
         /// <inheritdoc />
@@ -659,6 +677,9 @@ namespace ECommerce.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "CategorySizes");
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");
@@ -685,6 +706,9 @@ namespace ECommerce.Data.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
                 name: "Colors");
 
             migrationBuilder.DropTable(
@@ -701,9 +725,6 @@ namespace ECommerce.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sizes");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
         }
     }
 }

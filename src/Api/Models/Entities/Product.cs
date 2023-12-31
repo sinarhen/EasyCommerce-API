@@ -10,12 +10,8 @@ public class Product
     [Key]
     public Guid Id { get; set; }
     
-    // [Key]
-    // public Guid CategoryId { get; set; }
-
-    
     public string Name { get; set; }
-
+    
     public string Description { get; set; }
 
 
@@ -46,6 +42,7 @@ public class Product
     [ForeignKey("MainMaterialId")]
     public Material MainMaterial { get; set; }
     
+    // Navigation Properties
     public ICollection<ProductMaterial> Materials { get; set; } = new List<ProductMaterial>();
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();

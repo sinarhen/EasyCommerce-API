@@ -40,19 +40,6 @@ public class CategoryDto
     public int Order { get; set; }
 }
 
-public class MaterialDto
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public double Percentage { get; set; }
-}
-
-public class StockDto
-{
-    public ColorDto Color { get; set; }
-    public List<AvailabilityDto> Availability { get; set; }
-    public List<string> ImageUrls { get; set; }
-}
 
 public class AvailabilityDto
 {
