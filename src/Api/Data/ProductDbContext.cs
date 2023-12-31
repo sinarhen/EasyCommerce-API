@@ -19,6 +19,7 @@ public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string
     public DbSet<Material> Materials { get; set; }
 
     public DbSet<Category> Categories { get; set; }
+    public DbSet<CategorySize> CategorySizes { get; set; }
     
     public DbSet<Cart> Carts { get; set; }
     public DbSet<Order> Orders { get; set; }

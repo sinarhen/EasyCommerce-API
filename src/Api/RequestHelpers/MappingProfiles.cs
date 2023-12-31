@@ -70,7 +70,10 @@ public class MappingProfiles: Profile
                     Percentage = pm.Percentage
                 })))
             .ForMember(dest => dest.MinPrice, 
-                opt => opt.MapFrom(src => src.Stocks.Any() ? src.Stocks.Min(s => s.Price) : 0));
-
+                opt => opt.MapFrom(src => src.Stocks.Any() ? src.Stocks.Min(s => s.Price) : 0))
+            .ForMember(dest => dest.DiscountPrice, opt => opt.MapFrom(s => s.Discount != null && s.Discount > 0
+                ? s.Stocks.Any() ? s.Stocks.Min(productStock => productStock.Price) * (1 - (decimal) s.Discount) : 0
+                : 0));
+        
     }
 }

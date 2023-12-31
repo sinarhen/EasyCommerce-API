@@ -1,16 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 #
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src\Api\Api.csproj", "{CE70C60F-0C3F-472E-8329-35731C1C60D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src/Api\Api.csproj", "{CE70C60F-0C3F-472E-8329-35731C1C60D3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD9251A2-60F6-4566-9D71-6E8A38F1CFC0}"
-	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7AEC884A-63EB-4AFC-BA17-45B267EDF86B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "src\Lib\Lib.csproj", "{C75FA387-7E66-468B-9856-980E91585510}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "src/Lib/Lib.csproj", "{C75FA387-7E66-468B-9856-980E91585510}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

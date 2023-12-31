@@ -26,7 +26,5 @@ public class Category
     [InverseProperty("ParentCategory")]
     public ICollection<Category> SubCategories { get; set; } = new List<Category>(); 
     public ICollection<ProductCategory> Products { get; set; } = new List<ProductCategory>();
-
-    public ICollection<Size> Sizes { get; set; } = new List<Size>();
-
+    public ICollection<CategorySize> Sizes { get; set; } = new List<CategorySize>();
 }

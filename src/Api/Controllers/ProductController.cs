@@ -35,13 +35,59 @@ public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] Search
         "new" => query.Where(p => p.CreatedAt > DateTime.Now.AddDays(-7)),
         _ => query,
     };
+    
+    List<string> categories = null;
+    List<string> sizes = null;
 
     if (!string.IsNullOrEmpty(searchParams.Category))
     {
-        var categories = searchParams.Category.Split(",").Select(c => c.Trim().ToLower()).ToList();
-        query = query.Where(p => p.Categories.Any(pc => categories.Contains(pc.Category.Name.ToLower())));
+        categories = searchParams.Category.Split(",").Select(c => c.Trim().ToLower()).ToList();
     }
-    // TODO: ORDER BY 
+
+    if (!string.IsNullOrEmpty(searchParams.Size))
+    {
+        sizes = searchParams.Size.Split(",").Select(c => c.Trim().ToLower()).ToList();
+    }
+
+    if (categories != null && sizes != null)
+    {
+        query = query.Where(p =>
+            p.Categories.Any(pc => pc.Category.Sizes.Any(s => sizes.Contains(s.Size.Name.ToLower())) && categories.Contains(pc.Category.Name.ToLower()))
+        );
+    }
+    else
+    {
+        if (categories != null)
+        {
+            query = query.Where(p => p.Categories.Any(pc => categories.Contains(pc.Category.Name.ToLower())));
+        }
+        if (sizes != null)
+        {
+            query = query.Where(p => p.Stocks.Any(s => sizes.Contains(s.Size.Name.ToLower())));
+        }
+    }
+
+
+
+    if (!string.IsNullOrEmpty(searchParams.Color))
+    {
+        var colors = searchParams.Color.Split(',').Select(c => c.Trim().ToLower()).ToList();
+        query = query.Where(p => p.Stocks.Any(s => colors.Contains(s.Color.Name.ToLower())));
+    }
+    
+    if (!string.IsNullOrEmpty(searchParams.Occasion))
+    {
+        var occasions = searchParams.Occasion.Split(",").Select(c => c.Trim().ToLower()).ToList();
+        query = query.Where(p => occasions.Contains(p.Occasion.Name.ToLower()));
+    } 
+    
+    if (!string.IsNullOrEmpty(searchParams.Material))
+    {
+        var materials = searchParams.Material.Split(",").Select(c => c.Trim().ToLower()).ToList();
+        query = query.Where(p => p.Materials.Any(pm => materials.Contains(pm.Material.Name.ToLower())));
+    }
+    
+
     query = searchParams.OrderBy switch
     {
         "price" => query.OrderBy(p => p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : decimal.MaxValue),

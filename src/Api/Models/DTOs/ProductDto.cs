@@ -21,6 +21,7 @@ public class ProductDto
     public int ReviewsCount { get; set; }
     public double AvgRating { get; set; }
     public decimal MinPrice { get; set; }
+    public decimal DiscountPrice { get; set; }
     public bool IsNew { get; set; }
     public bool IsOnSale { get; set; }
     public bool IsBestseller { get; set; }

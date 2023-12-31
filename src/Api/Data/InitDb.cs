@@ -218,9 +218,19 @@ public static class InitDb
         product.Stocks = GetProductStocksForSeeding(product, colors, price, sizes);
     }
 
-    private static IReadOnlyCollection<Size> CreateSizeEntitiesFromList(IReadOnlyDictionary<string, int> sizes, Category category)
+    private static ICollection<CategorySize> CreateCategorySizeEntitiesFromList(IReadOnlyCollection<Size> sizes, IEnumerable<Category> categories)
     {
-        return sizes.Select(size => new Size { Name = size.Key, Value = size.Value, Category = category }).ToList();
+        
+        var list = new List<CategorySize>();
+        foreach (var category in categories)
+        {
+            list.AddRange(sizes.Select(size => new CategorySize { Category = category, Size = size, })); }
+
+        return list;
+    }
+    private static void AddSizesToCategory(Category category, IReadOnlyCollection<Size> sizes)
+    {
+        category.Sizes = CreateCategorySizeEntitiesFromList(sizes, new[] { category });
     }
     
     private static ICollection<ProductCategory> CreateProductCategoryEntitiesFromList(IEnumerable<Category> categories, Product product)
@@ -302,8 +312,10 @@ public static class InitDb
             {"L", -3},
             {"XL", -2},
             {"XXL", -1},
-        }, shirtsCategory);
+        });
+        var shirtsCategorySizes = CreateCategorySizeEntitiesFromList(shirtsSizes, new [] {shirtsCategory, tShirtsSubcategory, poloShirtSubcategory, blouseSubcategory});
 
+        
         var shoesSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
             {"36", 36},
             {"37", 37},
@@ -317,8 +329,11 @@ public static class InitDb
             {"45", 45},
             {"46", 46},
             {"47", 47},
-        }, shoesCategory);
+        });
+        var shoesCategorySizes = CreateCategorySizeEntitiesFromList(shoesSizes, 
+            new [] {shoesCategory, runningShoesSubcategory, casualShoesSubcategory,});
 
+        
         var pantsSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
             {"XS", 28},
             {"S", 30},
@@ -326,7 +341,9 @@ public static class InitDb
             {"L", 34},
             {"XL", 36},
             {"XXL", 38},
-        }, pantsCategory);
+        });
+        var pantsCategorySizes = CreateCategorySizeEntitiesFromList(pantsSizes, 
+            new [] {pantsCategory, chinosSubcategory});
 
         var accessoriesSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
             {"XS", 28},
@@ -335,8 +352,8 @@ public static class InitDb
             {"L", 34},
             {"XL", 36},
             {"XXL", 38},
-        }, accessoriesCategory);
-
+        });
+        
         var beltsSizes = CreateSizeEntitiesFromList(new Dictionary<string, int>{
             {"XS", 28},
             {"S", 30},
@@ -344,10 +361,15 @@ public static class InitDb
             {"L", 34},
             {"XL", 36},
             {"XXL", 38},
-        }, accessoriesCategory);
+        });
+        var accessoriesCategorySizes = CreateCategorySizeEntitiesFromList(accessoriesSizes, new []{accessoriesCategory, beltsSubcategory});
+
         // Add all sizes to the db
-        await context.Sizes.AddRangeAsync(shirtsSizes);
-        await context.Sizes.AddRangeAsync(shoesSizes);
+        await context.CategorySizes.AddRangeAsync(shirtsCategorySizes);
+        await context.CategorySizes.AddRangeAsync(shoesCategorySizes);
+        await context.CategorySizes.AddRangeAsync(pantsCategorySizes);
+        await context.CategorySizes.AddRangeAsync(accessoriesCategorySizes);
+        
         
         // Products with category "Shirts"
         var shirtsProductOne = CreateProductEntity( "Men's Casual Shirt", "A comfortable and stylish shirt for everyday wear.", cottonMaterial, Gender.Unisex, casualOccasion, Season.Summer, 2021);
@@ -449,6 +471,17 @@ public static class InitDb
 
         await context.SaveChangesAsync();
     }
+
+    private static IReadOnlyCollection<Size> CreateSizeEntitiesFromList(IReadOnlyDictionary<string, int> sizes)
+    {
+        return sizes.Select(size => new Size
+        {
+            Name = size.Key,
+            Value = size.Value,
+            Id = Guid.NewGuid()
+        }).ToList();
+    }
+
     private static async Task EnsureInitialProductsAreCreated(ProductDbContext context)
     {
 
