@@ -134,7 +134,25 @@ public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] Search
     [HttpGet("{id}")]
     public ActionResult GetProduct(Guid id)
     {
-        return Ok();
+        var product = _dbContext.Products
+            .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
+            .Include(p => p.Occasion)
+            .Include(p => p.MainMaterial)
+            .Include(p => p.Stocks).ThenInclude(s => s.Color)
+            .Include(p => p.Stocks).ThenInclude(s => s.Size)
+            .Include(p => p.Images)
+            .Include(p => p.Materials).ThenInclude(m => m.Material)
+            .Include(product => product.Reviews)
+            .Include(product => product.Orders)
+            .FirstOrDefault(p => p.Id == id);
+        
+        if (product == null)
+        {
+            return NotFound();
+        }
+        
+        var productDto = _mapper.Map<ProductDto>(product);
+        return Ok(productDto);
     }
 
     [HttpPost]
