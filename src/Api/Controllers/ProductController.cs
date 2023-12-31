@@ -226,6 +226,7 @@ public class ProductController : ControllerBase
         // Check if season is a valid value from Season Enum
         if (!Enum.TryParse<Season>(productDto.Season, out var season))
         {
+            
             throw new ArgumentException($"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
         }
     }
