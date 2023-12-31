@@ -26,7 +26,6 @@ public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] Search
 {
     var query = _dbContext.Products.AsNoTracking().AsSplitQuery();
 
-    // TODO: FILTER BY
     query = searchParams.FilterBy switch
     {
         "in_stock" => query.Where(p => p.Stocks.Any(s => s.Stock > 0)),
@@ -66,9 +65,7 @@ public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] Search
             query = query.Where(p => p.Stocks.Any(s => sizes.Contains(s.Size.Name.ToLower())));
         }
     }
-
-
-
+    
     if (!string.IsNullOrEmpty(searchParams.Color))
     {
         var colors = searchParams.Color.Split(',').Select(c => c.Trim().ToLower()).ToList();
@@ -87,6 +84,11 @@ public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] Search
         query = query.Where(p => p.Materials.Any(pm => materials.Contains(pm.Material.Name.ToLower())));
     }
     
+    if (!string.IsNullOrEmpty(searchParams.SearchTerm))
+    {
+        var searchTerm = searchParams.SearchTerm.Trim().ToLower();
+        query = query.Where(p => p.Name.ToLower().Contains(searchTerm));
+    }
 
     query = searchParams.OrderBy switch
     {
@@ -121,7 +123,13 @@ public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] Search
         .ToListAsync();
 
     var productDto = _mapper.Map<List<ProductDto>>(products);
-    return Ok(productDto);
+    return Ok(new
+    {
+        Products = productDto,
+        Total = await query.CountAsync(),
+        PageNumber = searchParams.PageNumber ?? 1,
+        PageSize = searchParams.PageSize
+    });
 }
     [HttpGet("{id}")]
     public ActionResult GetProduct(Guid id)
