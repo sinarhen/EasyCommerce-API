@@ -15,6 +15,8 @@ public class MappingProfiles: Profile
         CreateMap<RegisterDto, User>();
         CreateMap<LoginDto, User>();
         CreateMap<Product, ProductDto>()
+            .ForMember(dest => dest.CollectionId, opt => opt.MapFrom(x => x.Collection.Id))
+            .ForMember(dest => dest.CollectionName, opt => opt.MapFrom(x => x.Collection.Name))
             .ForMember(dest => dest.Categories, opt => opt.MapFrom(dest => dest.Categories
                 .Select(pc => new CategoryDto
                 {

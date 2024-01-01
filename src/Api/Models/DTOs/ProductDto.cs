@@ -1,5 +1,4 @@
-﻿using ECommerce.Models.Entities;
-
+﻿
 namespace ECommerce.Models.DTOs;
 
 public class ProductDto
@@ -12,7 +11,8 @@ public class ProductDto
     public double? Discount { get; set; }
     public string OccasionName { get; set; }
     public string OccasionId { get; set; }
-    public int? CollectionYear { get; set; }
+    public string CollectionName { get; set; }
+    public string CollectionId { get; set; }
     public string MainMaterialName { get; set; }
     public string Gender { get; set; }
     public string Season { get; set; }

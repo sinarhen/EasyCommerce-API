@@ -105,7 +105,6 @@ public class ProductController : ControllerBase
         _ => query.OrderBy(p => p.Name)
     };
 
-    // TODO: PAGINATION
     if (searchParams.PageSize.HasValue && searchParams.PageNumber.HasValue)
     {
         query = query
