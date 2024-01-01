@@ -427,9 +427,6 @@ namespace ECommerce.Data.Migrations
                     b.Property<Guid?>("CollectionId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("CollectionYear")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 

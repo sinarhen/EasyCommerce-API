@@ -152,7 +152,7 @@ namespace ECommerce.Data.Migrations
                     City = table.Column<string>(type: "text", nullable: true),
                     Country = table.Column<string>(type: "text", nullable: true),
                     PostalCode = table.Column<string>(type: "text", nullable: true),
-                    CartId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CartId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -175,8 +175,7 @@ namespace ECommerce.Data.Migrations
                         name: "FK_AspNetUsers_Carts_CartId",
                         column: x => x.CartId,
                         principalTable: "Carts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -422,7 +421,6 @@ namespace ECommerce.Data.Migrations
                     Season = table.Column<int>(type: "integer", nullable: true),
                     MainMaterialId = table.Column<Guid>(type: "uuid", nullable: false),
                     CollectionId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CollectionYear = table.Column<int>(type: "integer", nullable: true),
                     SizeId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)

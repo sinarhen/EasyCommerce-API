@@ -30,8 +30,6 @@ public class Product : BaseEntity
     
     public Guid? CollectionId { get; set; }
     
-    public int? CollectionYear { get; set; }
-    
     // Navigation properties
     [ForeignKey("OccasionId")]
     public Occasion Occasion { get; set; }

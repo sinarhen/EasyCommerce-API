@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240101133341_InitialCreate")]
+    [Migration("20240101134955_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -430,9 +430,6 @@ namespace ECommerce.Data.Migrations
                     b.Property<Guid?>("CollectionId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("CollectionYear")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -702,7 +699,7 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("CartId")
+                    b.Property<Guid?>("CartId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("City")
@@ -1219,9 +1216,7 @@ namespace ECommerce.Data.Migrations
                 {
                     b.HasOne("ECommerce.Models.Entities.Cart", "Cart")
                         .WithOne("Customer")
-                        .HasForeignKey("ECommerce.Models.Entities.User", "CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ECommerce.Models.Entities.User", "CartId");
 
                     b.Navigation("Cart");
                 });

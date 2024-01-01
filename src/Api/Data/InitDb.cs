@@ -231,7 +231,7 @@ public static class InitDb
     }
 
     private static Product CreateProductEntity(string name, string description,
-        Material mainMaterial, Gender gender, Occasion occasion, Season season, int collectionYear)
+        Material mainMaterial, Gender gender, Occasion occasion, Season season)
     {
         return new Product
         {
@@ -239,7 +239,6 @@ public static class InitDb
             Description = description,
             Season = season,
             MainMaterial = mainMaterial,
-            CollectionYear = collectionYear,
             Gender = gender,
             Occasion = occasion
         };
@@ -279,8 +278,10 @@ public static class InitDb
         return categories.Select((category, index) => new ProductCategory { Category = category, Product = product, Order = index + 1}).ToList();
     }
     
-    private static async Task SeedInitialProducts(ProductDbContext context)
+    private static async Task SeedInitialProducts(ProductDbContext context, Collection collection)
     {
+        
+        
         // Colors
         var white = CreateColorEntity("White", "#FFFFFF");
         var black = CreateColorEntity("Black", "#000000");
@@ -404,24 +405,30 @@ public static class InitDb
             {"XXL", 38},
         });
         var accessoriesCategorySizes = CreateCategorySizeEntitiesFromList(accessoriesSizes, new []{accessoriesCategory, beltsSubcategory});
-
+        
+            
+        
         // Add all sizes to the db
         await context.CategorySizes.AddRangeAsync(shirtsCategorySizes);
         await context.CategorySizes.AddRangeAsync(shoesCategorySizes);
         await context.CategorySizes.AddRangeAsync(pantsCategorySizes);
         await context.CategorySizes.AddRangeAsync(accessoriesCategorySizes);
         
+        // Create store and collection 
+        
         
         // Products with category "Shirts"
-        var shirtsProductOne = CreateProductEntity( "Men's Casual Shirt", "A comfortable and stylish shirt for everyday wear.", cottonMaterial, Gender.Unisex, casualOccasion, Season.Summer, 2021);
+        var shirtsProductOne = CreateProductEntity( "Men's Casual Shirt", "A comfortable and stylish shirt for everyday wear.", cottonMaterial, Gender.Unisex, casualOccasion, Season.Summer);
         AddImagesToProduct(shirtsProductOne, white, new List<string> { "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg" });
         AddMaterialsToProduct(shirtsProductOne, cottonMaterial, 0.9);
         AddMaterialsToProduct(shirtsProductOne, polyesterMaterial, 0.1);
         AddStocksToProduct(shirtsProductOne, new[] { white, black }, 30, shirtsSizes);
         AddCategoriesToProduct(shirtsProductOne, new[] { shirtsCategory, tShirtsSubcategory });
         
+        
+        
         products.Add(shirtsProductOne);
-        var shirtsProductTwo = CreateProductEntity("Women's Blouse", "Casual blouse for casual occasions.", silkMaterial, Gender.Female, formalOccasion, Season.Summer, 2021);
+        var shirtsProductTwo = CreateProductEntity("Women's Blouse", "Casual blouse for casual occasions.", silkMaterial, Gender.Female, formalOccasion, Season.Summer);
         AddImagesToProduct(shirtsProductTwo, white, new List<string> { "https://i.pinimg.com/564x/f5/58/9d/f5589d631ab3686d469ec93ac23ebc9f.jpg" });
         AddImagesToProduct(shirtsProductTwo, black, new List<string> { "https://i.pinimg.com/564x/82/2a/ac/822aac770bc03449bfb85a7d63e276d4.jpg" });
         AddMaterialsToProduct(shirtsProductTwo, silkMaterial, 0.9);
@@ -430,7 +437,7 @@ public static class InitDb
         AddCategoriesToProduct(shirtsProductTwo, new[] { shirtsCategory, blouseSubcategory });
         products.Add(shirtsProductTwo);
 
-        var shirtsProductThree = CreateProductEntity("Men's Striped Polo Shirt", "Casual polo shirt with stripes for a sporty look.", cottonMaterial, Gender.Male, casualOccasion, Season.Summer, 2021);
+        var shirtsProductThree = CreateProductEntity("Men's Striped Polo Shirt", "Casual polo shirt with stripes for a sporty look.", cottonMaterial, Gender.Male, casualOccasion, Season.Summer);
         AddImagesToProduct(shirtsProductThree, black, new List<string> { "https://i.pinimg.com/564x/70/da/dd/70dadd5f402821dcae83e7be32e29ce7.jpg" });
         AddMaterialsToProduct(shirtsProductThree, polyesterMaterial, 0.5);
         AddMaterialsToProduct(shirtsProductThree, cottonMaterial, 0.5);
@@ -445,7 +452,7 @@ public static class InitDb
         var accessoriesProducts = new List<Product>();
 
         // Shoes product one
-        var shoesProductOne = CreateProductEntity("Men's Running Shoes", "Comfortable running shoes for active individuals.", polyesterMaterial, Gender.Male, sportyOccasion, Season.DemiSeason, 2022);
+        var shoesProductOne = CreateProductEntity("Men's Running Shoes", "Comfortable running shoes for active individuals.", polyesterMaterial, Gender.Male, sportyOccasion, Season.DemiSeason);
         AddImagesToProduct(shoesProductOne, black, new List<string> { "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61ZA59Q2OIL._AC_SY395_.jpg", /*...other urls...*/ });
         AddImagesToProduct(shoesProductOne, white, new List<string> { "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/51+49v7ksXL._AC_SY395_.jpg", /*...other urls...*/ });
         AddMaterialsToProduct(shoesProductOne, rubberMaterial, 0.4);
@@ -453,7 +460,7 @@ public static class InitDb
         AddStocksToProduct(shoesProductOne, new[] { black, white }, 80, shoesSizes);
         shoesProducts.Add(shoesProductOne);
 
-        var shoesProductTwo = CreateProductEntity( "Unisex Casual Sneakers", "Comfortable and stylish casual sneakers for both men and women.", cottonMaterial, Gender.Unisex, streetOccasion, Season.DemiSeason, 2022);
+        var shoesProductTwo = CreateProductEntity( "Unisex Casual Sneakers", "Comfortable and stylish casual sneakers for both men and women.", cottonMaterial, Gender.Unisex, streetOccasion, Season.DemiSeason);
         AddImagesToProduct(shoesProductTwo, violet, new List<string> { "https://www.nike.org.ua/files/resized/products/85_1.700x800.png" });
         AddImagesToProduct(shoesProductTwo, white, new List<string> { "https://www.nike.org.ua/files/resized/products/84_1.700x800.png" });
         AddImagesToProduct(shoesProductTwo, black, new List<string> { "https://www.nike.org.ua/files/resized/products/80_1.700x800.png" });
@@ -462,7 +469,7 @@ public static class InitDb
         AddCategoriesToProduct(shoesProductTwo, new[] { shoesCategory, casualShoesSubcategory });
         shoesProducts.Add(shoesProductTwo);
 
-        var shoesProductThree = CreateProductEntity("Women's Casual Sneakers", "Stylish and comfortable casual sneakers for women.", cottonMaterial, Gender.Female, streetOccasion, Season.DemiSeason, 2022);
+        var shoesProductThree = CreateProductEntity("Women's Casual Sneakers", "Stylish and comfortable casual sneakers for women.", cottonMaterial, Gender.Female, streetOccasion, Season.DemiSeason);
         AddImagesToProduct(shoesProductThree, black, new List<string> { "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/397549/01/sv01/fnd/UKR/w/1000/h/1000/fmt/png" });
         AddMaterialsToProduct(shoesProductThree, suedeMaterial, 0.8);
         AddMaterialsToProduct(shoesProductThree, rubberMaterial, 0.2);
@@ -470,7 +477,7 @@ public static class InitDb
         AddCategoriesToProduct(shoesProductThree, new[] { shoesCategory, casualShoesSubcategory });
         shoesProducts.Add(shoesProductThree);
 
-        var pantsProductOne = CreateProductEntity( "Men's Casual Pants", "Comfortable and stylish pants for everyday wear.", cottonMaterial, Gender.Male, casualOccasion, Season.DemiSeason, 2022);
+        var pantsProductOne = CreateProductEntity( "Men's Casual Pants", "Comfortable and stylish pants for everyday wear.", cottonMaterial, Gender.Male, casualOccasion, Season.DemiSeason);
         pantsProductOne.SizeChartImageUrl = "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61q0QLQ1EFL._AC_SX342_.jpg";
         AddImagesToProduct(pantsProductOne, black, new List<string> 
         {
@@ -489,7 +496,7 @@ public static class InitDb
         AddCategoriesToProduct(pantsProductOne, new[] { pantsCategory, chinosSubcategory });
         pantsProducts.Add(pantsProductOne);
 
-        var accessoriesProductOne = CreateProductEntity( "Leather Belt", "Stylish leather belt for men and women.", leatherMaterial, Gender.Unisex, businessOccasion, Season.All, 2022);
+        var accessoriesProductOne = CreateProductEntity( "Leather Belt", "Stylish leather belt for men and women.", leatherMaterial, Gender.Unisex, businessOccasion, Season.All);
         AddImagesToProduct(accessoriesProductOne, brown, new List<string> 
         {
             "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61u1DkV6u8L._AC_SX679_.jpg",
@@ -507,6 +514,11 @@ public static class InitDb
         allProducts.AddRange(pantsProducts);
         allProducts.AddRange(accessoriesProducts);
         allProducts.AddRange(products);
+
+        foreach (var product in allProducts)
+        {
+            product.Collection = collection;
+        }
         
         await context.Products.AddRangeAsync(allProducts);
 
@@ -528,8 +540,18 @@ public static class InitDb
 
         if (!context.Products.Any())
         {
+            var admin = await context.Users.FirstOrDefaultAsync(user => user.Email == Secrets.AdminEmail);
+            
+            // Create store and collection
+            var store = CreateStoreEntity("My Store", "My Store Description",
+                "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg",
+                "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg", "My Store Address",
+                "My Store Contacts", "My Store Email", null);
+            
+            var collection = CreateCollectionEntity("My Collection", "My Collection Description", store);
+            
             // Add 10 products with new Color objects
-            await SeedInitialProducts(context);        
+            await SeedInitialProducts(context, collection);        
         }
     }
 
