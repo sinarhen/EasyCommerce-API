@@ -546,7 +546,7 @@ public static class InitDb
             var store = CreateStoreEntity("My Store", "My Store Description",
                 "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg",
                 "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg", "My Store Address",
-                "My Store Contacts", "My Store Email", null);
+                "My Store Contacts", "My Store Email", admin);
             
             var collection = CreateCollectionEntity("My Collection", "My Collection Description", store);
             

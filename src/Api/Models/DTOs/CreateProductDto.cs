@@ -11,8 +11,9 @@ public class CreateProductDto
     public string Gender { get; set; }
     public string Season { get; set; }
     public Guid MainMaterialId { get; set; }
-    public int? CollectionYear { get; set; }
     public Guid OccasionId { get; set; }
+    
+    public Guid CollectionId { get; set; }
     public List<CreateProductMaterialDto> Materials { get; set; }
     public List<CreateProductStockDto> Stocks { get; set; }
 }

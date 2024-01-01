@@ -638,7 +638,6 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     MaterialId = table.Column<Guid>(type: "uuid", nullable: false),
                     Percentage = table.Column<double>(type: "double precision", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -646,10 +645,10 @@ namespace ECommerce.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductMaterials", x => new { x.ProductId, x.Id });
+                    table.PrimaryKey("PK_ProductMaterials", x => new { x.ProductId, x.MaterialId });
                     table.ForeignKey(
-                        name: "FK_ProductMaterials_Materials_Id",
-                        column: x => x.Id,
+                        name: "FK_ProductMaterials_Materials_MaterialId",
+                        column: x => x.MaterialId,
                         principalTable: "Materials",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -870,9 +869,9 @@ namespace ECommerce.Data.Migrations
                 column: "ColorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductMaterials_Id",
+                name: "IX_ProductMaterials_MaterialId",
                 table: "ProductMaterials",
-                column: "Id");
+                column: "MaterialId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CollectionId",

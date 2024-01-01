@@ -1,10 +1,10 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using ECommerce.Config;
 using Ecommerce.Data;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
 using Ecommerce.RequestHelpers;
-using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +17,11 @@ public class ProductController : ControllerBase
 {
     private readonly ProductDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly JwtService _jwtService;
 
-    public ProductController(ProductDbContext dbContext, IMapper mapper, JwtService jwtService)
+    public ProductController(ProductDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _jwtService = jwtService;
     }
 
     [HttpGet]
@@ -216,11 +214,6 @@ public class ProductController : ControllerBase
         {
             throw new ArgumentException("Product discount must be between 0 and 1(represents percentage)");
         }
-        // get current year from DateTime.Now
-        if (productDto.CollectionYear < 1900 || productDto.CollectionYear > DateTime.Now.Year)
-        {
-            throw new ArgumentException("Product collection year must be between 1900 and current year");
-        }
         
         // Check if gender is a valid value from Gender Enum
         if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
@@ -233,6 +226,7 @@ public class ProductController : ControllerBase
         {
             throw new ArgumentException($"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
         }
+        
     }
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
@@ -268,6 +262,17 @@ public class ProductController : ControllerBase
         var existingMainMaterial = _dbContext.Materials.FirstOrDefault(material => material.Id == productDto.MainMaterialId);
         var existingOccasion = _dbContext.Occasions.FirstOrDefault(occasion => occasion.Id == productDto.OccasionId);
         var category = _dbContext.Categories.FirstOrDefault(c => c.Id == productDto.CategoryId);
+        var existingCollection = _dbContext.Collections.Include(collection => collection.Store)
+            .ThenInclude(store => store.Owner).FirstOrDefault(collection => collection.Id == productDto.CollectionId);
+
+        if (existingCollection == null)
+        {
+            return BadRequest($"Collection with ID {productDto.CollectionId} does not exist");
+        }
+        if (existingCollection.Store.Owner.UserName != User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value)
+        {
+            return Unauthorized("You are not the owner of this store");
+        }
 
         if (nonExistingMaterialIds.Any())
         {

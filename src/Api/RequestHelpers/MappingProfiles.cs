@@ -95,5 +95,6 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.Materials, opt => opt.Ignore())
             .ForMember(dest => dest.Stocks, opt => opt.Ignore())
             .ForMember(dest => dest.Images, opt => opt.Ignore());
+        
     }
 }

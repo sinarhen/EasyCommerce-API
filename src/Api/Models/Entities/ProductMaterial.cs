@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
-[PrimaryKey("ProductId", "Id")]
+[PrimaryKey("ProductId", "MaterialId")]
 public class ProductMaterial : BaseEntity
 {
     
@@ -17,7 +17,7 @@ public class ProductMaterial : BaseEntity
     public double Percentage { get; set; }
 
     // Navigation properties
-    [ForeignKey("Id")]
+    [ForeignKey("MaterialId")]
     public Material Material { get; set; }
     
     [ForeignKey("ProductId")]
