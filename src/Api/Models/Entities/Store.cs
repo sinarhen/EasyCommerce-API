@@ -15,6 +15,8 @@ public class Store
     
     public string OwnerId { get; set; }
     
+    public bool IsVerified { get; set; }
+    
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     
@@ -22,4 +24,6 @@ public class Store
     [ForeignKey("OwnerId")]
     public User Owner { get; set; }
     public List<Collection> Collections { get; set; }
+    
+    
 }

@@ -142,15 +142,49 @@ public static class InitDb
         return list;
     }
     
+    private static Store CreateStoreEntity(string name, string description, string bannerUrl, string logoUrl, string address, string contacts, string email, User owner)
+    {
+        return new Store
+        {
+            Name = name,
+            Description = description,
+            BannerUrl = bannerUrl,
+            LogoUrl = logoUrl,
+            Address = address,
+            Contacts = contacts,
+            Email = email,
+            Owner = owner,
+        };
+    }
+   
+    private static Collection CreateCollectionEntity(string name, string description, Store store)
+    {
+        return new Collection
+        {
+            Name = name,
+            Description = description,
+            Store = store,
+        };
+    }
+    
+    private static Billboard CreateBillboardEntity(string title, string subtitle, string imageUrl, Collection collection)
+    {
+        return new Billboard
+        {
+            Title = title,
+            Subtitle = subtitle,
+            ImageUrl = imageUrl,
+            Collection = collection,
+        };
+    }
+    
     private static ProductImage CreateProductImageEntity(Product product, Color color, List<string> imagesUrl)
     {
         return new ProductImage
         {
             Product = product,
             Color = color,
-            ImageUrls = imagesUrl,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
+            ImageUrls = imagesUrl
         };
     }
     private static Occasion CreateOccasionEntity(string name, string description)
@@ -159,7 +193,6 @@ public static class InitDb
         {
             Name = name,
             Description = description,
-            Id = Guid.NewGuid()
         };
     }
     private static Color CreateColorEntity(string name, string hexCode)
@@ -168,7 +201,6 @@ public static class InitDb
         {
             Name = name,
             HexCode = hexCode,
-            Id = Guid.NewGuid()
         };
     }
     private static Category CreateCategoryEntity(string name, Category parentCategory = null)
@@ -176,7 +208,6 @@ public static class InitDb
         return new Category
         {
             Name = name,
-            Id = Guid.NewGuid(),
             ParentCategory = parentCategory
         };
     }
@@ -204,11 +235,8 @@ public static class InitDb
     {
         return new Product
         {
-            Id = Guid.NewGuid(),
             Name = name,
             Description = description,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
             Season = season,
             MainMaterial = mainMaterial,
             CollectionYear = collectionYear,
@@ -244,10 +272,6 @@ public static class InitDb
             list.AddRange(sizes.Select(size => new CategorySize { Category = category, Size = size, })); }
 
         return list;
-    }
-    private static void AddSizesToCategory(Category category, IReadOnlyCollection<Size> sizes)
-    {
-        category.Sizes = CreateCategorySizeEntitiesFromList(sizes, new[] { category });
     }
     
     private static ICollection<ProductCategory> CreateProductCategoryEntitiesFromList(IEnumerable<Category> categories, Product product)
