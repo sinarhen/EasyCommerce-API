@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
-public class Review
+public class Review : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
@@ -17,8 +17,6 @@ public class Review
     public string Title { get; set; }
     public string Content { get; set; }
     public int Rating { get; set; } // 1 - 5
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
     
     // Navigation properties
     [ForeignKey("ProductId")]

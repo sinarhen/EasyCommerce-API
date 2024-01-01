@@ -14,6 +14,8 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<Store> Stores { get; set; }
     public DbSet<Collection> Collections { get; set; }
     public DbSet<Billboard> Billboards { get; set; }
+    public DbSet<BillboardFilter> BillboardFilters { get; set; }
+    public DbSet<BannedStore> BannedStores { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductStock> ProductStocks { get; set; }
     public DbSet<ProductCategory> ProductCategories { get; set; }
@@ -25,6 +27,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<CategorySize> CategorySizes { get; set; }
     
     public DbSet<Cart> Carts { get; set; }
+    public DbSet<CartProduct> CartProducts { get; set; }
     public DbSet<Order> Orders { get; set; }
     
     public DbSet<OrderDetail> OrderDetails { get; set; }
@@ -39,4 +42,34 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
         base.OnModelCreating(builder);
     }
 
+    public override int SaveChanges()
+    {
+        UpdateTimestamps();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateTimestamps()
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is BaseEntity && (
+                e.State == EntityState.Added
+                || e.State == EntityState.Modified));
+
+        foreach (var entityEntry in entries)
+        {
+            ((BaseEntity)entityEntry.Entity).UpdatedAt = DateTime.UtcNow;
+
+            if (entityEntry.State == EntityState.Added)
+            {
+                ((BaseEntity)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
+            }
+        }
+    }
 }

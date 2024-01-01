@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
-public class Material
+public class Material : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }

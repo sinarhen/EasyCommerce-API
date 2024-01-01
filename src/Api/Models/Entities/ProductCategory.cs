@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("ProductId", "CategoryId")]
-public class ProductCategory
+public class ProductCategory : BaseEntity
 {
     [Key]
     public Guid ProductId { get; set; }

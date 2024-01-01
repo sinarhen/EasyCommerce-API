@@ -6,7 +6,7 @@ namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
 [Index("ParentCategoryId")]
-public class Category
+public class Category : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
@@ -15,9 +15,6 @@ public class Category
     public Guid? ParentCategoryId { get; set; }
 
     public string Name { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
     [ForeignKey("ParentCategoryId")]

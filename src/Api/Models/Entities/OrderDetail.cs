@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
-public class OrderDetail 
+public class OrderDetail : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
@@ -15,11 +15,9 @@ public class OrderDetail
     public Guid ColorId { get; set; }
     
     public int Quantity { get; set; }
-    [Key]
+    
     public Guid SizeId { get; set; }
     
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
     public OrderStatus Status { get; set; }
 
     // Navigation properties

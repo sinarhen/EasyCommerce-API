@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models.Entities;
 
-public class BillboardFilter
+public class BillboardFilter : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }

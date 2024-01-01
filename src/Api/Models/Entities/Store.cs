@@ -2,7 +2,7 @@
 
 namespace ECommerce.Models.Entities;
 
-public class Store
+public class Store : BaseEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
@@ -17,8 +17,6 @@ public class Store
     
     public bool IsVerified { get; set; }
     
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
     
     // Navigation properties
     [ForeignKey("OwnerId")]

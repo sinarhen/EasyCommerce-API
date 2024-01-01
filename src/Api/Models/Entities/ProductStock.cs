@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 [PrimaryKey("ProductId", "ColorId", "SizeId")]
-public class ProductStock
+public class ProductStock : BaseEntity
 {
     [Key]
     public Guid ProductId { get; set; }

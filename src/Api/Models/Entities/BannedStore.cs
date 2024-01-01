@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ECommerce.Models.Entities;
 
 
-public class BannedStore
+public class BannedStore : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }

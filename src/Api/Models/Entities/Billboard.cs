@@ -2,7 +2,7 @@
 
 namespace ECommerce.Models.Entities;
 
-public class Billboard
+public class Billboard : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
@@ -12,10 +12,6 @@ public class Billboard
     public string Subtitle { get; set; }
     
     public string ImageUrl { get; set; }
-    
-    public DateTime CreatedAt { get; set; }
-    
-    public DateTime? UpdatedAt { get; set; }
     
     public Guid CollectionId { get; set; }
     

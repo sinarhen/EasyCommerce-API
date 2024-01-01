@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
-public class Product
+public class Product : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
@@ -32,10 +32,6 @@ public class Product
     
     public int? CollectionYear { get; set; }
     
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
-
     // Navigation properties
     [ForeignKey("OccasionId")]
     public Occasion Occasion { get; set; }
@@ -52,6 +48,8 @@ public class Product
     public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
     public ICollection<ProductCategory> Categories { get; set; } = new List<ProductCategory>();
     
+    // public ICollectiion<CartProduct> Carts { get; set; } = new List<CartProduct>();
+    // Unnecessary because we don't need to know which carts a product is in and how many of them   
 }
 
 public enum Gender

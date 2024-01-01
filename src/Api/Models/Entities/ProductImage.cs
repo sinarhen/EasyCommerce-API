@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("ProductId", "ColorId")]
-public class ProductImage
+public class ProductImage : BaseEntity
 {
 
     [Key]
@@ -15,9 +15,6 @@ public class ProductImage
     public Guid ColorId { get; set; }
     
     public List<string> ImageUrls { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
     
     // Navigation properties
     [ForeignKey("ProductId")]

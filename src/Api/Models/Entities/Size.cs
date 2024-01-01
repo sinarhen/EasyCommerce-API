@@ -2,7 +2,7 @@
 
 namespace ECommerce.Models.Entities;
 
-public class Size
+public class Size : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }

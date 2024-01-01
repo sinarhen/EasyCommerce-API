@@ -4,17 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
-[PrimaryKey("CustomerId", "ProductId")]
-public class Cart
+[PrimaryKey("Id")]
+public class Cart : BaseEntity
 {
+    [Key]
+    public Guid Id { get; set; }
+
     [Key] public string CustomerId { get; set; }
 
-    [Key] public Guid ProductId { get; set; }
-
     // Navigation properties
-    [ForeignKey("CustomerId")]
-    public User User { get; set; }
+    public User Customer { get; set; }
     
-    [ForeignKey("ProductId")]
-    public Product Product { get; set; }
+    public ICollection<CartProduct> Products { get; set; } = new List<CartProduct>();
+    
 }
