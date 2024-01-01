@@ -122,6 +122,7 @@ public class ProductController : ControllerBase
         .Include(p => p.Materials).ThenInclude(m => m.Material)
         .Include(product => product.Reviews)
         .Include(product => product.Orders)
+        .Include(product => product.Collection)
         .ToListAsync();
 
     var productDto = _mapper.Map<List<ProductDto>>(products);
