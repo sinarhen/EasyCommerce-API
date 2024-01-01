@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using ECommerce.Config;
 using Ecommerce.Data;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
 using Ecommerce.RequestHelpers;
+using ECommerce.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,11 +17,13 @@ public class ProductController : ControllerBase
 {
     private readonly ProductDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly JwtService _jwtService;
 
-    public ProductController(ProductDbContext dbContext, IMapper mapper)
+    public ProductController(ProductDbContext dbContext, IMapper mapper, JwtService jwtService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _jwtService = jwtService;
     }
 
     [HttpGet]
@@ -226,17 +231,14 @@ public class ProductController : ControllerBase
         // Check if season is a valid value from Season Enum
         if (!Enum.TryParse<Season>(productDto.Season, out var season))
         {
-            
-            
             throw new ArgumentException($"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
         }
     }
-
     
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpPost]
     public async Task<IActionResult> CreateProduct(CreateProductDto productDto)
     {
-        
         try 
         {
             ValidateOnModelLevel(productDto);
@@ -247,15 +249,13 @@ public class ProductController : ControllerBase
         }
         
         var nonExistingMaterialIds = productDto.Materials
-            .Select(m => _dbContext.Materials.FirstOrDefault(material => material.Id == m.Id))
-            .Where(material => material == null)
-            .Select(material => material.Id)
+            .Where(m => !_dbContext.Materials.Any(material => material.Id == m.Id))
+            .Select(m => m.Id)
             .ToList();
         
         var nonExistingColors = productDto.Stocks
-            .Select(s => _dbContext.Colors.FirstOrDefault(color => color.Id == s.ColorId))
-            .Where(color => color == null)
-            .Select(color => color.Id)
+            .Where(s => !_dbContext.Colors.Any(color => color.Id == s.ColorId))
+            .Select(color => color.ColorId)
             .ToList();
         
 
@@ -264,6 +264,7 @@ public class ProductController : ControllerBase
             .Select(size => _dbContext.Sizes.FirstOrDefault(s => s.Id == size.SizeId))
             .Where(size => size == null)
             .ToList();
+        
         var existingMainMaterial = _dbContext.Materials.FirstOrDefault(material => material.Id == productDto.MainMaterialId);
         var existingOccasion = _dbContext.Occasions.FirstOrDefault(occasion => occasion.Id == productDto.OccasionId);
         var category = _dbContext.Categories.FirstOrDefault(c => c.Id == productDto.CategoryId);

@@ -10,12 +10,10 @@ public record JwtSecrets(
     string Audience
 );
 
-public partial class JwtService
+public class JwtService
 {
     private readonly JwtSecrets _jwtSecrets;
 
-    private const string UserNameClaim = "username";
-    private const string RoleClaim = "role"; 
     
     public JwtService(JwtSecrets jwtSecrets)
     {
@@ -25,17 +23,18 @@ public partial class JwtService
     public JwtSecurityToken GenerateToken(string username, IEnumerable<string> roles)
     {
 
+        Console.WriteLine("generating jwt with such secret key: " + _jwtSecrets.Key);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecrets.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
      
         var claims = new List<Claim>
         {
-            new Claim(UserNameClaim, username),
+            new Claim(ClaimTypes.Name, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
         foreach (var role in roles)
         {
-            if (role != null) claims.Add(new Claim(RoleClaim, role));
+            if (role != null) claims.Add(new Claim(ClaimTypes.Role, role));
         }  
 
         var jwt = new JwtSecurityToken(
@@ -67,7 +66,7 @@ public partial class JwtService
                 IssuerSigningKey = securityKey,
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
-                ValidateAudience = false,
+                ValidateAudience = true,
                 ValidateLifetime = true,
             };
 

@@ -12,8 +12,8 @@ public class MappingProfiles: Profile
     }
     private void MapProductProfiles()
     {
-        CreateMap<RegisterDto, Customer>();
-        CreateMap<LoginDto, Customer>();
+        CreateMap<RegisterDto, User>();
+        CreateMap<LoginDto, User>();
         CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.Categories, opt => opt.MapFrom(dest => dest.Categories
                 .Select(pc => new CategoryDto
@@ -24,6 +24,7 @@ public class MappingProfiles: Profile
                 })
                 .OrderBy(pc => pc.Order)))
             .ForMember(dest => dest.OccasionName, opt => opt.MapFrom(dest => dest.Occasion.Name))
+            .ForMember(dest => dest.OccasionId, opt => opt.MapFrom(dest => dest.Occasion.Id))
             .ForMember(dest => dest.MainMaterialName, opt => opt.MapFrom(dest => dest.MainMaterial.Name)) 
             .ForMember(dest => dest.OrdersCount, opt => opt.MapFrom(x => x.Orders.Count))
             .ForMember(dest => dest.OrdersCountLastMonth,
@@ -50,6 +51,7 @@ public class MappingProfiles: Profile
                     Availability = g.Select(ps => new AvailabilityDto
                     {
                         // Get value from SizeEnum or return default value
+                        SizeId = ps.Size.Id,
                         Size = ps.Size.Name,
                         SizeValue = ps.Size.Value,
                         Quantity = ps.Stock,

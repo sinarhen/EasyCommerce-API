@@ -19,7 +19,7 @@ public class Order
     
     // Navigation properties
     [ForeignKey("CustomerId")]
-    public Customer Customer { get; set; }
+    public User User { get; set; }
     public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     

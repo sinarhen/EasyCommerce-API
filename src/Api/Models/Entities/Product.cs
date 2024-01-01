@@ -27,28 +27,31 @@ public class Product
     public Season? Season { get; set; }
 
     public Guid MainMaterialId { get; set; }
+    
+    public Guid? CollectionId { get; set; }
+    
     public int? CollectionYear { get; set; }
-
+    
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
-    // [ForeignKey("CategoryId")]
-    // public Category Category { get; set; }
     [ForeignKey("OccasionId")]
     public Occasion Occasion { get; set; }
 
     [ForeignKey("MainMaterialId")]
     public Material MainMaterial { get; set; }
     
-    // Navigation Properties
+    [ForeignKey("CollectionId")]
+    public Collection Collection { get; set; }
     public ICollection<ProductMaterial> Materials { get; set; } = new List<ProductMaterial>();
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
     public ICollection<ProductCategory> Categories { get; set; } = new List<ProductCategory>();
+    
 }
 
 public enum Gender

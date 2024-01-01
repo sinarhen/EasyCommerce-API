@@ -2,6 +2,6 @@
 
 namespace ECommerce.Models.Entities;
 
-public class CustomerRole : IdentityRole
+public class UserRole : IdentityRole
 {
 }

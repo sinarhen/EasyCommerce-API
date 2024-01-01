@@ -18,12 +18,12 @@ namespace Ecommerce.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IMapper _mapper;
-    private readonly UserManager<Customer> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly JwtService _jwtService;
 
     public AuthController(
         IMapper mapper,
-        UserManager<Customer> userManager,
+        UserManager<User> userManager,
         JwtService jwtService
     )
     {
@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
             return BadRequest("Empty data");
         }
 
-        var user = _mapper.Map<Customer>(dto);
+        var user = _mapper.Map<User>(dto);
         var result = await _userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
         {

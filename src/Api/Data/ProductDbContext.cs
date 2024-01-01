@@ -4,13 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Data;
 
-public class ProductDbContext : IdentityDbContext<Customer, CustomerRole, string>
+public class ProductDbContext : IdentityDbContext<User, UserRole, string>
 {
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
         
     }
     
+    public DbSet<Store> Stores { get; set; }
+    public DbSet<Collection> Collections { get; set; }
+    public DbSet<Billboard> Billboards { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductStock> ProductStocks { get; set; }
     public DbSet<ProductCategory> ProductCategories { get; set; }

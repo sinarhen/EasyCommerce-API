@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using ECommerce.Config;
@@ -34,7 +35,7 @@ builder.Services.AddDbContext<ProductDbContext>(options =>
     var connString = Secrets.DbConnectionString;
     options.UseNpgsql(connString).EnableSensitiveDataLogging();
 });
-builder.Services.AddIdentity<Customer, CustomerRole>(options =>
+builder.Services.AddIdentity<User, UserRole>(options =>
     {
         options.Password.RequireDigit = true;
         options.Password.RequiredLength = 8;
@@ -44,16 +45,24 @@ builder.Services.AddIdentity<Customer, CustomerRole>(options =>
         options.User.RequireUniqueEmail = true;
         
     })
-    .AddRoles<CustomerRole>()
+    .AddRoles<UserRole>()
     .AddEntityFrameworkStores<ProductDbContext>()
     .AddDefaultTokenProviders();
 
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
+        Console.WriteLine("Adding jwt bearer with such jwt key: " + Secrets.JwtKey);
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            RoleClaimType = ClaimTypes.Role,
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
@@ -68,6 +77,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSingleton<JwtService>(provider =>
 {
+    Console.WriteLine("key: " + Secrets.JwtKey);
     var jwtSecrets = new JwtSecrets(
         Issuer: Secrets.JwtIssuer,
         Key: Secrets.JwtKey,
@@ -86,8 +96,8 @@ if (app.Environment.IsDevelopment())
 
 
 // app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 

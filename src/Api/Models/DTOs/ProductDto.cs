@@ -11,6 +11,7 @@ public class ProductDto
     public string Description { get; set; }
     public double? Discount { get; set; }
     public string OccasionName { get; set; }
+    public string OccasionId { get; set; }
     public int? CollectionYear { get; set; }
     public string MainMaterialName { get; set; }
     public string Gender { get; set; }
@@ -43,6 +44,7 @@ public class CategoryDto
 
 public class AvailabilityDto
 {
+    public Guid SizeId { get; set; }
     public string Size { get; set; }
     public int SizeValue { get; set; }
     public int Quantity { get; set; }

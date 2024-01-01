@@ -13,7 +13,7 @@ public class Cart
 
     // Navigation properties
     [ForeignKey("CustomerId")]
-    public Customer Customer { get; set; }
+    public User User { get; set; }
     
     [ForeignKey("ProductId")]
     public Product Product { get; set; }
