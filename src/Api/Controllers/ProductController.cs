@@ -2,6 +2,7 @@
 using AutoMapper;
 using ECommerce.Config;
 using Ecommerce.Data;
+using Ecommerce.Models.DTOs;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
 using Ecommerce.RequestHelpers;
@@ -105,12 +106,9 @@ public class ProductController : ControllerBase
         _ => query.OrderBy(p => p.Name)
     };
 
-    if (searchParams.PageSize.HasValue && searchParams.PageNumber.HasValue)
-    {
-        query = query
-            .Skip(searchParams.PageSize.Value * (searchParams.PageNumber.Value - 1))
-            .Take(searchParams.PageSize.Value);
-    }
+    query = query
+        .Skip(searchParams.PageSize * (searchParams.PageNumber - 1))
+        .Take(searchParams.PageSize);
 
     var products = await query
         .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
@@ -130,7 +128,7 @@ public class ProductController : ControllerBase
     {
         Products = productDto,
         Total = await query.CountAsync(),
-        PageNumber = searchParams.PageNumber ?? 1,
+        PageNumber = searchParams.PageNumber,
         PageSize = searchParams.PageSize
     });
 }
@@ -353,9 +351,151 @@ public class ProductController : ControllerBase
     }
     
     [HttpPut("{id}")]
-    public IActionResult UpdateProduct(Guid id, Product product)
+    public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {
-        // TODO: Implement
+        var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+        if (product == null)
+        {
+            return NotFound();
+        }
+        
+        if (!string.IsNullOrEmpty(productDto.Name))
+        {
+            product.Name = productDto.Name;
+        }
+        if (productDto.CategoryId != Guid.Empty)
+        {
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
+            if (category == null)
+            {
+                return BadRequest($"Category with ID {productDto.CategoryId} does not exist");
+            }
+            product.Categories.Clear();
+            AddToCategories(category, product);
+        }
+        if (!string.IsNullOrEmpty(productDto.Description))
+        {
+            product.Description = productDto.Description;
+        }
+        if (productDto.Discount.HasValue)
+        {
+            product.Discount = productDto.Discount.Value;
+        }
+        if (!string.IsNullOrEmpty(productDto.SizeChartImageUrl))
+        {
+            product.SizeChartImageUrl = productDto.SizeChartImageUrl;
+        }
+
+        if (productDto.MainMaterialId != Guid.Empty)
+        {
+            var mainMaterial = await _dbContext.Materials.FirstOrDefaultAsync(m => m.Id == productDto.MainMaterialId);
+            if (mainMaterial == null)
+            {
+                return BadRequest($"Main material with ID {productDto.MainMaterialId} does not exist");
+            }
+            product.MainMaterial = mainMaterial;
+        }
+
+        if (!string.IsNullOrEmpty(productDto.Gender))
+        {
+            if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
+            {
+                return BadRequest($"Invalid gender value. Valid gender options are: ({string.Join(", ", Enum.GetNames<Gender>())})");
+            }
+        
+
+        }
+
+        if (!string.IsNullOrEmpty(productDto.Season))
+        {
+            if (!Enum.TryParse<Season>(productDto.Season, out var season))
+            {
+                return BadRequest($"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
+            }            
+        }
+        
+        if (productDto.OccasionId != Guid.Empty)
+        {
+            var occasion = await _dbContext.Occasions.FirstOrDefaultAsync(o => o.Id == productDto.OccasionId);
+            if (occasion == null)
+            {
+                return BadRequest($"Occasion with ID {productDto.OccasionId} does not exist");
+            }
+            product.Occasion = occasion;
+        }
+        
+        if (productDto.CollectionId != Guid.Empty)
+        {
+            var collection = await _dbContext.Collections.Include(collection => collection.Store)
+                .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
+            if (collection == null)
+            {
+                return BadRequest($"Collection with ID {productDto.CollectionId} does not exist");
+            }
+            if (collection.Store.Owner.UserName != User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value)
+            {
+                return Unauthorized("You are not the owner of this store");
+            }
+            product.Collection = collection;
+        }
+        
+        if (productDto.Materials is { Count: > 0 })
+        {
+            var nonExistingMaterialIds = productDto.Materials
+                .Where(m => !_dbContext.Materials.Any(material => material.Id == m.Id))
+                .Select(m => m.Id)
+                .ToList();
+            
+            if (nonExistingMaterialIds.Any())
+            {
+                return BadRequest($"Materials with the following IDs do not exist: {string.Join(", ", nonExistingMaterialIds)}");
+            }
+            
+            product.Materials.Clear();
+            product.Materials = productDto.Materials.Select(material => new ProductMaterial
+            {
+                Product = product,
+                Material = _dbContext.Materials.FirstOrDefault(m => m.Id == material.Id),
+                Percentage = material.Percentage
+            }).ToList();
+        }
+        
+        if (productDto.Stocks is { Count: > 0 })
+        {
+            var nonExistingColors = productDto.Stocks
+                .Where(s => !_dbContext.Colors.Any(color => color.Id == s.ColorId))
+                .Select(color => color.ColorId)
+                .ToList();
+            
+            var nonExistingSizes = productDto.Stocks
+                .SelectMany(s => s.Sizes)
+                .Select(size => _dbContext.Sizes.FirstOrDefault(s => s.Id == size.SizeId))
+                .Where(size => size == null)
+                .ToList();
+            
+            if (nonExistingColors.Any())
+            {
+                return BadRequest($"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
+            }
+            if (nonExistingSizes.Any())
+            {
+                return BadRequest($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
+            }
+            
+            product.Stocks.Clear();
+            product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+            {
+                Product = product,
+                Color = _dbContext.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+                Size = _dbContext.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+                Stock = stockDto.Sizes.First().Stock,
+                Price = stockDto.Sizes.First().Price
+            }).ToList();
+        }
+        
+
+            
+        
         return Ok();
     }
 

@@ -3,7 +3,19 @@
 public class ProductDetailsDto : ProductDto
 {
     public List<ReviewDto> Reviews { get; set; }
+    
 }
+
+public class ProductDetailsWithStockDto : ProductDetailsDto
+{
+    public List<ProductStockDto> Stocks { get; set; }
+}
+
+public class ProductDetailsWithSingleStockDto : ProductDetailsDto
+{
+    public ProductStockDto Stock { get; set; }
+}
+
 
 
 public class ReviewDto

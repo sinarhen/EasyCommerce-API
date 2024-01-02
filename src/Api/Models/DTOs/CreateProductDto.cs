@@ -14,27 +14,6 @@ public class CreateProductDto
     public Guid OccasionId { get; set; }
     
     public Guid CollectionId { get; set; }
-    public List<CreateProductMaterialDto> Materials { get; set; }
-    public List<CreateProductStockDto> Stocks { get; set; }
-}
-
-public class CreateProductMaterialDto
-{
-    public Guid Id { get; set; }
-    public double Percentage { get; set; }
-}
-
-public class CreateProductStockDto
-{
-    public Guid ColorId { get; set; }
-    public List<CreateProductStockSizeDto> Sizes { get; set; }
-    public List<string> ImageUrls { get; set; }
-    
-}
-
-public class CreateProductStockSizeDto
-{
-    public Guid SizeId { get; set; }
-    public int Stock { get; set; }
-    public decimal Price { get; set; }
+    public List<MaterialDto> Materials { get; set; }
+    public List<ProductStockDto> Stocks { get; set; }
 }

@@ -30,7 +30,16 @@ public class ProductDto
     public DateTime? UpdatedAt { get; set; }
     
     public List<MaterialDto> Materials { get; set; }
-    public List<StockDto> Stocks { get; set; }
+    public List<SizeDto> Sizes { get; set; }
+    public List<ColorDto> Colors { get; set; }
+    
+}
+
+public class SizeDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public int Value { get; set; }
 }
 
 public class CategoryDto

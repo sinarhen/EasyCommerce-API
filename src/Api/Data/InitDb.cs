@@ -28,7 +28,6 @@ public static class InitDb
         roleManager.Roles.ToList().ForEach(role => Console.WriteLine(role.Name));
         if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
         {
-            Console.WriteLine("Admin Role does not exist");
             var role = new UserRole
             {
                 Name = UserRoles.Admin
@@ -38,12 +37,10 @@ public static class InitDb
             {
                 throw new Exception("Failed to create admin role");
             }
-            Console.WriteLine("Admin Role created");
         }
 
         if (!await roleManager.RoleExistsAsync(UserRoles.Customer))
         {
-            Console.WriteLine("Customer Role does not exist");
             var role = new UserRole
             {
                 Name = UserRoles.Customer
@@ -53,12 +50,10 @@ public static class InitDb
             {
                 throw new Exception("Failed to create customer role");
             }
-            Console.WriteLine("Customer Role created");
         }
         
         if (!await roleManager.RoleExistsAsync(UserRoles.SuperAdmin))
         {
-            Console.WriteLine("SuperAdmin Role does not exist");
             var role = new UserRole
             {
                 Name = UserRoles.SuperAdmin
@@ -68,7 +63,19 @@ public static class InitDb
             {
                 throw new Exception("Failed to create SuperAdmin role");
             }
-            Console.WriteLine("SuperAdmin Role created");
+        }
+        
+        if (!await roleManager.RoleExistsAsync(UserRoles.Seller))
+        {
+            var role = new UserRole
+            {
+                Name = UserRoles.Seller
+            };
+            var roleResult = await roleManager.CreateAsync(role);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Failed to create seller role");
+            }
         }
 
     }
@@ -82,7 +89,6 @@ public static class InitDb
         var adminPassword = Secrets.AdminPassword;
         
         var admin = await userManager.FindByEmailAsync(adminEmail);
-        Console.WriteLine(!string.IsNullOrEmpty(admin?.Email) ? "Admin: " + admin.Email : "Admin does not exist");
         if (admin == null)
         {
             admin = new User
@@ -97,26 +103,23 @@ public static class InitDb
             {
                 throw new Exception("Failed to create admin user");
             }
-            Console.WriteLine("Admin created");
             
         }
 
         var roles = await userManager.GetRolesAsync(admin);
+        
         Console.WriteLine("Admin roles:");
         roles.ToList().ForEach(role => Console.WriteLine(role));
         
         if (await userManager.IsInRoleAsync(admin, UserRoles.SuperAdmin))
         {
-            Console.WriteLine("Admin is already in SuperAdmin role");
             return;
         }
-        Console.WriteLine("Admin is not in SuperAdmin role");
         var roleResult = await userManager.AddToRoleAsync(admin, UserRoles.SuperAdmin);
         if (!roleResult.Succeeded)
         {
             throw new Exception("Failed to add admin user to roles");
         }
-        Console.WriteLine("Admin added to SuperAdmin role");
 
     }
 

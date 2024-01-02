@@ -40,31 +40,26 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.IsBestseller, opt => opt.MapFrom(x => x.Orders.Count > 10))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(x => x.CreatedAt))
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(x => x.UpdatedAt))
-            .ForMember(dest => dest.Stocks, opt => opt.MapFrom(dest => dest.Stocks
-                .GroupBy(ps => ps.ColorId)
-                .Select(g => new StockDto
+            .ForMember(dest => dest.Sizes, opt => opt.MapFrom(dest => dest.Stocks
+                .Select(ps => new SizeDto
                 {
-                    Color = new ColorDto 
-                    { 
-                        Id = g.First().Color.Id, 
-                        Name = g.First().Color.Name, 
-                        HexCode = g.First().Color.HexCode 
-                    },
-                    Availability = g.Select(ps => new AvailabilityDto
-                    {
-                        // Get value from SizeEnum or return default value
-                        SizeId = ps.Size.Id,
-                        Size = ps.Size.Name,
-                        SizeValue = ps.Size.Value,
-                        Quantity = ps.Stock,
-                        Price = ps.Price
-                    })
-                    .OrderBy(availability => availability.SizeValue)
-                    .ToList(),
+                    Id = ps.Size.Id,
+                    Name = ps.Size.Name,
+                    Value = ps.Size.Value
+                })
+                .OrderBy(ps => ps.Value)
+            ))
+            .ForMember(dest => dest.Colors, opt => opt.MapFrom(dest => dest.Stocks
+                .GroupBy(ps => ps.ColorId)
+                .Select(g => new ColorDto
+                {
+                    Id = g.First().Color.Id,
+                    Name = g.First().Color.Name,
+                    HexCode = g.First().Color.HexCode,
                     ImageUrls = dest.Images
-                    .Where(i => i.ColorId == g.Key)
-                    .SelectMany(i => i.ImageUrls)
-                    .ToList()
+                        .Where(i => i.ColorId == g.Key)
+                        .SelectMany(i => i.ImageUrls)
+                        .ToList()
                 })))
             .ForMember(dest => dest.Materials, opt => opt.MapFrom(dest => dest.Materials
                 .Select(pm => new MaterialDto
