@@ -1,6 +1,4 @@
-using System.Security.Claims;
 using System.Text;
-using System.Text.Json.Serialization;
 using ECommerce.Config;
 using Ecommerce.Data;
 using ECommerce.Models.Entities;
@@ -33,7 +31,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ProductDbContext>(options =>
 {
     var connString = Secrets.DbConnectionString;
-    options.UseNpgsql(connString).EnableSensitiveDataLogging();
+    options.UseNpgsql(connString);
 });
 builder.Services.AddIdentity<User, UserRole>(options =>
     {

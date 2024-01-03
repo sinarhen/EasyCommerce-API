@@ -62,14 +62,16 @@ public class JwtService
 
             var validations = new TokenValidationParameters
             {
-                ValidIssuer = _jwtSecrets.Issuer,
                 IssuerSigningKey = securityKey,
+                RoleClaimType = CustomClaimTypes.Role,
+                NameClaimType = CustomClaimTypes.Username,
                 ValidateIssuer = true,
-                ValidateIssuerSigningKey = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = Secrets.JwtIssuer,
+                ValidAudience = Secrets.JwtAudience,
             };
-
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, validations, out var _);
 
