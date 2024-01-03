@@ -49,6 +49,7 @@ public class MappingProfiles: Profile
                 })
                 .OrderBy(ps => ps.Value)
             ))
+            .ForMember(dest => dest.IsAvailable, opt => opt.MapFrom(dest => dest.Stocks.Any(ps => ps.Stock > 0)))
             .ForMember(dest => dest.Colors, opt => opt.MapFrom(dest => dest.Stocks
                 .GroupBy(ps => ps.ColorId)
                 .Select(g => new ColorDto
@@ -74,17 +75,6 @@ public class MappingProfiles: Profile
                 ? s.Stocks.Any() ? s.Stocks.Min(productStock => productStock.Price) * (1 - (decimal) s.Discount) : 0
                 : 0));
 
-        CreateMap<Product, ProductDetailsDto>()
-            .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews
-                .Select(r => new ReviewDto
-                {
-                    Title = r.Title,
-                    Content = r.Content,
-                    Rating = r.Rating,
-                    CreatedAt = r.CreatedAt,
-                    // TODO: Add customer information to review
-                })
-            ));
 
         CreateMap<CreateProductDto, Product>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
@@ -92,6 +82,19 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.Materials, opt => opt.Ignore())
             .ForMember(dest => dest.Stocks, opt => opt.Ignore())
             .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+        CreateMap<Product, ProductDetailsDto>()
+            .IncludeBase<Product, ProductDto>()
+            .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews
+                .Select(r => new ReviewDto
+                {
+                    Title = r.Title,
+                    Content = r.Content,
+                    Rating = r.Rating,
+                    CreatedAt = r.CreatedAt
+                })
+            ))
+            ;
         
     }
 }

@@ -1,8 +1,10 @@
 ﻿
 namespace ECommerce.Models.DTOs;
 
-public class ProductDto
+
+public class ProductDto 
 {
+    
     public Guid Id { get; set; }
     public CategoryDto[] Categories { get; set; }
     
@@ -25,6 +27,8 @@ public class ProductDto
     public decimal DiscountPrice { get; set; }
     public bool IsNew { get; set; }
     public bool IsOnSale { get; set; }
+    
+    public bool IsAvailable { get; set; }
     public bool IsBestseller { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
@@ -32,14 +36,6 @@ public class ProductDto
     public List<MaterialDto> Materials { get; set; }
     public List<SizeDto> Sizes { get; set; }
     public List<ColorDto> Colors { get; set; }
-    
-}
-
-public class SizeDto
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public int Value { get; set; }
 }
 
 public class CategoryDto
@@ -50,12 +46,3 @@ public class CategoryDto
     public int Order { get; set; }
 }
 
-
-public class AvailabilityDto
-{
-    public Guid SizeId { get; set; }
-    public string Size { get; set; }
-    public int SizeValue { get; set; }
-    public int Quantity { get; set; }
-    public decimal Price { get; set; }
-}

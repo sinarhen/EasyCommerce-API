@@ -132,11 +132,11 @@ public class ProductController : ControllerBase
         PageSize = searchParams.PageSize
     });
 }
-    
+        
     [HttpGet("{id}")]
-    public ActionResult GetProduct(Guid id)
+    public async Task<ActionResult> GetProduct(Guid id, Guid sizeId, Guid colorId)
     {
-        var product = _dbContext.Products
+        var product = await _dbContext.Products.AsNoTracking().AsSplitQuery()
             .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
             .Include(p => p.Occasion)
             .Include(p => p.MainMaterial)
@@ -146,17 +146,55 @@ public class ProductController : ControllerBase
             .Include(p => p.Materials).ThenInclude(m => m.Material)
             .Include(product => product.Reviews)
             .Include(product => product.Orders)
-            .FirstOrDefault(p => p.Id == id);
-        
+            .Include(product => product.Collection)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
         if (product == null)
         {
             return NotFound();
         }
-        
-        var productDto = _mapper.Map<ProductDetailsDto>(product);
-        return Ok(productDto);
-    }
 
+        var productDto = _mapper.Map<ProductDetailsDto>(product);
+
+        if (sizeId != Guid.Empty && colorId != Guid.Empty)
+        {
+            var stock = product.Stocks.FirstOrDefault(s => s.SizeId == sizeId && s.ColorId == colorId);
+            if (stock != null)
+            {
+                productDto.Availability = new AvailabilityDto { Quantity = stock.Stock, Price = stock.Price };
+            }
+        }
+        if (sizeId != Guid.Empty)
+        {
+            productDto.Colors = product.Stocks
+                .Where(ps => ps.SizeId == sizeId)
+                .Select(ps => new ColorDto
+                {
+                    Id = ps.Color.Id,
+                    Name = ps.Color.Name,
+                    HexCode = ps.Color.HexCode,
+                    ImageUrls = product.Images
+                        .Where(i => i.ColorId == ps.ColorId)
+                        .SelectMany(i => i.ImageUrls)
+                        .ToList(),
+                    IsAvailable = ps.Stock > 0,
+                    Quantity = ps.Stock
+                }).ToList();
+        }
+        
+        if (colorId != Guid.Empty)
+        {
+            productDto.Sizes = product.Stocks
+                .Where(s => s.ColorId == colorId)
+                .Select(s => new SizeDto { Id = s.SizeId, Name = s.Size.Name, Quantity = s.Stock })
+                .ToList();
+
+            
+        }
+
+        return Ok(productDto);
+    }    
+    
     private void ValidateOnModelLevel(CreateProductDto productDto)
     {
         if (productDto == null)

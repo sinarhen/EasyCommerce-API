@@ -1,13 +1,13 @@
 ﻿namespace ECommerce.Models.DTOs;
 
-public class ColorDto
+public class SizeDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public string HexCode { get; set; }
-    public List<string> ImageUrls { get; set; }
+    public int Value { get; set; }
+   
+    public int? Quantity { get; set; }
     
     public bool? IsAvailable { get; set; }
     
-    public int? Quantity { get; set; }
 }
