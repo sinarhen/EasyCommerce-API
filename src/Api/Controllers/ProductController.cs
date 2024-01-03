@@ -133,8 +133,50 @@ public class ProductController : ControllerBase
     });
 }
         
+    private List<ColorDto> GetColorDtos(IEnumerable<ProductStock> stocks, Guid? sizeId = null)
+    {
+        var query = stocks.AsQueryable();
+
+        if (sizeId.HasValue)
+        {
+            query = query.Where(ps => ps.SizeId == sizeId.Value);
+        }
+
+        return query.Select(ps => new ColorDto
+        {
+            Id = ps.Color.Id,
+            Name = ps.Color.Name,
+            HexCode = ps.Color.HexCode,
+            ImageUrls = ps.Product.Images
+                .Where(i => i.ColorId == ps.ColorId)
+                .SelectMany(i => i.ImageUrls)
+                .ToList(),
+            IsAvailable = ps.Stock > 0,
+            Quantity = ps.Stock
+        })
+        .ToList();
+    }
+
+    private List<SizeDto> GetSizeDtos(IEnumerable<ProductStock> stocks, Guid? colorId = null)
+    {
+        var query = stocks.AsQueryable();
+
+        if (colorId.HasValue)
+        {
+            query = query.Where(s => s.ColorId == colorId.Value);
+        }
+
+        return query
+            .Select(s => new SizeDto {
+                Id = s.SizeId, 
+                Name = s.Size.Name, 
+                Quantity = s.Stock })
+            .OrderBy(s => s.Value)
+            .ToList();
+    }
+
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetProduct(Guid id, Guid sizeId, Guid colorId)
+    public async Task<ActionResult> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
     {
         var product = await _dbContext.Products.AsNoTracking().AsSplitQuery()
             .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
@@ -156,45 +198,19 @@ public class ProductController : ControllerBase
 
         var productDto = _mapper.Map<ProductDetailsDto>(product);
 
-        if (sizeId != Guid.Empty && colorId != Guid.Empty)
+        if (sizeId.HasValue && colorId.HasValue)
         {
-            var stock = product.Stocks.FirstOrDefault(s => s.SizeId == sizeId && s.ColorId == colorId);
+            var stock = product.Stocks.FirstOrDefault(s => s.SizeId == sizeId.Value && s.ColorId == colorId.Value);
             if (stock != null)
             {
                 productDto.Availability = new AvailabilityDto { Quantity = stock.Stock, Price = stock.Price };
             }
         }
-        if (sizeId != Guid.Empty)
-        {
-            productDto.Colors = product.Stocks
-                .Where(ps => ps.SizeId == sizeId)
-                .Select(ps => new ColorDto
-                {
-                    Id = ps.Color.Id,
-                    Name = ps.Color.Name,
-                    HexCode = ps.Color.HexCode,
-                    ImageUrls = product.Images
-                        .Where(i => i.ColorId == ps.ColorId)
-                        .SelectMany(i => i.ImageUrls)
-                        .ToList(),
-                    IsAvailable = ps.Stock > 0,
-                    Quantity = ps.Stock
-                }).ToList();
-        }
-        
-        if (colorId != Guid.Empty)
-        {
-            productDto.Sizes = product.Stocks
-                .Where(s => s.ColorId == colorId)
-                .Select(s => new SizeDto { Id = s.SizeId, Name = s.Size.Name, Quantity = s.Stock })
-                .ToList();
 
-            
-        }
-
+        productDto.Colors = GetColorDtos(product.Stocks, (sizeId.HasValue && colorId.HasValue) ? sizeId : null);
+        productDto.Sizes = GetSizeDtos(product.Stocks, (sizeId.HasValue && colorId.HasValue) ? colorId : null);
         return Ok(productDto);
     }    
-    
     private void ValidateOnModelLevel(CreateProductDto productDto)
     {
         if (productDto == null)

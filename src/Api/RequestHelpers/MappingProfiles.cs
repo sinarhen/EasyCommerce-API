@@ -94,6 +94,10 @@ public class MappingProfiles: Profile
                     CreatedAt = r.CreatedAt
                 })
             ))
+            .ForMember(dest => dest.Colors, opt => opt.Ignore())
+            .ForMember(dest => dest.Sizes, opt => opt.Ignore())
+            ;
+            
             ;
         
     }
