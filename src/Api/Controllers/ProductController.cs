@@ -417,16 +417,25 @@ public class ProductController : ControllerBase
         {
             product.Name = productDto.Name;
         }
-        if (productDto.CategoryId != Guid.Empty)
+           
+        // checking if category id is not empty
+        if (!string.IsNullOrEmpty(productDto.CategoryId))
         {
-            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
+            // checking if category with given id exists
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == Guid.Parse(productDto.CategoryId));
             if (category == null)
             {
                 return BadRequest($"Category with ID {productDto.CategoryId} does not exist");
             }
+            
+            // clearing all categories from product
             product.Categories.Clear();
+            
+            // adding product to category
             AddToCategories(category, product);
         }
+        
+        
         if (!string.IsNullOrEmpty(productDto.Description))
         {
             product.Description = productDto.Description;
@@ -440,9 +449,9 @@ public class ProductController : ControllerBase
             product.SizeChartImageUrl = productDto.SizeChartImageUrl;
         }
 
-        if (productDto.MainMaterialId != Guid.Empty)
+        if (!string.IsNullOrEmpty(productDto.MainMaterialId))
         {
-            var mainMaterial = await _dbContext.Materials.FirstOrDefaultAsync(m => m.Id == productDto.MainMaterialId);
+            var mainMaterial = await _dbContext.Materials.FirstOrDefaultAsync(m => m.Id == Guid.Parse(productDto.MainMaterialId));
             if (mainMaterial == null)
             {
                 return BadRequest($"Main material with ID {productDto.MainMaterialId} does not exist");
@@ -456,8 +465,8 @@ public class ProductController : ControllerBase
             {
                 return BadRequest($"Invalid gender value. Valid gender options are: ({string.Join(", ", Enum.GetNames<Gender>())})");
             }
-        
 
+            product.Gender = gender;
         }
 
         if (!string.IsNullOrEmpty(productDto.Season))
@@ -465,12 +474,13 @@ public class ProductController : ControllerBase
             if (!Enum.TryParse<Season>(productDto.Season, out var season))
             {
                 return BadRequest($"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
-            }            
+            }
+            product.Season = season;
         }
         
-        if (productDto.OccasionId != Guid.Empty)
+        if (!string.IsNullOrEmpty(productDto.OccasionId))
         {
-            var occasion = await _dbContext.Occasions.FirstOrDefaultAsync(o => o.Id == productDto.OccasionId);
+            var occasion = await _dbContext.Occasions.FirstOrDefaultAsync(o => o.Id == Guid.Parse(productDto.OccasionId));
             if (occasion == null)
             {
                 return BadRequest($"Occasion with ID {productDto.OccasionId} does not exist");
@@ -478,10 +488,10 @@ public class ProductController : ControllerBase
             product.Occasion = occasion;
         }
         
-        if (productDto.CollectionId != Guid.Empty)
+        if (!string.IsNullOrEmpty(productDto.CollectionId))
         {
             var collection = await _dbContext.Collections.Include(collection => collection.Store)
-                .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
+                .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == Guid.Parse(productDto.CollectionId));
             if (collection == null)
             {
                 return BadRequest($"Collection with ID {productDto.CollectionId} does not exist");
@@ -547,9 +557,7 @@ public class ProductController : ControllerBase
             }).ToList();
         }
         
-
-            
-        
+        await _dbContext.SaveChangesAsync();
         return Ok();
     }
 

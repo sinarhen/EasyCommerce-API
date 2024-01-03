@@ -146,6 +146,7 @@ public class AuthController : ControllerBase
         
         var token = _jwtService.GenerateToken(username: user.UserName, roles: await _userManager.GetRolesAsync(user));
         
+        Console.WriteLine("token: " + _jwtService.WriteToken(token));
         return CreatedAtAction(nameof(ChangePassword),
         new
         {

@@ -59,10 +59,10 @@ builder.Services.AddIdentity<User, UserRole>(options =>
     })
     .AddJwtBearer(options =>
     {
-        Console.WriteLine("Adding jwt bearer with such jwt key: " + Secrets.JwtKey);
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            RoleClaimType = ClaimTypes.Role,
+            RoleClaimType = CustomClaimTypes.Role,
+            NameClaimType = CustomClaimTypes.Username,
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
@@ -77,7 +77,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddSingleton<JwtService>(provider =>
 {
-    Console.WriteLine("key: " + Secrets.JwtKey);
     var jwtSecrets = new JwtSecrets(
         Issuer: Secrets.JwtIssuer,
         Key: Secrets.JwtKey,

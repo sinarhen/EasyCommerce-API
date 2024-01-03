@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ECommerce.Config;
 using Microsoft.IdentityModel.Tokens;
 namespace ECommerce.Services;
 
@@ -23,18 +24,17 @@ public class JwtService
     public JwtSecurityToken GenerateToken(string username, IEnumerable<string> roles)
     {
 
-        Console.WriteLine("generating jwt with such secret key: " + _jwtSecrets.Key);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecrets.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
      
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, username),
+            new Claim(CustomClaimTypes.Username, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
         foreach (var role in roles)
         {
-            if (role != null) claims.Add(new Claim(ClaimTypes.Role, role));
+            if (role != null) claims.Add(new Claim(CustomClaimTypes.Role, role));
         }  
 
         var jwt = new JwtSecurityToken(
@@ -80,8 +80,9 @@ public class JwtService
 
             return simplePrincipal;
         }
-        catch
+        catch (Exception err)
         {
+            Console.WriteLine(err);
             return null;
         }
     }
