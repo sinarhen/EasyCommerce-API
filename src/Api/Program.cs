@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
 using Ecommerce.Data;
+using ECommerce.Data;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;
@@ -83,6 +84,8 @@ builder.Services.AddSingleton<JwtService>(provider =>
     );
     return new JwtService(jwtSecrets);
 });
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
