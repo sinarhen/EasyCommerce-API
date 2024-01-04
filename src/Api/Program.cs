@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
 using Ecommerce.Data;
@@ -48,7 +49,7 @@ builder.Services.AddIdentity<User, UserRole>(options =>
     .AddDefaultTokenProviders();
 
 
-    builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -59,7 +60,7 @@ builder.Services.AddIdentity<User, UserRole>(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            RoleClaimType = CustomClaimTypes.Role,
+            RoleClaimType = ClaimTypes.Role,
             NameClaimType = CustomClaimTypes.Username,
             ValidateIssuer = true,
             ValidateAudience = true,

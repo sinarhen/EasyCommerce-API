@@ -34,9 +34,12 @@ public class JwtService
         };
         foreach (var role in roles)
         {
-            if (role != null) claims.Add(new Claim(CustomClaimTypes.Role, role));
+            if (role != null) claims.Add(new Claim(ClaimTypes.Role, role));
         }  
-
+        
+        Console.WriteLine("Generating token for user: " + username + " with roles: " + string.Join(",", roles));
+        Console.WriteLine("Claims: " + string.Join(",", claims.Select(c => c.Type + ":" + c.Value)));
+        
         var jwt = new JwtSecurityToken(
             _jwtSecrets.Issuer,
             _jwtSecrets.Audience,

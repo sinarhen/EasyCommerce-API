@@ -108,19 +108,45 @@ public static class InitDb
 
         var roles = await userManager.GetRolesAsync(admin);
         
-        Console.WriteLine("Admin roles:");
         roles.ToList().ForEach(role => Console.WriteLine(role));
         
-        if (await userManager.IsInRoleAsync(admin, UserRoles.SuperAdmin))
+        // Used only for development purposes. Will be removed in production for better security and performance.
+        if (!await userManager.IsInRoleAsync(admin, UserRoles.SuperAdmin))
         {
-            return;
-        }
-        var roleResult = await userManager.AddToRoleAsync(admin, UserRoles.SuperAdmin);
-        if (!roleResult.Succeeded)
-        {
-            throw new Exception("Failed to add admin user to roles");
+            var roleResult = await userManager.AddToRoleAsync(admin, UserRoles.SuperAdmin);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Failed to add admin user to SuperAdmin role");
+            }
         }
 
+        if (!await userManager.IsInRoleAsync(admin, UserRoles.Admin))
+        {
+            var roleResult = await userManager.AddToRoleAsync(admin, UserRoles.Admin);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Failed to add admin user to Admin role");
+            }
+        }
+        
+        if (!await userManager.IsInRoleAsync(admin, UserRoles.Seller))
+        {
+            var roleResult = await userManager.AddToRoleAsync(admin, UserRoles.Seller);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Failed to add admin user to Seller role");
+            }
+        }
+        
+        if (!await userManager.IsInRoleAsync(admin, UserRoles.Customer))
+        {
+            var roleResult = await userManager.AddToRoleAsync(admin, UserRoles.Customer);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Failed to add admin user to Customer role");
+            }
+        }
+        
     }
 
     private static List<ProductStock> GetProductStocksForSeeding(Product product, IEnumerable<Color> colors, int price, IReadOnlyCollection<Size> sizes)

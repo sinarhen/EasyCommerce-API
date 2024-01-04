@@ -321,8 +321,11 @@ public class ProductController : ControllerBase
         {
             return BadRequest($"Collection with ID {productDto.CollectionId} does not exist");
         }
-        if (existingCollection.Store.Owner.UserName != User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value)
+        
+        if (existingCollection.Store.Owner.UserName != User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Username)?.Value)
         {
+            Console.WriteLine("Store owner: " + existingCollection.Store.Owner.UserName);
+            Console.WriteLine("User: " + User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Username)?.Value);
             return Unauthorized("You are not the owner of this store");
         }
 
@@ -404,10 +407,38 @@ public class ProductController : ControllerBase
         }
     }
     
+    private void ClearProductCategories(Product product)
+    {
+        foreach (var productCategory in product.Categories)
+        {
+            _dbContext.ProductCategories.Remove(productCategory);
+        }
+    }
+    
+    private void ClearProductMaterials(Product product)
+    {
+        foreach (var productMaterial in product.Materials)
+        {
+            _dbContext.ProductMaterials.Remove(productMaterial);
+        }
+    }
+
+    private void ClearProductStocks(Product product)
+    {
+        foreach (var productStock in product.Stocks)
+        {
+            _dbContext.ProductStocks.Remove(productStock);
+        }
+    }
+    
+    
+    
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {
-        var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _dbContext.Products.Include(product => product.Stocks)
+            .Include(product => product.Categories).Include(product => product.Materials).FirstOrDefaultAsync(p => p.Id == id);
         if (product == null)
         {
             return NotFound();
@@ -429,9 +460,7 @@ public class ProductController : ControllerBase
             }
             
             // clearing all categories from product
-            product.Categories.Clear();
-            
-            // adding product to category
+            ClearProductCategories(product);
             AddToCategories(category, product);
         }
         
@@ -515,7 +544,8 @@ public class ProductController : ControllerBase
                 return BadRequest($"Materials with the following IDs do not exist: {string.Join(", ", nonExistingMaterialIds)}");
             }
             
-            product.Materials.Clear();
+            ClearProductMaterials(product);
+            
             product.Materials = productDto.Materials.Select(material => new ProductMaterial
             {
                 Product = product,
@@ -546,7 +576,7 @@ public class ProductController : ControllerBase
                 return BadRequest($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
             }
             
-            product.Stocks.Clear();
+            ClearProductStocks(product);
             product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
             {
                 Product = product,
