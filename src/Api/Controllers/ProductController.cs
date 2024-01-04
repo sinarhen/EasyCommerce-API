@@ -311,11 +311,11 @@ public class ProductController : ControllerBase
             .Where(size => size == null)
             .ToList();
         
-        var existingMainMaterial = _dbContext.Materials.FirstOrDefault(material => material.Id == productDto.MainMaterialId);
-        var existingOccasion = _dbContext.Occasions.FirstOrDefault(occasion => occasion.Id == productDto.OccasionId);
-        var category = _dbContext.Categories.FirstOrDefault(c => c.Id == productDto.CategoryId);
-        var existingCollection = _dbContext.Collections.Include(collection => collection.Store)
-            .ThenInclude(store => store.Owner).FirstOrDefault(collection => collection.Id == productDto.CollectionId);
+        var existingMainMaterial = await _dbContext.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
+        var existingOccasion = await _dbContext.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
+        var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
+        var existingCollection = await _dbContext.Collections.Include(collection => collection.Store)
+            .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
 
         if (existingCollection == null)
         {
@@ -324,8 +324,6 @@ public class ProductController : ControllerBase
         
         if (existingCollection.Store.Owner.UserName != User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Username)?.Value)
         {
-            Console.WriteLine("Store owner: " + existingCollection.Store.Owner.UserName);
-            Console.WriteLine("User: " + User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Username)?.Value);
             return Unauthorized("You are not the owner of this store");
         }
 
@@ -356,8 +354,6 @@ public class ProductController : ControllerBase
             return BadRequest($"Category with ID {productDto.CategoryId} does not exist");
         }
         
-        
-        
         var product = _mapper.Map<Product>(productDto);
         
         product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
@@ -383,27 +379,38 @@ public class ProductController : ControllerBase
             ImageUrls = stockDto.ImageUrls
         }).ToList();
         
-        AddToCategories(category, product);
-        
+        int initialOrder = CalculateDepth(category);
+        AddToCategories(category, product, initialOrder);
+
         await _dbContext.Products.AddAsync(product);
         await _dbContext.SaveChangesAsync();
         
         return Ok();
     }
 
-    private void AddToCategories(Category category, Product product)
+    private int CalculateDepth(Category category)
     {
+        int depth = 1;
+        while (category.ParentCategory != null)
+        {
+            depth++;
+            category = category.ParentCategory;
+        }
+        return depth;
+    }
+
+    private void AddToCategories(Category category, Product product, int order)
+    {
+        product.Categories.Add(new ProductCategory
+        {
+            ProductId = product.Id,
+            CategoryId = category.Id,
+            Order = order
+        });
+
         if (category.ParentCategory != null)
         {
-            AddToCategories(category.ParentCategory, product);
-        }
-        else
-        {
-            product.Categories.Add(new ProductCategory
-            {
-                ProductId = product.Id,
-                CategoryId = category.Id
-            });
+            AddToCategories(category.ParentCategory, product, order - 1);
         }
     }
     
@@ -437,13 +444,25 @@ public class ProductController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {
-        var product = await _dbContext.Products.Include(product => product.Stocks)
-            .Include(product => product.Categories).Include(product => product.Materials).FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _dbContext.Products
+            .Include(product => product.Stocks)
+            .Include(product => product.Categories).ThenInclude(c => c.Category).ThenInclude(c => c.ParentCategory)
+            .Include(product => product.Materials)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
         if (product == null)
         {
             return NotFound();
         }
-        
+
+        var categories = await _dbContext.Categories.ToListAsync();
+        var materials = await _dbContext.Materials.ToListAsync();
+        var colors = await _dbContext.Colors.ToListAsync();
+        var sizes = await _dbContext.Sizes.ToListAsync();
+        var occasions = await _dbContext.Occasions.ToListAsync();
+        var collections = await _dbContext.Collections.Include(collection => collection.Store)
+                .ThenInclude(store => store.Owner).ToListAsync();
+
         if (!string.IsNullOrEmpty(productDto.Name))
         {
             product.Name = productDto.Name;
@@ -453,7 +472,7 @@ public class ProductController : ControllerBase
         if (!string.IsNullOrEmpty(productDto.CategoryId))
         {
             // checking if category with given id exists
-            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == Guid.Parse(productDto.CategoryId));
+            var category = categories.FirstOrDefault(c => c.Id == Guid.Parse(productDto.CategoryId));
             if (category == null)
             {
                 return BadRequest($"Category with ID {productDto.CategoryId} does not exist");
@@ -461,7 +480,9 @@ public class ProductController : ControllerBase
             
             // clearing all categories from product
             ClearProductCategories(product);
-            AddToCategories(category, product);
+
+            int initialOrder = CalculateDepth(category);
+            AddToCategories(category, product, initialOrder);
         }
         
         
@@ -480,7 +501,7 @@ public class ProductController : ControllerBase
 
         if (!string.IsNullOrEmpty(productDto.MainMaterialId))
         {
-            var mainMaterial = await _dbContext.Materials.FirstOrDefaultAsync(m => m.Id == Guid.Parse(productDto.MainMaterialId));
+            var mainMaterial = materials.FirstOrDefault(m => m.Id == Guid.Parse(productDto.MainMaterialId));
             if (mainMaterial == null)
             {
                 return BadRequest($"Main material with ID {productDto.MainMaterialId} does not exist");
@@ -509,7 +530,7 @@ public class ProductController : ControllerBase
         
         if (!string.IsNullOrEmpty(productDto.OccasionId))
         {
-            var occasion = await _dbContext.Occasions.FirstOrDefaultAsync(o => o.Id == Guid.Parse(productDto.OccasionId));
+            var occasion = occasions.FirstOrDefault(o => o.Id == Guid.Parse(productDto.OccasionId));
             if (occasion == null)
             {
                 return BadRequest($"Occasion with ID {productDto.OccasionId} does not exist");
@@ -519,8 +540,7 @@ public class ProductController : ControllerBase
         
         if (!string.IsNullOrEmpty(productDto.CollectionId))
         {
-            var collection = await _dbContext.Collections.Include(collection => collection.Store)
-                .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == Guid.Parse(productDto.CollectionId));
+            var collection = collections.FirstOrDefault(collection => collection.Id == Guid.Parse(productDto.CollectionId));
             if (collection == null)
             {
                 return BadRequest($"Collection with ID {productDto.CollectionId} does not exist");
@@ -535,7 +555,7 @@ public class ProductController : ControllerBase
         if (productDto.Materials is { Count: > 0 })
         {
             var nonExistingMaterialIds = productDto.Materials
-                .Where(m => !_dbContext.Materials.Any(material => material.Id == m.Id))
+                .Where(m => !materials.Any(material => material.Id == m.Id))
                 .Select(m => m.Id)
                 .ToList();
             
@@ -587,15 +607,28 @@ public class ProductController : ControllerBase
             }).ToList();
         }
         
-        await _dbContext.SaveChangesAsync();
+        using (var transaction = _dbContext.Database.BeginTransaction())
+        {
+            try
+            {
+                _dbContext.Products.Update(product);
+                await _dbContext.SaveChangesAsync();
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
         return Ok();
     }
 
     [HttpDelete("{id}")]
     public IActionResult DeleteProduct(Guid id)
     {
-        // TODO: Implement
-        return Ok();
-        
+
+        return Ok();        
     }
 }
