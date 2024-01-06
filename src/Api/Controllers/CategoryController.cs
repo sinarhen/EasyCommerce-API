@@ -23,7 +23,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetProducts([FromQuery] SearchParams searchParams)
+    public async Task<ActionResult> GetCategories([FromQuery] SearchParams searchParams)
     {
         return Ok();
     }

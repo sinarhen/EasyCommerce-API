@@ -15,7 +15,8 @@ public class Category : BaseEntity
     public Guid? ParentCategoryId { get; set; }
 
     public string Name { get; set; }
-
+    
+    public string ImageUrl { get; set; }
     // Navigation properties
     [ForeignKey("ParentCategoryId")]
     public Category ParentCategory { get; set; }
