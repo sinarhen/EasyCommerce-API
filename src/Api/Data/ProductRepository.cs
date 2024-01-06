@@ -568,8 +568,25 @@ public class ProductRepository: IProductRepository
         return product;
     }
     
-    public Task DeleteProductAsync(Guid id)
+    public async Task DeleteProductAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var product = await _dbContext.Products
+            .Include(product => product.Stocks)
+            .Include(product => product.Categories)
+            .Include(product => product.Materials)
+            .Include(product => product.Collection)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        
+        if (product == null)
+        {
+            throw new ArgumentException($"Product with ID {id} does not exist");
+        }
+        
+        ClearProductCategories(product);
+        ClearProductMaterials(product);
+        ClearProductStocks(product);
+        
+        _dbContext.Products.Remove(product);
+        await SaveChangesAsyncWithTransaction();
     }
 }

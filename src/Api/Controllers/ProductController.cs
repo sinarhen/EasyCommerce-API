@@ -186,9 +186,11 @@ public class ProductController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteProduct(Guid id)
+    public async Task<ActionResult> DeleteProduct(Guid id)
     {
-
+        await _repository.DeleteProductAsync(id);
+        
+        
         return Ok();        
     }
 }
