@@ -185,6 +185,7 @@ public class ProductController : ControllerBase
         }
     }
 
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
