@@ -1,31 +1,34 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
 using Ecommerce.Data;
+using Ecommerce.Data.Repositories.Category;
 using Ecommerce.Models.DTOs;
 using ECommerce.Models.DTOs;
-using Ecommerce.RequestHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Controllers;
 
 [ApiController]
-[Route("api/products")]
+[Route("api/categories")]
 public class CategoryController : ControllerBase
 {
-    private readonly ProductDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly ICategoryRepository _repository;
 
-    public CategoryController(ProductDbContext dbContext, IMapper mapper)
+    public CategoryController(IMapper mapper, ICategoryRepository repository)
     {
-        _dbContext = dbContext;
         _mapper = mapper;
+        _repository = repository;
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetCategories([FromQuery] SearchParams searchParams)
+    public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
-        return Ok();
+        var categories = await _repository.GetCategoriesAsync();
+        var categoriesDtos = _mapper.Map<List<CategoryDto>>(categories);
+        
+        return Ok(categoriesDtos);
     }
 
     [HttpGet("{id}")]

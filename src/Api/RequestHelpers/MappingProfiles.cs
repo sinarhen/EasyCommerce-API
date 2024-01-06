@@ -6,9 +6,14 @@ namespace Ecommerce.RequestHelpers;
 
 public class MappingProfiles: Profile
 {
+    private void MapCategoryProfiles()
+    {
+        CreateMap<Category, CategoryDto>();
+    }
     public MappingProfiles()
     {
         MapProductProfiles();
+        MapCategoryProfiles();
     }
     private void MapProductProfiles()
     {

@@ -3,6 +3,7 @@ using System.Text;
 using ECommerce.Config;
 using Ecommerce.Data;
 using ECommerce.Data;
+using Ecommerce.Data.Repositories.Category;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;
@@ -86,6 +87,8 @@ builder.Services.AddSingleton<JwtService>(provider =>
 });
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

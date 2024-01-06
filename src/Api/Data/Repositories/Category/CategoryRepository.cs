@@ -1,5 +1,4 @@
 ﻿using ECommerce.Models.DTOs;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Data.Repositories.Category;
@@ -12,27 +11,30 @@ public class CategoryRepository : ICategoryRepository
     {
         _dbContext = dbContext;
     }
-    public async Task<ActionResult<List<ECommerce.Models.Entities.Category>>> GetCategoriesAsync()
+    public async Task<List<ECommerce.Models.Entities.Category>> GetCategoriesAsync()
     {
-        return await _dbContext.Categories.ToListAsync();
+        return await _dbContext.Categories
+            .Include(c => c.SubCategories)
+            .Where(c => c.ParentCategoryId == null)
+            .ToListAsync();
     }
 
-    public Task<ActionResult> GetCategoryAsync(Guid id, Guid? sizeId = null, Guid? colorId = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ActionResult> CreateCategoryAsync(WriteCategoryDto categoryDto)
+    public Task<ECommerce.Models.Entities.Category> GetCategoryAsync(Guid id, Guid? sizeId = null, Guid? colorId = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ActionResult> UpdateCategoryAsync(Guid id, WriteCategoryDto productDto)
+    public Task<ECommerce.Models.Entities.Category> CreateCategoryAsync(WriteCategoryDto categoryDto)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ActionResult> DeleteCategoryAsync(Guid id)
+    public Task UpdateCategoryAsync(Guid id, WriteCategoryDto productDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteCategoryAsync(Guid id)
     {
         throw new NotImplementedException();
     }

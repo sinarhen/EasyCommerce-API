@@ -48,6 +48,7 @@ namespace ECommerce.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentCategoryId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: true),
+                    ImageUrl = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

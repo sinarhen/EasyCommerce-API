@@ -15,13 +15,11 @@ namespace Ecommerce.Controllers;
 [Route("api/products")]
 public class ProductController : ControllerBase
 {
-    private readonly ProductDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
 
-    public ProductController(ProductDbContext dbContext, IMapper mapper, IProductRepository repository)
+    public ProductController(IMapper mapper, IProductRepository repository)
     {
-        _dbContext = dbContext;
         _mapper = mapper;
         _repository = repository;
     }
