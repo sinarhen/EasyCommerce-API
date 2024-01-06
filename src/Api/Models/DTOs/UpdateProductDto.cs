@@ -1,7 +1,4 @@
-﻿using ECommerce.Models.DTOs;
-using ECommerce.Models.Entities;
-
-namespace Ecommerce.Models.DTOs;
+﻿namespace ECommerce.Models.DTOs;
 
 public class UpdateProductDto
 {

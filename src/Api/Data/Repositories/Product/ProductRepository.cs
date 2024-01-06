@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
-using Ecommerce.Data;
-using Ecommerce.Data.Repositories;
-using Ecommerce.Models.DTOs;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
-using Ecommerce.RequestHelpers;
+using ECommerce.RequestHelpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Product;

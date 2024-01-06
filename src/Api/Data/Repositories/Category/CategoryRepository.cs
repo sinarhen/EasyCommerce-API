@@ -1,7 +1,7 @@
 ﻿using ECommerce.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Data.Repositories.Category;
+namespace ECommerce.Data.Repositories.Category;
 
 public class CategoryRepository : BaseRepository, ICategoryRepository
 {

@@ -1,6 +1,6 @@
 ﻿using ECommerce.Models.Entities;
 
-namespace Ecommerce.Data.Repositories;
+namespace ECommerce.Data.Repositories;
 
 public class BaseRepository
 {

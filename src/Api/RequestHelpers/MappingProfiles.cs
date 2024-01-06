@@ -2,7 +2,7 @@
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
 
-namespace Ecommerce.RequestHelpers;
+namespace ECommerce.RequestHelpers;
 
 public class MappingProfiles: Profile
 {

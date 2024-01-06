@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
-using Ecommerce.Data.Repositories.Category;
-using Ecommerce.Models.DTOs;
+using ECommerce.Data.Repositories.Category;
 using ECommerce.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ecommerce.Controllers;
+namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/categories")]

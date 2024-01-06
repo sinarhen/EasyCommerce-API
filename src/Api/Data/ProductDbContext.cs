@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Data;
+namespace ECommerce.Data;
 
 public class ProductDbContext : IdentityDbContext<User, UserRole, string>
 {

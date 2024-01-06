@@ -1,4 +1,6 @@
-namespace ECommerce.Services;
+using ECommerce.Models.DTOs;
+
+namespace ECommerce.Config;
 
 public class SimplePrincipal
 {

@@ -1,17 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using AutoMapper;
 using ECommerce.Config;
-using Ecommerce.Data;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Controllers;
+namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/auth")]
@@ -154,10 +151,8 @@ public class AuthController : ControllerBase
             expiration = token.ValidTo,
         });
         
-    }
-
-
-    // TODO: add change email
+    } 
+    
     [HttpPost("change-email")]
     public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
     {

@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.RequestHelpers;
+﻿namespace ECommerce.RequestHelpers;
 
 public class SearchParams
 {

@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
+using ECommerce.Models.DTOs;
 using Microsoft.IdentityModel.Tokens;
 namespace ECommerce.Services;
 
@@ -20,6 +21,21 @@ public class JwtService
     {
         _jwtSecrets = jwtSecrets ?? throw new ArgumentNullException(nameof(jwtSecrets));
     }
+    
+    public void AddJwtService(IServiceCollection services)
+    {
+        var jwtSecrets = new JwtSecrets(
+            Secrets.JwtIssuer,
+            Secrets.JwtKey,
+            Secrets.JwtAudience
+        );
+        services.AddSingleton(jwtSecrets);
+        services.AddScoped<JwtService>();
+    }
+    
+    // public void AddJwtBearer(IServiceCollection services)
+    
+    
 
     public JwtSecurityToken GenerateToken(string username, IEnumerable<string> roles)
     {

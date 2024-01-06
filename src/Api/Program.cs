@@ -1,9 +1,8 @@
 using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
-using Ecommerce.Data;
 using ECommerce.Data;
-using Ecommerce.Data.Repositories.Category;
+using ECommerce.Data.Repositories.Category;
 using ECommerce.Data.Repositories.Product;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
@@ -77,15 +76,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddSingleton<JwtService>(provider =>
-{
-    var jwtSecrets = new JwtSecrets(
-        Issuer: Secrets.JwtIssuer,
-        Key: Secrets.JwtKey,
-        Audience: Secrets.JwtAudience
-    );
-    return new JwtService(jwtSecrets);
-});
+builder.Services.AddJwtService();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();

@@ -1,8 +1,6 @@
 ﻿using ECommerce.Models.DTOs;
-using ECommerce.Models.Entities;
 
-
-namespace Ecommerce.Data.Repositories.Category;
+namespace ECommerce.Data.Repositories.Category;
 
 public interface ICategoryRepository
 {

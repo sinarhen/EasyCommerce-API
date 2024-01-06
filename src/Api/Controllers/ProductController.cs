@@ -1,16 +1,14 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
 using ECommerce.Config;
-using Ecommerce.Data;
 using ECommerce.Data.Repositories.Product;
-using Ecommerce.Models.DTOs;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
-using Ecommerce.RequestHelpers;
+using ECommerce.RequestHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ecommerce.Controllers;
+namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/products")]

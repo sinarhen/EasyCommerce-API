@@ -3,7 +3,7 @@ using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Ecommerce.Data;
+namespace ECommerce.Data;
 
 public static class InitDb
 { 
