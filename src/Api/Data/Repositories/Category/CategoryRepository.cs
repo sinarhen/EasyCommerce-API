@@ -1,34 +1,39 @@
 ﻿using ECommerce.Models.DTOs;
-using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Data.Repositories.Category;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryRepository : BaseRepository, ICategoryRepository
 {
-    private readonly ProductDbContext _dbContext;
-
-    public CategoryRepository(ProductDbContext dbContext)
+    public CategoryRepository(ProductDbContext db) : base(db)
     {
-        _dbContext = dbContext;
+        
     }
     public async Task<List<ECommerce.Models.Entities.Category>> GetCategoriesAsync()
     {
-        return await _dbContext.Categories.AsNoTracking()
+        return await _db.Categories.AsNoTracking()
             .Include(c => c.SubCategories)
             .Where(c => c.ParentCategoryId == null)
             .ToListAsync();
     }
     public async Task<ECommerce.Models.Entities.Category> GetCategoryAsync(Guid id)
     {
-        return await _dbContext.Categories
+        return await _db.Categories
             .Include(c => c.SubCategories)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public Task<ECommerce.Models.Entities.Category> CreateCategoryAsync(WriteCategoryDto categoryDto)
+    public async Task<bool> CreateCategoryAsync(WriteCategoryDto categoryDto)
     {
-        throw new NotImplementedException();
+        var category = new ECommerce.Models.Entities.Category
+        {
+            ParentCategoryId = categoryDto.ParentCategoryId,
+            Name = categoryDto.Name,
+            ImageUrl = categoryDto.ImageUrl
+        };
+        
+        await _db.Categories.AddAsync(category);
+        return await _db.SaveChangesAsync() > 0;
     }
 
     public Task UpdateCategoryAsync(Guid id, WriteCategoryDto productDto)

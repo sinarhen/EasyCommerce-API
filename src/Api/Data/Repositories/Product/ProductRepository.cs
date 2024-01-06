@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
 using Ecommerce.Data;
+using Ecommerce.Data.Repositories;
 using Ecommerce.Models.DTOs;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.Entities;
@@ -9,17 +10,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Product;
 
-public class ProductRepository: IProductRepository
+public class ProductRepository: BaseRepository, IProductRepository
 {
-    private readonly ProductDbContext _dbContext;
+    
     private readonly IMapper _mapper;
-
-
-    public ProductRepository(ProductDbContext dbContext, IMapper mapper)
+    public ProductRepository(ProductDbContext db, IMapper mapper) : base(db)
     {
-        _dbContext = dbContext;
         _mapper = mapper;
     }
+    
+    
     
     private static void ValidateOnModelLevel(CreateProductDto productDto)
     {
@@ -93,10 +93,10 @@ public class ProductRepository: IProductRepository
 
     private async Task SaveChangesAsyncWithTransaction()
     {
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        await using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             await transaction.CommitAsync();
         }
         catch (Exception e)
@@ -109,7 +109,7 @@ public class ProductRepository: IProductRepository
             
     public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(SearchParams searchParams)
     {
-        var query = _dbContext.Products.AsNoTracking().AsSplitQuery();
+        var query = _db.Products.AsNoTracking().AsSplitQuery();
 
         query = searchParams.FilterBy switch
         {
@@ -213,7 +213,7 @@ public class ProductRepository: IProductRepository
 
     public async Task<Models.Entities.Product> GetProductAsync(Guid id)
     {
-        var product = await _dbContext.Products.AsNoTracking().AsSplitQuery()
+        var product = await _db.Products.AsNoTracking().AsSplitQuery()
             .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
             .Include(p => p.Occasion)
             .Include(p => p.MainMaterial)
@@ -234,26 +234,26 @@ public class ProductRepository: IProductRepository
         ValidateOnModelLevel(productDto);
         
         var nonExistingMaterialIds = productDto.Materials
-            .Where(m => !_dbContext.Materials.Any(material => material.Id == m.Id))
+            .Where(m => !_db.Materials.Any(material => material.Id == m.Id))
             .Select(m => m.Id)
             .ToList();
         
         var nonExistingColors = productDto.Stocks
-            .Where(s => !_dbContext.Colors.Any(color => color.Id == s.ColorId))
+            .Where(s => !_db.Colors.Any(color => color.Id == s.ColorId))
             .Select(color => color.ColorId)
             .ToList();
         
 
         var nonExistingSizes = productDto.Stocks
             .SelectMany(s => s.Sizes)
-            .Select(size => _dbContext.Sizes.FirstOrDefault(s => s.Id == size.SizeId))
+            .Select(size => _db.Sizes.FirstOrDefault(s => s.Id == size.SizeId))
             .Where(size => size == null)
             .ToList();
         
-        var existingMainMaterial = await _dbContext.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
-        var existingOccasion = await _dbContext.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
-        var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
-        var existingCollection = await _dbContext.Collections.Include(collection => collection.Store)
+        var existingMainMaterial = await _db.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
+        var existingOccasion = await _db.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
+        var existingCollection = await _db.Collections.Include(collection => collection.Store)
             .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
 
         if (existingCollection == null)
@@ -305,11 +305,12 @@ public class ProductRepository: IProductRepository
         
         var product = _mapper.Map<Models.Entities.Product>(productDto);
         
+        
         product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
         {
             Product = product,
-            Color = _dbContext.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-            Size = _dbContext.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+            Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+            Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
             Stock = stockDto.Sizes.First().Stock,
             Price = stockDto.Sizes.First().Price
         }).ToList();
@@ -317,21 +318,21 @@ public class ProductRepository: IProductRepository
         product.Materials = productDto.Materials.Select(material => new ProductMaterial
         {
             Product = product,
-            Material = _dbContext.Materials.FirstOrDefault(m => m.Id == material.Id),
+            Material = _db.Materials.FirstOrDefault(m => m.Id == material.Id),
             Percentage = material.Percentage
         }).ToList();
         
         product.Images = productDto.Stocks.Select(stockDto => new ProductImage
         {
             Product = product,
-            Color = _dbContext.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+            Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
             ImageUrls = stockDto.ImageUrls
         }).ToList();
         
         int initialOrder = CalculateDepth(category);
         AddToCategories(category, product, initialOrder);
 
-        await _dbContext.Products.AddAsync(product);
+        await _db.Products.AddAsync(product);
         await SaveChangesAsyncWithTransaction();
 
         return product;
@@ -352,7 +353,7 @@ public class ProductRepository: IProductRepository
     {
         foreach (var productCategory in product.Categories)
         {
-            _dbContext.ProductCategories.Remove(productCategory);
+            _db.ProductCategories.Remove(productCategory);
         }
     }
     
@@ -360,7 +361,7 @@ public class ProductRepository: IProductRepository
     {
         foreach (var productMaterial in product.Materials)
         {
-            _dbContext.ProductMaterials.Remove(productMaterial);
+            _db.ProductMaterials.Remove(productMaterial);
         }
     }
 
@@ -368,7 +369,7 @@ public class ProductRepository: IProductRepository
     {
         foreach (var productStock in product.Stocks)
         {
-            _dbContext.ProductStocks.Remove(productStock);
+            _db.ProductStocks.Remove(productStock);
         }
     }
 
@@ -390,7 +391,7 @@ public class ProductRepository: IProductRepository
     
     public async Task<Models.Entities.Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string username, IEnumerable<string> roles)
     {
-        var product = await _dbContext.Products
+        var product = await _db.Products
             .Include(product => product.Stocks)
             .Include(product => product.Categories).ThenInclude(c => c.Category).ThenInclude(c => c.ParentCategory)
             .Include(product => product.Materials)
@@ -414,12 +415,12 @@ public class ProductRepository: IProductRepository
             throw new UnauthorizedAccessException("You are not the owner of this store");
         }
 
-        var categories = await _dbContext.Categories.ToListAsync();
-        var materials = await _dbContext.Materials.ToListAsync();
-        var colors = await _dbContext.Colors.ToListAsync();
-        var sizes = await _dbContext.Sizes.ToListAsync();
-        var occasions = await _dbContext.Occasions.ToListAsync();
-        var collections = await _dbContext.Collections.Include(collection => collection.Store)
+        var categories = await _db.Categories.ToListAsync();
+        var materials = await _db.Materials.ToListAsync();
+        var colors = await _db.Colors.ToListAsync();
+        var sizes = await _db.Sizes.ToListAsync();
+        var occasions = await _db.Occasions.ToListAsync();
+        var collections = await _db.Collections.Include(collection => collection.Store)
                 .ThenInclude(store => store.Owner).ToListAsync();
 
         if (!string.IsNullOrEmpty(productDto.Name))
@@ -524,7 +525,7 @@ public class ProductRepository: IProductRepository
             product.Materials = productDto.Materials.Select(material => new ProductMaterial
             {
                 Product = product,
-                Material = _dbContext.Materials.FirstOrDefault(m => m.Id == material.Id),
+                Material = _db.Materials.FirstOrDefault(m => m.Id == material.Id),
                 Percentage = material.Percentage
             }).ToList();
         }
@@ -555,8 +556,8 @@ public class ProductRepository: IProductRepository
             product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
             {
                 Product = product,
-                Color = _dbContext.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-                Size = _dbContext.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+                Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+                Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
                 Stock = stockDto.Sizes.First().Stock,
                 Price = stockDto.Sizes.First().Price
             }).ToList();
@@ -570,7 +571,7 @@ public class ProductRepository: IProductRepository
     
     public async Task DeleteProductAsync(Guid id)
     {
-        var product = await _dbContext.Products
+        var product = await _db.Products
             .Include(product => product.Stocks)
             .Include(product => product.Categories)
             .Include(product => product.Materials)
@@ -586,7 +587,8 @@ public class ProductRepository: IProductRepository
         ClearProductMaterials(product);
         ClearProductStocks(product);
         
-        _dbContext.Products.Remove(product);
+        _db.Products.Remove(product);
         await SaveChangesAsyncWithTransaction();
     }
+
 }
