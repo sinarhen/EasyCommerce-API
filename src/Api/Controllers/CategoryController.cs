@@ -36,29 +36,54 @@ public class CategoryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult> GetCategory(Guid id)
     {
-        if (id == Guid.Empty)
+        try
         {
-            return BadRequest();
-        }
-        var category = await _repository.GetCategoryAsync(id);
-        if (category == null)
+            if (id == Guid.Empty)
+            {
+                return BadRequest();
+            }
+            var category = await _repository.GetCategoryAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(_mapper.Map<CategoryDto>(category));
+        } catch (Exception e)
         {
-            return NotFound();
+            return BadRequest(e.Message);
         }
-        return Ok(_mapper.Map<CategoryDto>(category));
+        
     }
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpPost]
-    public async Task<ActionResult> CreateCategory(CreateProductDto productDto)
+    public async Task<ActionResult> CreateCategory(WriteCategoryDto categoryDto)
     {
+        try
+        {
+            await _repository.CreateCategoryAsync(categoryDto);
+            
+        } catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+        
         return Ok();
     }
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateCategory(Guid id, UpdateProductDto productDto)
+    public async Task<ActionResult> UpdateCategory(Guid id, WriteCategoryDto categoryDto)
     {
+        try
+        {
+            await _repository.UpdateCategoryAsync(id, categoryDto);
+            
+        } catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+        
         return Ok();
     }
 
