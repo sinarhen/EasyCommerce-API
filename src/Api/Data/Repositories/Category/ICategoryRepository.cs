@@ -1,4 +1,5 @@
 ﻿using ECommerce.Models.DTOs;
+using ECommerce.Models.Entities;
 
 
 namespace Ecommerce.Data.Repositories.Category;

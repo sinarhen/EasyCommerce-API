@@ -4,6 +4,7 @@ using ECommerce.Config;
 using Ecommerce.Data;
 using ECommerce.Data;
 using Ecommerce.Data.Repositories.Category;
+using ECommerce.Data.Repositories.Product;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;

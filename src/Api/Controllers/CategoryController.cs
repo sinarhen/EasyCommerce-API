@@ -36,10 +36,18 @@ public class CategoryController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult> GetCategory(Guid id)
     {
+        if (id == Guid.Empty)
+        {
+            return BadRequest();
+        }
         var category = await _repository.GetCategoryAsync(id);
+        if (category == null)
+        {
+            return NotFound();
+        }
         return Ok(_mapper.Map<CategoryDto>(category));
-    }    
-
+    }
+    
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpPost]
     public async Task<ActionResult> CreateCategory(CreateProductDto productDto)

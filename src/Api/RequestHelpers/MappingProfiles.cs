@@ -20,8 +20,11 @@ public class MappingProfiles: Profile
         CreateMap<RegisterDto, User>();
         CreateMap<LoginDto, User>();
         CreateMap<Product, ProductDto>()
-            .ForMember(dest => dest.CollectionId, opt => opt.MapFrom(x => x.Collection.Id))
-            .ForMember(dest => dest.CollectionName, opt => opt.MapFrom(x => x.Collection.Name))
+            .ForMember(dest => dest.Collection, opt => opt.MapFrom(x => new IdNameDto
+            {
+                Id = x.Collection.Id,
+                Name = x.Collection.Name
+            }))
             .ForMember(dest => dest.Categories, opt => opt.MapFrom(dest => dest.Categories
                 .Select(pc => new ProductCategoryDto
                 {
@@ -30,8 +33,11 @@ public class MappingProfiles: Profile
                     Order = pc.Order
                 })
                 .OrderBy(pc => pc.Order)))
-            .ForMember(dest => dest.OccasionName, opt => opt.MapFrom(dest => dest.Occasion.Name))
-            .ForMember(dest => dest.OccasionId, opt => opt.MapFrom(dest => dest.Occasion.Id))
+            .ForMember(dest => dest.Occasion, opt => opt.MapFrom(dest => new IdNameDto
+            {
+                Id = dest.Occasion.Id,
+                Name = dest.Occasion.Name
+            }))
             .ForMember(dest => dest.MainMaterialName, opt => opt.MapFrom(dest => dest.MainMaterial.Name)) 
             .ForMember(dest => dest.OrdersCount, opt => opt.MapFrom(x => x.Orders.Count))
             .ForMember(dest => dest.OrdersCountLastMonth,
@@ -39,7 +45,7 @@ public class MappingProfiles: Profile
                     x => x.Orders.Count(p => p.CreatedAt > DateTime.Now - TimeSpan.FromDays(30))))
             .ForMember(dest => dest.ReviewsCount, opt => opt.MapFrom(x => x.Reviews.Count))
             .ForMember(dest => dest.AvgRating, opt => 
-                opt.MapFrom(x => x.Reviews.Count == 0 ? 0 : x.Reviews.Average(r => (int) r.Rating)))
+                opt.MapFrom(x => x.Reviews.Count == 0 ? 0 : x.Reviews.Average(r => r.Rating)))
             .ForMember(dest => dest.IsNew, opt => opt.MapFrom(x => x.CreatedAt > DateTime.Now - TimeSpan.FromDays(30)))
             .ForMember(dest => dest.IsOnSale, opt => opt.MapFrom(x => x.Discount != null && x.Discount > 0))
             .ForMember(dest => dest.IsBestseller, opt => opt.MapFrom(x => x.Orders.Count > 10))
@@ -102,8 +108,5 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.Colors, opt => opt.Ignore())
             .ForMember(dest => dest.Sizes, opt => opt.Ignore())
             ;
-            
-            ;
-        
     }
 }

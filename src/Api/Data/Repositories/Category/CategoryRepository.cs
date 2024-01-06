@@ -1,4 +1,5 @@
 ﻿using ECommerce.Models.DTOs;
+using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Data.Repositories.Category;
@@ -13,12 +14,11 @@ public class CategoryRepository : ICategoryRepository
     }
     public async Task<List<ECommerce.Models.Entities.Category>> GetCategoriesAsync()
     {
-        return await _dbContext.Categories
+        return await _dbContext.Categories.AsNoTracking()
             .Include(c => c.SubCategories)
             .Where(c => c.ParentCategoryId == null)
             .ToListAsync();
     }
-
     public async Task<ECommerce.Models.Entities.Category> GetCategoryAsync(Guid id)
     {
         return await _dbContext.Categories

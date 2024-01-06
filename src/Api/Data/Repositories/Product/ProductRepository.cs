@@ -7,7 +7,7 @@ using ECommerce.Models.Entities;
 using Ecommerce.RequestHelpers;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Data;
+namespace ECommerce.Data.Repositories.Product;
 
 public class ProductRepository: IProductRepository
 {
@@ -107,7 +107,7 @@ public class ProductRepository: IProductRepository
     }
 
             
-    public async Task<IEnumerable<Product>> GetProductsAsync(SearchParams searchParams)
+    public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(SearchParams searchParams)
     {
         var query = _dbContext.Products.AsNoTracking().AsSplitQuery();
 
@@ -136,14 +136,14 @@ public class ProductRepository: IProductRepository
         if (categories != null && sizes != null)
         {
             query = query.Where(p =>
-                p.Categories.Any(pc => pc.Category.Sizes.Any(s => sizes.Contains(s.Size.Name.ToLower())) && categories.Contains(pc.Category.Name.ToLower()))
+                p.Categories.Any(pc => pc.Category.Sizes.Any(s => sizes.Contains(s.Size.Name.ToLower())) && categories.Contains(pc.Category.Name.ToLower()) || categories.Contains(pc.CategoryId.ToString())) 
             );
         }
         else
         {
             if (categories != null)
             {
-                query = query.Where(p => p.Categories.Any(pc => categories.Contains(pc.Category.Name.ToLower())));
+                query = query.Where(p => p.Categories.Any(pc => categories.Contains(pc.Category.Name.ToLower()) || categories.Contains(pc.CategoryId.ToString())));
             }
             if (sizes != null)
             {
@@ -211,7 +211,7 @@ public class ProductRepository: IProductRepository
     }
     
 
-    public async Task<Product> GetProductAsync(Guid id)
+    public async Task<Models.Entities.Product> GetProductAsync(Guid id)
     {
         var product = await _dbContext.Products.AsNoTracking().AsSplitQuery()
             .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
@@ -229,7 +229,7 @@ public class ProductRepository: IProductRepository
         return product;
     }
 
-    public async Task<Product> CreateProductAsync(CreateProductDto productDto, string username, IEnumerable<string> roles)
+    public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string username, IEnumerable<string> roles)
     {
         ValidateOnModelLevel(productDto);
         
@@ -303,7 +303,7 @@ public class ProductRepository: IProductRepository
             throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
         }
         
-        var product = _mapper.Map<Product>(productDto);
+        var product = _mapper.Map<Models.Entities.Product>(productDto);
         
         product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
         {
@@ -348,7 +348,7 @@ public class ProductRepository: IProductRepository
         return depth;
     }
     
-    private void ClearProductCategories(Product product)
+    private void ClearProductCategories(Models.Entities.Product product)
     {
         foreach (var productCategory in product.Categories)
         {
@@ -356,7 +356,7 @@ public class ProductRepository: IProductRepository
         }
     }
     
-    private void ClearProductMaterials(Product product)
+    private void ClearProductMaterials(Models.Entities.Product product)
     {
         foreach (var productMaterial in product.Materials)
         {
@@ -364,7 +364,7 @@ public class ProductRepository: IProductRepository
         }
     }
 
-    private void ClearProductStocks(Product product)
+    private void ClearProductStocks(Models.Entities.Product product)
     {
         foreach (var productStock in product.Stocks)
         {
@@ -373,7 +373,7 @@ public class ProductRepository: IProductRepository
     }
 
 
-    private void AddToCategories(Category category, Product product, int order)
+    private void AddToCategories(Category category, Models.Entities.Product product, int order)
     {
         product.Categories.Add(new ProductCategory
         {
@@ -388,7 +388,7 @@ public class ProductRepository: IProductRepository
         }
     }
     
-    public async Task<Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string username, IEnumerable<string> roles)
+    public async Task<Models.Entities.Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string username, IEnumerable<string> roles)
     {
         var product = await _dbContext.Products
             .Include(product => product.Stocks)

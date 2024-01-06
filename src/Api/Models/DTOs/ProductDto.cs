@@ -11,10 +11,8 @@ public class ProductDto
     public string Name { get; set; }
     public string Description { get; set; }
     public double? Discount { get; set; }
-    public string OccasionName { get; set; }
-    public string OccasionId { get; set; }
-    public string CollectionName { get; set; }
-    public string CollectionId { get; set; }
+    public IdNameDto Occasion { get; set; }
+    public IdNameDto Collection { get; set; }
     public string MainMaterialName { get; set; }
     public string Gender { get; set; }
     public string Season { get; set; }
