@@ -6,7 +6,7 @@ public class ProductDto
 {
     
     public Guid Id { get; set; }
-    public CategoryDto[] Categories { get; set; }
+    public ProductCategoryDto[] Categories { get; set; }
     
     public string Name { get; set; }
     public string Description { get; set; }
@@ -38,7 +38,7 @@ public class ProductDto
     public List<ColorDto> Colors { get; set; }
 }
 
-public class CategoryDto
+public class ProductCategoryDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

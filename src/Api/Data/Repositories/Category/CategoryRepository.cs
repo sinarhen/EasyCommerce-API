@@ -1,13 +1,20 @@
-﻿using Ecommerce.RequestHelpers;
+﻿using ECommerce.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Data.Repositories.Category;
 
 public class CategoryRepository : ICategoryRepository
 {
-    public Task<ActionResult> GetCategoriesAsync(SearchParams searchParams)
+    private readonly ProductDbContext _dbContext;
+
+    public CategoryRepository(ProductDbContext dbContext)
     {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
+    }
+    public async Task<ActionResult<List<ECommerce.Models.Entities.Category>>> GetCategoriesAsync()
+    {
+        return await _dbContext.Categories.ToListAsync();
     }
 
     public Task<ActionResult> GetCategoryAsync(Guid id, Guid? sizeId = null, Guid? colorId = null)

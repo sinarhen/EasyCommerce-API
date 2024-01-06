@@ -18,7 +18,7 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.CollectionId, opt => opt.MapFrom(x => x.Collection.Id))
             .ForMember(dest => dest.CollectionName, opt => opt.MapFrom(x => x.Collection.Name))
             .ForMember(dest => dest.Categories, opt => opt.MapFrom(dest => dest.Categories
-                .Select(pc => new CategoryDto
+                .Select(pc => new ProductCategoryDto
                 {
                     Id = pc.Category.Id,
                     Name = pc.Category.Name,
