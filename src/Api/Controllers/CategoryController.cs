@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
-using Ecommerce.Data;
 using Ecommerce.Data.Repositories.Category;
 using Ecommerce.Models.DTOs;
 using ECommerce.Models.DTOs;
@@ -26,15 +25,19 @@ public class CategoryController : ControllerBase
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
         var categories = await _repository.GetCategoriesAsync();
-        var categoriesDtos = _mapper.Map<List<CategoryDto>>(categories);
-        
-        return Ok(categoriesDtos);
+        return Ok(
+            new 
+            {
+                Categories = _mapper.Map<List<CategoryDto>>(categories)   
+            }
+        );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetCategory(Guid id, Guid? sizeId = null, Guid? colorId = null)
+    public async Task<ActionResult> GetCategory(Guid id)
     {
-        return Ok();
+        var category = await _repository.GetCategoryAsync(id);
+        return Ok(_mapper.Map<CategoryDto>(category));
     }    
 
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
