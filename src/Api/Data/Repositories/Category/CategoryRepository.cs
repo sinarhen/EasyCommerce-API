@@ -18,12 +18,12 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
     }
     public async Task<ECommerce.Models.Entities.Category> GetCategoryAsync(Guid id)
     {
-        return await _db.Categories
+        return await _db.Categories.AsNoTracking()
             .Include(c => c.SubCategories)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<bool> CreateCategoryAsync(WriteCategoryDto categoryDto)
+    public async Task CreateCategoryAsync(WriteCategoryDto categoryDto)
     {
         var category = new ECommerce.Models.Entities.Category
         {
@@ -33,12 +33,33 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
         };
         
         await _db.Categories.AddAsync(category);
-        return await _db.SaveChangesAsync() > 0;
+        await SaveChangesAsyncWithTransaction();
     }
 
-    public Task UpdateCategoryAsync(Guid id, WriteCategoryDto productDto)
+    public async Task UpdateCategoryAsync(Guid id, WriteCategoryDto productDto)
     {
-        throw new NotImplementedException();
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        if (category == null)
+        {
+            throw new Exception("Category not found");
+        }
+        
+        if (productDto.ParentCategoryId != null)
+        {
+            category.ParentCategoryId = productDto.ParentCategoryId;
+        }
+        if (productDto.Name != null)
+        {
+            category.Name = productDto.Name;
+        }
+        if (productDto.ImageUrl != null)
+        {
+            category.ImageUrl = productDto.ImageUrl;
+        }
+        
+        _db.Categories.Update(category);
+        
+        await SaveChangesAsyncWithTransaction();
     }
 
     public Task DeleteCategoryAsync(Guid id)
