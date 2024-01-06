@@ -1,10 +1,12 @@
-﻿namespace Ecommerce.Data.Repositories;
+﻿using ECommerce.Models.Entities;
+
+namespace Ecommerce.Data.Repositories;
 
 public class BaseRepository
 {
     protected readonly ProductDbContext _db;
 
-    public BaseRepository(ProductDbContext db)
+    protected BaseRepository(ProductDbContext db)
     {
         _db = db;
     }
@@ -22,4 +24,32 @@ public class BaseRepository
             throw;
         }
     }
+    
+    protected int CalculateDepth(ECommerce.Models.Entities.Category category)
+    {
+        int depth = 1;
+        while (category.ParentCategory != null)
+        {
+            depth++;
+            category = category.ParentCategory;
+        }
+        return depth;
+    }
+    
+
+    protected void AddToCategories(ECommerce.Models.Entities.Category category, ECommerce.Models.Entities.Product product, int order)
+    {
+        product.Categories.Add(new ProductCategory
+        {
+            ProductId = product.Id,
+            CategoryId = category.Id,
+            Order = order
+        });
+
+        if (category.ParentCategory != null)
+        {
+            AddToCategories(category.ParentCategory, product, order - 1);
+        }
+    }
+
 }

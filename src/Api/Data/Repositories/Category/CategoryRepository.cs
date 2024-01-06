@@ -47,6 +47,12 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
         if (productDto.ParentCategoryId != null)
         {
             category.ParentCategoryId = productDto.ParentCategoryId;
+
+            if (category.ParentCategoryId != productDto.ParentCategoryId)
+            {
+                UpdateCategoryProductsWithNewParentId(category);
+            }
+            
         }
         if (productDto.Name != null)
         {
@@ -62,8 +68,21 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public Task DeleteCategoryAsync(Guid id)
+    public async Task DeleteCategoryAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        if (category == null)
+        {
+            throw new Exception("Category not found");
+        }
+    }
+
+    private void UpdateCategoryProductsWithNewParentId(ECommerce.Models.Entities.Category category)
+    {
+        foreach (var product in category.Products)
+        {
+            _db.Categories.Remove(product.Category);
+            AddToCategories(category, product.Product, CalculateDepth(category));
+        }
     }
 }

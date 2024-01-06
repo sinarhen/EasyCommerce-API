@@ -91,6 +91,14 @@ public class CategoryController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteCategory(Guid id)
     {
+        try
+        {
+            await _repository.DeleteCategoryAsync(id);
+            
+        } catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
         return Ok();        
     }
 }

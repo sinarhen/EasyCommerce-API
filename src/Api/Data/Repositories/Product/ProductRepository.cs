@@ -90,22 +90,6 @@ public class ProductRepository: BaseRepository, IProductRepository
         }
         
     }
-
-    private async Task SaveChangesAsyncWithTransaction()
-    {
-        await using var transaction = await _db.Database.BeginTransactionAsync();
-        try
-        {
-            await _db.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync();
-            Console.WriteLine(e);
-        }
-    }
-
             
     public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(SearchParams searchParams)
     {
@@ -338,57 +322,6 @@ public class ProductRepository: BaseRepository, IProductRepository
         return product;
     }
 
-    private int CalculateDepth(Category category)
-    {
-        int depth = 1;
-        while (category.ParentCategory != null)
-        {
-            depth++;
-            category = category.ParentCategory;
-        }
-        return depth;
-    }
-    
-    private void ClearProductCategories(Models.Entities.Product product)
-    {
-        foreach (var productCategory in product.Categories)
-        {
-            _db.ProductCategories.Remove(productCategory);
-        }
-    }
-    
-    private void ClearProductMaterials(Models.Entities.Product product)
-    {
-        foreach (var productMaterial in product.Materials)
-        {
-            _db.ProductMaterials.Remove(productMaterial);
-        }
-    }
-
-    private void ClearProductStocks(Models.Entities.Product product)
-    {
-        foreach (var productStock in product.Stocks)
-        {
-            _db.ProductStocks.Remove(productStock);
-        }
-    }
-
-
-    private void AddToCategories(Category category, Models.Entities.Product product, int order)
-    {
-        product.Categories.Add(new ProductCategory
-        {
-            ProductId = product.Id,
-            CategoryId = category.Id,
-            Order = order
-        });
-
-        if (category.ParentCategory != null)
-        {
-            AddToCategories(category.ParentCategory, product, order - 1);
-        }
-    }
-    
     public async Task<Models.Entities.Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string username, IEnumerable<string> roles)
     {
         var product = await _db.Products
@@ -590,5 +523,31 @@ public class ProductRepository: BaseRepository, IProductRepository
         _db.Products.Remove(product);
         await SaveChangesAsyncWithTransaction();
     }
+    
+    private void ClearProductCategories(ECommerce.Models.Entities.Product product)
+    {
+        foreach (var productCategory in product.Categories)
+        {
+            _db.ProductCategories.Remove(productCategory);
+        }
+    }
+    
+    private void ClearProductMaterials(ECommerce.Models.Entities.Product product)
+    {
+        foreach (var productMaterial in product.Materials)
+        {
+            _db.ProductMaterials.Remove(productMaterial);
+        }
+    }
+
+    private void ClearProductStocks(ECommerce.Models.Entities.Product product)
+    {
+        foreach (var productStock in product.Stocks)
+        {
+            _db.ProductStocks.Remove(productStock);
+        }
+    }
+
+
 
 }
