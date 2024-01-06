@@ -19,9 +19,11 @@ public class CategoryRepository : ICategoryRepository
             .ToListAsync();
     }
 
-    public Task<ECommerce.Models.Entities.Category> GetCategoryAsync(Guid id, Guid? sizeId = null, Guid? colorId = null)
+    public async Task<ECommerce.Models.Entities.Category> GetCategoryAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Categories
+            .Include(c => c.SubCategories)
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public Task<ECommerce.Models.Entities.Category> CreateCategoryAsync(WriteCategoryDto categoryDto)
