@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Category;
 using ECommerce.Models.DTOs;
@@ -74,6 +75,8 @@ public class CategoryController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCategory(Guid id, WriteCategoryDto categoryDto)
     {
+        Console.WriteLine("UpdateCategory User: " + User.Identity?.Name + "\n\n roles: " +
+                          User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value));
         try
         {
             await _repository.UpdateCategoryAsync(id, categoryDto);

@@ -1,4 +1,5 @@
 ﻿using ECommerce.Models.DTOs;
+using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Category;
@@ -36,38 +37,59 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public async Task UpdateCategoryAsync(Guid id, WriteCategoryDto productDto)
+    public async Task UpdateCategoryAsync(Guid id, WriteCategoryDto categoryDto)
     {
-        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        var category = await _db.Categories.Include(c => c.Products).ThenInclude(productCategory => productCategory.Product)
+            .FirstOrDefaultAsync(c => c.Id == id);
         if (category == null)
         {
             throw new Exception("Category not found");
         }
         
-        if (productDto.ParentCategoryId != null)
-        {
-            category.ParentCategoryId = productDto.ParentCategoryId;
+        // Get the old parent categories
 
-            if (category.ParentCategoryId != productDto.ParentCategoryId)
+        if (categoryDto.ParentCategoryId != null)
+        {
+            category.ParentCategoryId = categoryDto.ParentCategoryId;
+
+            if (category.ParentCategoryId != categoryDto.ParentCategoryId)
             {
-                UpdateCategoryProductsWithNewParentId(category);
+                // Update the ProductCategory records
+                var newParents = await GetParentCategories(category);
+                await UpdateProductCategories(category.Products, newParents);
             }
-            
-        }
-        if (productDto.Name != null)
-        {
-            category.Name = productDto.Name;
-        }
-        if (productDto.ImageUrl != null)
-        {
-            category.ImageUrl = productDto.ImageUrl;
         }
         
+        // Rest of the update logic...
+
         _db.Categories.Update(category);
-        
         await SaveChangesAsyncWithTransaction();
     }
+    private async Task<List<Models.Entities.Category>> GetParentCategories(Models.Entities.Category category)
+    {
+        var parents = new List<Models.Entities.Category>();
+        var current = category;
+        while (current.ParentCategoryId != null)
+        {
+            current = await _db.Categories.FindAsync(current.ParentCategoryId);
+            parents.Add(current);
+        }
+        return parents;
+    }
 
+
+
+    private async Task UpdateProductCategories(ICollection<ProductCategory> productCategories)
+    {
+        foreach (var productCategory in productCategories)
+        {
+            // Delete the old ProductCategory records
+            var oldProductCategories = _db.ProductCategories.Where(pc => pc.ProductId == productCategory.ProductId);
+            _db.ProductCategories.RemoveRange(oldProductCategories);
+        }
+
+        await _db.SaveChangesAsync();
+    }
     public async Task DeleteCategoryAsync(Guid id)
     {
         var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id);
@@ -77,12 +99,4 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
         }
     }
 
-    private void UpdateCategoryProductsWithNewParentId(ECommerce.Models.Entities.Category category)
-    {
-        foreach (var product in category.Products)
-        {
-            _db.Categories.Remove(product.Category);
-            AddToCategories(category, product.Product, CalculateDepth(category));
-        }
-    }
 }
