@@ -36,67 +36,62 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
         await _db.Categories.AddAsync(category);
         await SaveChangesAsyncWithTransaction();
     }
-
-    public async Task UpdateCategoryAsync(Guid id, WriteCategoryDto categoryDto)
+public async Task UpdateCategoryAsync(Guid id, WriteCategoryDto categoryDto)
+{
+    var category = await _db.Categories.AsNoTracking()
+        .Include(c => c.Products)
+        .ThenInclude(productCategory => productCategory.Product)
+        .FirstOrDefaultAsync(c => c.Id == id);
+    if (category == null)
     {
-        var category = await _db.Categories.Include(c => c.Products).ThenInclude(productCategory => productCategory.Product)
-            .FirstOrDefaultAsync(c => c.Id == id);
-        if (category == null)
-        {
-            throw new Exception("Category not found");
-        }
-        
-        // Get the old parent categories
-
-        if (categoryDto.ParentCategoryId != null)
-        {
-            category.ParentCategoryId = categoryDto.ParentCategoryId;
-
-            if (category.ParentCategoryId != categoryDto.ParentCategoryId)
-            {
-                // Update the ProductCategory records
-                var newParents = await GetParentCategories(category);
-                await UpdateProductCategories(category.Products, newParents);
-            }
-        }
-        
-        // Rest of the update logic...
-
-        _db.Categories.Update(category);
-        await SaveChangesAsyncWithTransaction();
+        throw new ArgumentException($"Category not found: {id}");
     }
-    private async Task<List<Models.Entities.Category>> GetParentCategories(Models.Entities.Category category)
+    
+    var parentCategory = await _db.Categories.AsNoTracking()
+        .FirstOrDefaultAsync(c => c.Id == categoryDto.ParentCategoryId);
+    
+    if (parentCategory != null)
     {
-        var parents = new List<Models.Entities.Category>();
-        var current = category;
-        while (current.ParentCategoryId != null)
-        {
-            current = await _db.Categories.FindAsync(current.ParentCategoryId);
-            parents.Add(current);
-        }
-        return parents;
+        await UpdateProductCategories(category, parentCategory);
+
+        category.ParentCategoryId = categoryDto.ParentCategoryId;
     }
+    
+    // Rest of the update logic...
 
+    _db.Categories.Update(category);
+    await _db.SaveChangesAsync();
+}
 
-
-    private async Task UpdateProductCategories(ICollection<ProductCategory> productCategories)
+private async Task UpdateProductCategories(Models.Entities.Category category, Models.Entities.Category newParentCategory)
+{
+    var products = category.Products.ToList();
+    var productCategoriesToRemove = new List<ProductCategory>();
+    foreach (var product in products)
     {
-        foreach (var productCategory in productCategories)
-        {
-            // Delete the old ProductCategory records
-            var oldProductCategories = _db.ProductCategories.Where(pc => pc.ProductId == productCategory.ProductId);
-            _db.ProductCategories.RemoveRange(oldProductCategories);
-        }
-
-        await _db.SaveChangesAsync();
+        var productCategories = await _db.ProductCategories.AsNoTracking()
+            .Where(pc => pc.ProductId == product.ProductId && pc.CategoryId != category.Id)
+            .ToListAsync();
+        productCategoriesToRemove.AddRange(productCategories);
+    
+        AddToCategories(newParentCategory, product.Product, CalculateDepth(category));
     }
+
+    _db.ProductCategories.RemoveRange(productCategoriesToRemove);
+}
     public async Task DeleteCategoryAsync(Guid id)
     {
-        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        var category = await _db.Categories.Include(category => category.Products)
+            .ThenInclude(productCategory => productCategory.Product).FirstOrDefaultAsync(c => c.Id == id);
         if (category == null)
         {
             throw new Exception("Category not found");
         }
+
+        category.Products.Clear();
+        _db.Categories.Remove(category);
+        
+        await SaveChangesAsyncWithTransaction();
     }
 
 }
