@@ -4,7 +4,8 @@ using ECommerce.Data.Repositories.Store;
 using ECommerce.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 namespace ECommerce.Controllers;
 
 [ApiController]
@@ -23,7 +24,7 @@ public class StoreController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<StoreDto>> GetStore(Guid id)
     {
-        var store = _repository.GetStoreAsync(id);
+        var store = await _repository.GetStoreAsync(id);
         if (store == null)
         {
             return NotFound();
@@ -37,32 +38,50 @@ public class StoreController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetStores()
     {
-        return Ok();
+        var stores = await _repository.GetStoresAsync();
+        if (stores == null)
+        {
+            return NotFound();
+        }
+        var storesDto = _mapper.Map<IEnumerable<StoreDto>>(stores);
+
+        return Ok(storesDto);
     }
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
     [HttpPost]
-    public async Task<ActionResult> CreateStore()
+    public async Task<ActionResult> CreateStore(StoreDto storeDto)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        await _repository.CreateStoreAsync(storeDto, userId);
         return Ok();
     }
     
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateStore()
+    public async Task<ActionResult> UpdateStore(Guid storeId, StoreDto storeDto)
     {
+        
+        await _repository.UpdateStoreAsync(storeId, storeDto);
         return Ok();
     }
     
     
+    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteStore()
+    public async Task<ActionResult> DeleteStore(Guid storeId)
     {
+        var store = await _repository.GetStoreAsync(storeId);
+        if (store.OwnerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            return Unauthorized();
+        }
+
+        await _repository.DeleteStoreAsync(storeId);
         return Ok();
     }
-    
-    
     
     
 }

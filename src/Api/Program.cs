@@ -4,6 +4,7 @@ using ECommerce.Config;
 using ECommerce.Data;
 using ECommerce.Data.Repositories.Category;
 using ECommerce.Data.Repositories.Product;
+using ECommerce.Data.Repositories.Store;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;
@@ -80,6 +81,7 @@ builder.Services.AddJwtService();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 
 var app = builder.Build();
 
