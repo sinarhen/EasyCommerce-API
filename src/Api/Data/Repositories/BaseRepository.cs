@@ -51,5 +51,19 @@ public class BaseRepository
             AddToCategories(category.ParentCategory, product, order - 1);
         }
     }
+    protected void ClearProductCategories(ECommerce.Models.Entities.Product product)
+    {
+        _db.ProductCategories.RemoveRange(product.Categories);
+    }
+    
+    protected void ClearProductMaterials(ECommerce.Models.Entities.Product product)
+    {
+        _db.ProductMaterials.RemoveRange(product.Materials);
+    }
+
+    protected void ClearProductStocks(ECommerce.Models.Entities.Product product)
+    {
+        _db.ProductStocks.RemoveRange(product.Stocks);
+    }
 
 }

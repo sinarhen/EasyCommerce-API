@@ -4,7 +4,6 @@ namespace ECommerce.Models.DTOs;
 
 public class StoreDto : BaseEntity
 {
-    public Guid Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public string BannerUrl { get; set; }
@@ -14,3 +13,4 @@ public class StoreDto : BaseEntity
     public string Email { get; set; }
     
 }
+

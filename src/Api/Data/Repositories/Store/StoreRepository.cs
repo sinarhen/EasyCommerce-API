@@ -5,6 +5,7 @@ namespace ECommerce.Data.Repositories.Store;
 
 public class StoreRepository : BaseRepository, IStoreRepository
 {
+
     public StoreRepository(ProductDbContext db) : base(db)
     {
         
@@ -56,13 +57,57 @@ public class StoreRepository : BaseRepository, IStoreRepository
         return store;
     }
 
-    public async Task<Models.Entities.Store> UpdateStoreAsync(Models.Entities.Store store)
+    public async Task UpdateStoreAsync(Guid storeId, StoreDto storeDto)
     {
-        throw new NotImplementedException();
+        var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
+        if (store == null)
+        {
+            throw new ArgumentException($"Store not found: {storeId}");
+        }
+        store.Name = storeDto.Name;
+        store.Description = storeDto.Description;
+        store.BannerUrl = storeDto.BannerUrl;
+        store.LogoUrl = storeDto.LogoUrl;
+        store.Address = storeDto.Address;
+        store.Contacts = storeDto.Contacts;
+        store.Email = storeDto.Email;
+        
+        await SaveChangesAsyncWithTransaction();
     }
 
-    public async Task<Models.Entities.Store> DeleteStoreAsync(Guid id)
+    public async Task DeleteStoreAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var store = await _db.Stores
+            .Include(store => store.Collections)
+            .ThenInclude(collection => collection.Products)
+            .ThenInclude(products => products.Categories)
+            .Include(store => store.Collections)
+            .ThenInclude(collection => collection.Products)
+            .ThenInclude(products => products.Materials)
+            .Include(store => store.Collections)
+            .ThenInclude(collection => collection.Products)
+            .ThenInclude(products => products.Stocks)
+            .FirstOrDefaultAsync(s => s.Id == id);
+        
+        if (store == null)
+        {
+            throw new ArgumentException($"Store not found: {id}");
+        }
+        
+        foreach (var collection in store.Collections)
+        {
+            // Remove products from collection
+            var products = collection.Products;
+            products.ForEach(p =>
+            {
+                ClearProductCategories(p);
+                ClearProductMaterials(p);
+                ClearProductStocks(p);
+            });
+            _db.Products.RemoveRange(products);
+        }
+        
+        _db.Stores.Remove(store);
+        await SaveChangesAsyncWithTransaction();
     }
 }

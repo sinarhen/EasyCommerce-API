@@ -521,29 +521,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         await SaveChangesAsyncWithTransaction();
     }
     
-    private void ClearProductCategories(ECommerce.Models.Entities.Product product)
-    {
-        foreach (var productCategory in product.Categories)
-        {
-            _db.ProductCategories.Remove(productCategory);
-        }
-    }
-    
-    private void ClearProductMaterials(ECommerce.Models.Entities.Product product)
-    {
-        foreach (var productMaterial in product.Materials)
-        {
-            _db.ProductMaterials.Remove(productMaterial);
-        }
-    }
 
-    private void ClearProductStocks(ECommerce.Models.Entities.Product product)
-    {
-        foreach (var productStock in product.Stocks)
-        {
-            _db.ProductStocks.Remove(productStock);
-        }
-    }
 
 
 
