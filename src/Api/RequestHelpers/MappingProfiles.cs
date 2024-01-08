@@ -10,6 +10,10 @@ public class MappingProfiles: Profile
     {
         CreateMap<Category, CategoryDto>();
     }
+    private void MapStoreProfiles()
+    {
+        CreateMap<Store, StoreDto>();
+    }
     public MappingProfiles()
     {
         MapProductProfiles();

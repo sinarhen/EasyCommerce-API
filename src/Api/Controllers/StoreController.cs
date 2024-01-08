@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
+using ECommerce.Data.Repositories.Store;
+using ECommerce.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,17 +12,25 @@ namespace ECommerce.Controllers;
 public class StoreController : ControllerBase
 {
     private readonly IMapper _mapper;
+    private readonly IStoreRepository _repository;
 
-    public StoreController(IMapper mapper)
+    public StoreController(IMapper mapper, IStoreRepository repository)
     {
         _mapper = mapper;
+        _repository = repository;
     }
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetStore()
+    public async Task<ActionResult<StoreDto>> GetStore(Guid id)
     {
-        return Ok();
+        var store = _repository.GetStoreAsync(id);
+        if (store == null)
+        {
+            return NotFound();
+        }
+        var storeDto = _mapper.Map<StoreDto>(store);
+        
+        return Ok(storeDto);
     }
 
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]

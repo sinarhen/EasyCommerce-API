@@ -577,7 +577,7 @@ public static class InitDb
                 "https://i.pinimg.com/564x/1b/7c/b6/1b7cb6fe341e990867f7f29d8fc44773.jpg", "My Store Address",
                 "My Store Contacts", "My Store Email", admin);
             
-            var collection = CreateCollectionEntity("My Collection", "My Collection Description", store);
+            var collection = CreateCollectionEntity("My CollectionId", "My CollectionId Description", store);
             
             // Add 10 products with new Color objects
             await SeedInitialProducts(context, collection);        

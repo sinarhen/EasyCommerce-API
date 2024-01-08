@@ -18,6 +18,8 @@ public class SearchParams
     
     public string Size { get; set; }
     
+    public Guid CollectionId { get; set; }
+    
     public string Material { get; set; }
     
     public string Occasion { get; set; }

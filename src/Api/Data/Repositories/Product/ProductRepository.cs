@@ -90,101 +90,7 @@ public class ProductRepository: BaseRepository, IProductRepository
             
     public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(SearchParams searchParams)
     {
-        var query = _db.Products.AsNoTracking().AsSplitQuery();
-
-        query = searchParams.FilterBy switch
-        {
-            "in_stock" => query.Where(p => p.Stocks.Any(s => s.Stock > 0)),
-            "discount" => query.Where(p => p.Discount > 0),
-            "out_of_stock" => query.Where(p => p.Stocks.All(s => s.Stock == 0)),
-            "new" => query.Where(p => p.CreatedAt > DateTime.Now.AddDays(-7)),
-            _ => query,
-        };
-        
-        List<string> categories = null;
-        List<string> sizes = null;
-
-        if (!string.IsNullOrEmpty(searchParams.Category))
-        {
-            categories = searchParams.Category.Split(",").Select(c => c.Trim().ToLower()).ToList();
-        }
-
-        if (!string.IsNullOrEmpty(searchParams.Size))
-        {
-            sizes = searchParams.Size.Split(",").Select(c => c.Trim().ToLower()).ToList();
-        }
-
-        if (categories != null && sizes != null)
-        {
-            query = query.Where(p =>
-                p.Categories.Any(pc => pc.Category.Sizes.Any(s => sizes.Contains(s.Size.Name.ToLower())) && categories.Contains(pc.Category.Name.ToLower()) || categories.Contains(pc.CategoryId.ToString())) 
-            );
-        }
-        else
-        {
-            if (categories != null)
-            {
-                query = query.Where(p => p.Categories.Any(pc => categories.Contains(pc.Category.Name.ToLower()) || categories.Contains(pc.CategoryId.ToString())));
-            }
-            if (sizes != null)
-            {
-                query = query.Where(p => p.Stocks.Any(s => sizes.Contains(s.Size.Name.ToLower())));
-            }
-        }
-        
-        if (!string.IsNullOrEmpty(searchParams.Color))
-        {
-            var colors = searchParams.Color.Split(',').Select(c => c.Trim().ToLower()).ToList();
-            query = query.Where(p => p.Stocks.Any(s => colors.Contains(s.Color.Name.ToLower())));
-        }
-        
-        if (!string.IsNullOrEmpty(searchParams.Occasion))
-        {
-            var occasions = searchParams.Occasion.Split(",").Select(c => c.Trim().ToLower()).ToList();
-            query = query.Where(p => occasions.Contains(p.Occasion.Name.ToLower()));
-        } 
-        
-        if (!string.IsNullOrEmpty(searchParams.Material))
-        {
-            var materials = searchParams.Material.Split(",").Select(c => c.Trim().ToLower()).ToList();
-            query = query.Where(p => p.Materials.Any(pm => materials.Contains(pm.Material.Name.ToLower())));
-        }
-        
-        if (!string.IsNullOrEmpty(searchParams.SearchTerm))
-        {
-            var searchTerm = searchParams.SearchTerm.Trim().ToLower();
-            query = query.Where(p => p.Name.ToLower().Contains(searchTerm));
-        }
-
-        query = searchParams.OrderBy switch
-        {
-            "price" => query.OrderBy(p => p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : decimal.MaxValue),
-            "price_desc" => query.OrderByDescending(p => p.Stocks.Any() ? p.Stocks.Min(s => s.Price): decimal.MaxValue),
-            "name" => query.OrderBy(p => p.Name),
-            "name_desc" => query.OrderByDescending(p => p.Name),
-            "newest" => query.OrderByDescending(p => p.CreatedAt),
-            "oldest" => query.OrderBy(p => p.CreatedAt),
-            "bestseller" => query.OrderBy(p => p.Orders.Count),
-            _ => query.OrderBy(p => p.Name)
-        };
-
-        query = query
-            .Skip(searchParams.PageSize * (searchParams.PageNumber - 1))
-            .Take(searchParams.PageSize);
-
-        var products = await query
-            .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
-            .Include(p => p.Occasion)
-            .Include(p => p.MainMaterial)
-            .Include(p => p.Stocks).ThenInclude(s => s.Color)
-            .Include(p => p.Stocks).ThenInclude(s => s.Size)
-            .Include(p => p.Images)
-            .Include(p => p.Materials).ThenInclude(m => m.Material)
-            .Include(product => product.Reviews)
-            .Include(product => product.Orders)
-            .Include(product => product.Collection)
-            .ToListAsync();
-
+        var products = await FilterProductsBySearchParams(searchParams);
         await SaveChangesAsyncWithTransaction();
         
         return products;
@@ -239,7 +145,7 @@ public class ProductRepository: BaseRepository, IProductRepository
 
         if (existingCollection == null)
         {
-            throw new ArgumentException($"Collection with ID {productDto.CollectionId} does not exist");
+            throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
         }
         
         var enumerable = roles as string[] ?? roles.ToArray();
@@ -433,7 +339,7 @@ public class ProductRepository: BaseRepository, IProductRepository
             var collection = collections.FirstOrDefault(c => c.Id == Guid.Parse(productDto.CollectionId));
             if (collection == null)
             {
-                throw new ArgumentException($"Collection with ID {productDto.CollectionId} does not exist");
+                throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
             }
             product.Collection = collection;
         }
