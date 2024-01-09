@@ -13,12 +13,10 @@ public class MappingProfiles: Profile
     private void MapStoreProfiles()
     {
         CreateMap<Store, StoreDto>()
-            .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner.UserName)) // Assuming User entity has a Username property
-            .ForMember(dest => dest.Collections, opt => opt.MapFrom(src => src.Collections));
+            .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner.UserName));
 
         CreateMap<Collection, CollectionDto>()
-            .ForMember(dest => dest.Billboards, opt => opt.MapFrom(src => src.Billboards))
-            .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products));
+            .ForMember(dest => dest.Billboards, opt => opt.MapFrom(src => src.Billboards));
 
         CreateMap<Billboard, BillboardDto>()
             .ForMember(dest => dest.BillboardFilter, opt => opt.MapFrom(src => src.BillboardFilter));

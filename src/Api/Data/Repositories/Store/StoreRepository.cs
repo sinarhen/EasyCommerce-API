@@ -17,19 +17,12 @@ public class StoreRepository : BaseRepository, IStoreRepository
 
     public async Task<List<Models.Entities.Store>> GetStoresAsync()
     {
-        return await _db.Stores.AsNoTracking()
+        return await _db.Stores
+        .AsNoTracking()
         .Include(s => s.Collections)
-        .ThenInclude(col => col.Billboards)
-        .ThenInclude(billboard => billboard.BillboardFilter)
-        .Include(s => s.Collections)
-        .ThenInclude(col => col.Products)
-        .ThenInclude(product => product.Categories)
-        .Include(s => s.Collections)
-        .ThenInclude(col => col.Products)
-        .ThenInclude(product => product.Materials)
-        .Include(s => s.Collections)
-        .ThenInclude(col => col.Products)
-        .ThenInclude(product => product.Stocks)
+        .ThenInclude(c => c.Billboards)
+        .ThenInclude(b => b.BillboardFilter)
+        .Include(s => s.Owner)
         .ToListAsync();
     }
 

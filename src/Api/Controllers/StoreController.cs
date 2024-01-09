@@ -4,7 +4,6 @@ using ECommerce.Data.Repositories.Store;
 using ECommerce.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 namespace ECommerce.Controllers;
 
@@ -45,7 +44,11 @@ public class StoreController : ControllerBase
         }
         var storesDto = _mapper.Map<IEnumerable<StoreDto>>(stores);
 
-        return Ok(storesDto);
+        return Ok(new 
+            { 
+                Stores = storesDto
+            }
+        );
     }
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
