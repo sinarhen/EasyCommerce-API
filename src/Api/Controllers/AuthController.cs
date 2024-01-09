@@ -55,7 +55,7 @@ public class AuthController : ControllerBase
             return BadRequest(result.Errors);
         }
 
-        var token = _jwtService.GenerateToken(user.UserName, new List<string> { UserRoles.Customer });
+        var token = _jwtService.GenerateToken(user.Id, user.UserName, new List<string> { UserRoles.Customer });
         var tokenAsString = _jwtService.WriteToken(token);
 
         return CreatedAtAction(
@@ -93,7 +93,7 @@ public class AuthController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        var token = _jwtService.GenerateToken(user.UserName, roles);
+        var token = _jwtService.GenerateToken(user.Id, user.UserName, roles);
         var tokenAsString = _jwtService.WriteToken(token);
         return Ok(new
         {
@@ -141,7 +141,7 @@ public class AuthController : ControllerBase
         }
 
         
-        var token = _jwtService.GenerateToken(username: user.UserName, roles: await _userManager.GetRolesAsync(user));
+        var token = _jwtService.GenerateToken(userId: user.Id, username: user.UserName, roles: await _userManager.GetRolesAsync(user));
         
         Console.WriteLine("token: " + _jwtService.WriteToken(token));
         return CreatedAtAction(nameof(ChangePassword),
@@ -180,7 +180,7 @@ public class AuthController : ControllerBase
         }
 
         
-        var token = _jwtService.GenerateToken(username: user.UserName, roles: await _userManager.GetRolesAsync(user));
+        var token = _jwtService.GenerateToken(userId: user.Id, username: user.UserName, roles: await _userManager.GetRolesAsync(user));
         
         return CreatedAtAction(nameof(ChangePassword),
             new

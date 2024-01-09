@@ -64,25 +64,30 @@ public class StoreController : ControllerBase
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateStore(Guid storeId, StoreDto storeDto)
+    public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
-        
-        await _repository.UpdateStoreAsync(storeId, storeDto);
+        Console.WriteLine("[PUT] StoreId: " + id);
+        await _repository.UpdateStoreAsync(id, storeDto);
         return Ok();
     }
     
     
     [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteStore(Guid storeId)
+    public async Task<ActionResult> DeleteStore(Guid id)
     {
-        var store = await _repository.GetStoreAsync(storeId);
-        if (store.OwnerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+        
+        var store = await _repository.GetStoreAsync(id);
+        
+
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId != store.OwnerId)
         {
             return Unauthorized();
         }
 
-        await _repository.DeleteStoreAsync(storeId);
+
+        await _repository.DeleteStoreAsync(id);
         return Ok();
     }
     
