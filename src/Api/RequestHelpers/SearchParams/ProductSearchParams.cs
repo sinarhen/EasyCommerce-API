@@ -1,6 +1,6 @@
 ﻿namespace ECommerce.RequestHelpers;
 
-public class SearchParams
+public class ProductSearchParams
 {
     public string OrderBy { get; set; }
     
@@ -23,5 +23,9 @@ public class SearchParams
     public string Material { get; set; }
     
     public string Occasion { get; set; }
+
+    // TODO: From Price
+
+    // TODO: To Price
     
 }

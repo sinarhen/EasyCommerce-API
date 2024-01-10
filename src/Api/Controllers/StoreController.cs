@@ -8,6 +8,7 @@ using System.Security.Claims;
 namespace ECommerce.Controllers;
 
 [ApiController]
+[Route("api/stores")]
 public class StoreController : ControllerBase
 {
     private readonly IMapper _mapper;

@@ -88,7 +88,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         
     }
             
-    public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(SearchParams searchParams)
+    public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(ProductSearchParams searchParams)
     {
         var products = await FilterProductsBySearchParams(searchParams);
         await SaveChangesAsyncWithTransaction();

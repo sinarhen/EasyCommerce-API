@@ -1,4 +1,6 @@
 ﻿using ECommerce.Models.DTOs;
+using ECommerce.RequestHelpers;
+using ECommerce.RequestHelpers.SearchParams;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Collection;
@@ -47,11 +49,54 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         return collection;
     }
 
-    public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsAsync()
+    public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsAsync(CollectionSearchParams searchParams)
     {
-        return await _db.Collections.AsNoTracking()
-            .Include(c => c.Billboards).ThenInclude(b => b.BillboardFilter)
-            .ToListAsync();
+        var query = _db.Collections
+            .AsSplitQuery()
+            .AsNoTracking()
+            .AsQueryable()
+            ;
+
+        if (!string.IsNullOrEmpty(searchParams.SearchTerm))
+        {
+            query = query.Where(c => c.Name.Contains(searchParams.SearchTerm));
+        }
+
+
+        bool includedStocks = false;
+        if (searchParams.MinPrice > 0)
+        {
+            query = query.Include(c => c.Products).ThenInclude(p => p.Stocks);
+
+            query = query.Where(
+                c => c.Products.Min(p => p.Stocks.Min(s => s.Price)) >= searchParams.MinPrice);
+        }
+
+        if (searchParams.MaxPrice < decimal.MaxValue)
+        {
+            if (!includedStocks)
+            {
+                query = query.Include(c => c.Products).ThenInclude(p => p.Stocks);
+            }
+            query = query.Where(c => c.Products.Max(p => p.Stocks.Max(s => s.Price)) <= searchParams.MaxPrice);
+        }
+
+        query = searchParams.OrderBy switch
+        {
+            "name" => query.OrderBy(c => c.Name),
+            "name_desc" => query.OrderByDescending(c => c.Name),
+            _ => query.OrderBy(c => c.Name)
+        };
+
+        query = searchParams.FilterBy switch 
+        {
+            "new" => query.Where(c => c.CreatedAt >= DateTime.Now.AddDays(-7)),
+            "verified" => query.Where(c => c.Store.IsVerified),
+            "has_sale" => query.Where(c => c.HasSale),
+            _ => query
+        };
+
+        return await query.ToListAsync();
     }
 
     public async Task UpdateCollectionAsync(Guid collectionId, CreateCollectionDto collection, string ownerId)

@@ -68,7 +68,7 @@ public class BaseRepository
         _db.ProductStocks.RemoveRange(product.Stocks);
     }
 
-    protected async  Task<List<Models.Entities.Product>> FilterProductsBySearchParams(SearchParams searchParams)
+    protected async  Task<List<Models.Entities.Product>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
         var query = _db.Products.AsNoTracking().AsSplitQuery();
 
