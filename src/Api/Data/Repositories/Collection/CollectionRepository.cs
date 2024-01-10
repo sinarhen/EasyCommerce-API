@@ -1,8 +1,5 @@
-﻿
-using System.Collections;
-using ECommerce.Config;
-using ECommerce.Models.DTOs;
-using Microsoft.AspNetCore.Authorization;
+﻿using ECommerce.Models.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Collection;
 
@@ -28,23 +25,60 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         return coll;
     }
 
-    public Task DeleteCollectionAsync(Guid id)
+    public async Task DeleteCollectionAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var collection = await _db.Collections.FindAsync(id);
+        if (collection == null)
+        {
+            throw new ArgumentException("Collection not found");
+        }
+
+        _db.Collections.Remove(collection);
+        await SaveChangesAsyncWithTransaction();
     }
 
-    public Task<ICollection> GetCollectionByIdAsync(Guid id)
+    public async Task<ECommerce.Models.Entities.Collection> GetCollectionByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var collection = await _db.Collections.FindAsync(id);
+        if (collection == null)
+        {
+            throw new ArgumentException("Collection not found");
+        }
+        return collection;
     }
 
-    public Task<IEnumerable<ICollection>> GetCollectionsAsync()
+    public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsAsync()
     {
-        throw new NotImplementedException();
+        return await _db.Collections.AsNoTracking()
+            .Include(c => c.Billboards).ThenInclude(b => b.BillboardFilter)
+            .ToListAsync();
     }
 
-    public Task UpdateCollectionAsync(ECommerce.Models.Entities.Collection collection)
+    public async Task UpdateCollectionAsync(Guid id, CreateCollectionDto collection)
     {
-        throw new NotImplementedException();
+        if (collection == null)
+        {
+            throw new ArgumentException("Request body is empty");
+        }
+
+        if (Guid.Empty.Equals(id))
+        {
+            throw new ArgumentException("Id is empty. Internal error");
+        }
+
+        var existingCollection = await _db.Collections.FindAsync(id) ?? throw new ArgumentException("Collection not found");
+        if (!string.IsNullOrEmpty(collection.Name))
+        {
+            existingCollection.Name = collection.Name;
+        }
+
+        if (!string.IsNullOrEmpty(collection.Description))
+        {
+            existingCollection.Description = collection.Description;
+        }
+
+        _db.Collections.Update(existingCollection);
+
+        await SaveChangesAsyncWithTransaction();
     }
 }
