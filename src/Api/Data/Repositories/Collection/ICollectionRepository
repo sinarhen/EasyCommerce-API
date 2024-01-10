@@ -1,0 +1,14 @@
+using System.Collections.Generic;
+
+namespace ECommerce.Api.Data.Repositories.Collection;
+public interface ICollectionRepository
+{
+    Task<ICollection> GetCollectionByIdAsync(Guid id);
+    Task<IEnumerable<ICollection>> GetCollectionsAsync();
+    Task CreateCollectionAsync(CreateCollectionDto collection);
+    Task UpdateCollectionAsync(UpdateCollectionDto collection);
+    Task DeleteCollectionAsync(Guid id);
+
+
+}
+
