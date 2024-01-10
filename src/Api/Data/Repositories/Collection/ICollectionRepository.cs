@@ -10,7 +10,7 @@ public interface ICollectionRepository
     Task<ECommerce.Models.Entities.Collection> GetCollectionByIdAsync(Guid id);
     Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsAsync();
     Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection, Guid storeId);
-    Task UpdateCollectionAsync(Guid id, CreateCollectionDto collection); // The same dto is used for update and create
+    Task UpdateCollectionAsync(Guid collectionId, CreateCollectionDto collection, string ownerId); // The same dto is used for update and create
     Task DeleteCollectionAsync(Guid id);
 
 

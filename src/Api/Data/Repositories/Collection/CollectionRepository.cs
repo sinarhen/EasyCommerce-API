@@ -7,7 +7,7 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
 {
     public CollectionRepository(ProductDbContext dbContext) : base(dbContext)
     {
-        
+
     }
 
     public async Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection, Guid storeId)
@@ -54,19 +54,33 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
             .ToListAsync();
     }
 
-    public async Task UpdateCollectionAsync(Guid id, CreateCollectionDto collection)
+    public async Task UpdateCollectionAsync(Guid collectionId, CreateCollectionDto collection, string ownerId)
     {
         if (collection == null)
         {
             throw new ArgumentException("Request body is empty");
         }
-
-        if (Guid.Empty.Equals(id))
+        
+        if (Guid.Empty.Equals(collectionId))
         {
             throw new ArgumentException("Id is empty. Internal error");
         }
+        if (Guid.Empty.Equals(ownerId))
+        {
+            throw new UnauthorizedAccessException("OwnerId is empty. Internal error");
+        }
 
-        var existingCollection = await _db.Collections.FindAsync(id) ?? throw new ArgumentException("Collection not found");
+        var existingCollection = await _db.Collections
+            .Include(c => c.Store)
+            .FirstOrDefaultAsync(c => collectionId == c.Id) 
+        ?? throw new ArgumentException("Collection not found");
+        
+
+        if (existingCollection.Store.OwnerId != ownerId)
+        {
+            throw new UnauthorizedAccessException("You are not the owner of this collection");
+        }
+
         if (!string.IsNullOrEmpty(collection.Name))
         {
             existingCollection.Name = collection.Name;
