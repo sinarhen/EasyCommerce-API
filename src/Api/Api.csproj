@@ -30,10 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Lib\Lib.csproj" />
     </ItemGroup>
 
