@@ -1,4 +1,5 @@
-﻿using ECommerce.Models.DTOs;
+﻿using ECommerce.Config;
+using ECommerce.Models.DTOs;
 using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;
 using Microsoft.EntityFrameworkCore;
@@ -11,14 +12,12 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
     {
 
     }
-
-    public async Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection, Guid storeId)
+    public async Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection)
     {
         var coll = new ECommerce.Models.Entities.Collection
         {
             Name = collection.Name,
-            Description = collection.Description,
-            StoreId = storeId
+            Description = collection.Description
         };
         await _db.Collections.AddAsync(coll);
 
@@ -27,32 +26,37 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         return coll;
     }
 
-    public async Task DeleteCollectionAsync(Guid storeId, Guid id, string ownerId)
+
+
+
+    public async Task DeleteCollectionAsync(Guid collectionId, string ownerId, List<string> ownerRoles)
     {
-        
-        var collection = await _db.Collections
+        if (Guid.Empty.Equals(collectionId))
+        {
+            throw new ArgumentException("Id is empty. Internal error");
+        }
+        if (Guid.Empty.Equals(ownerId))
+        {
+            throw new UnauthorizedAccessException("OwnerId is empty. Internal error");
+        }
+
+        var existingCollection = await _db.Collections
             .Include(c => c.Store)
-            .FirstOrDefaultAsync(c => id == c.Id);
+            .FirstOrDefaultAsync(c => collectionId == c.Id) 
+        ?? throw new ArgumentException("Collection not found");
         
-        if (collection == null)
+        // If the user is a Seller, check if they are the owner of the collection
+        if (ownerRoles.Contains(UserRoles.Seller) && !ownerRoles.Contains(UserRoles.Admin) && !ownerRoles.Contains(UserRoles.SuperAdmin))
         {
-            throw new ArgumentException("Collection not found");
+            if (existingCollection.Store.OwnerId != ownerId)
+            {
+                throw new UnauthorizedAccessException("You are not the owner of this collection");
+            }
         }
 
-        if (collection.StoreId != storeId)
-        {
-            throw new Exception("Collection does not belong to this store");
-        }
-
-        if (collection.Store.OwnerId != ownerId)
-        {
-            throw new UnauthorizedAccessException("You are not the owner of this collection");
-        }
-
-        _db.Collections.Remove(collection);
-        await SaveChangesAsyncWithTransaction();
+        _db.Collections.Remove(existingCollection);
+        await _db.SaveChangesAsync();
     }
-
     public async Task<ECommerce.Models.Entities.Collection> GetCollectionByIdAsync(Guid id)
     {
         var collection = await _db.Collections.FindAsync(id);
@@ -61,18 +65,7 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
             throw new ArgumentException("Collection not found");
         }
         return collection;
-    }
-
-    public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsForStoreAsync(Guid storeId)
-    {
-        return await _db.Collections
-            .AsSplitQuery()
-            .AsNoTracking()
-            .AsQueryable()
-            .Where(c => c.StoreId == storeId)
-            .ToListAsync();
-    }
-    
+    }    
 
     public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsAsync(CollectionSearchParams searchParams)
     {
@@ -135,7 +128,7 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
             .ToListAsync();
     }
 
-    public async Task UpdateCollectionAsync(Guid storeId, Guid collectionId, CreateCollectionDto collection, string ownerId)
+    public async Task UpdateCollectionAsync(Guid collectionId, CreateCollectionDto collection, string ownerId, List<string> ownerRoles)
     {
         if (collection == null)
         {
@@ -156,10 +149,13 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
             .FirstOrDefaultAsync(c => collectionId == c.Id) 
         ?? throw new ArgumentException("Collection not found");
         
-
-        if (existingCollection.Store.OwnerId != ownerId)
+        // If the user is a Seller, check if they are the owner of the collection
+        if (ownerRoles.Contains(UserRoles.Seller) && !ownerRoles.Contains(UserRoles.Admin) && !ownerRoles.Contains(UserRoles.SuperAdmin))
         {
-            throw new UnauthorizedAccessException("You are not the owner of this collection");
+            if (existingCollection.Store.OwnerId != ownerId)
+            {
+                throw new UnauthorizedAccessException("You are not the owner of this collection");
+            }
         }
 
         if (!string.IsNullOrEmpty(collection.Name))
@@ -167,16 +163,9 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
             existingCollection.Name = collection.Name;
         }
 
-        if (!string.IsNullOrEmpty(collection.Description))
-        {
-            existingCollection.Description = collection.Description;
-        }
-
         _db.Collections.Update(existingCollection);
-
-        await SaveChangesAsyncWithTransaction();
+        await _db.SaveChangesAsync();
     }
-
     public async Task<IEnumerable<ECommerce.Models.Entities.Product>> GetProductsInCollectionAsync(Guid storeId, Guid collectionId, ProductSearchParams searchParams)
     {
         var collection = await _db.Collections
