@@ -24,8 +24,9 @@ public class ProductSearchParams
     
     public string Occasion { get; set; }
 
-    // TODO: From Price
+    public decimal MinPrice { get; set; } = 0;
 
-    // TODO: To Price
+    public decimal MaxPrice { get; set; } = decimal.MaxValue;
+
     
 }

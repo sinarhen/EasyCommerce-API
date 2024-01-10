@@ -27,12 +27,26 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         return coll;
     }
 
-    public async Task DeleteCollectionAsync(Guid id)
+    public async Task DeleteCollectionAsync(Guid storeId, Guid id, string ownerId)
     {
-        var collection = await _db.Collections.FindAsync(id);
+        
+        var collection = await _db.Collections
+            .Include(c => c.Store)
+            .FirstOrDefaultAsync(c => id == c.Id);
+        
         if (collection == null)
         {
             throw new ArgumentException("Collection not found");
+        }
+
+        if (collection.StoreId != storeId)
+        {
+            throw new Exception("Collection does not belong to this store");
+        }
+
+        if (collection.Store.OwnerId != ownerId)
+        {
+            throw new UnauthorizedAccessException("You are not the owner of this collection");
         }
 
         _db.Collections.Remove(collection);
@@ -48,6 +62,17 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         }
         return collection;
     }
+
+    public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsForStoreAsync(Guid storeId)
+    {
+        return await _db.Collections
+            .AsSplitQuery()
+            .AsNoTracking()
+            .AsQueryable()
+            .Where(c => c.StoreId == storeId)
+            .ToListAsync();
+    }
+    
 
     public async Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetCollectionsAsync(CollectionSearchParams searchParams)
     {
@@ -99,7 +124,18 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         return await query.ToListAsync();
     }
 
-    public async Task UpdateCollectionAsync(Guid collectionId, CreateCollectionDto collection, string ownerId)
+    public async Task<IEnumerable<Models.Entities.Collection>> GetRandomCollectionsAsync()
+    {
+        return await _db.Collections
+            .AsSplitQuery()
+            .AsNoTracking()
+            .AsQueryable()
+            .OrderBy(c => Guid.NewGuid())
+            .Take(10)
+            .ToListAsync();
+    }
+
+    public async Task UpdateCollectionAsync(Guid storeId, Guid collectionId, CreateCollectionDto collection, string ownerId)
     {
         if (collection == null)
         {
@@ -139,5 +175,34 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         _db.Collections.Update(existingCollection);
 
         await SaveChangesAsyncWithTransaction();
+    }
+
+    public async Task<IEnumerable<ECommerce.Models.Entities.Product>> GetProductsInCollectionAsync(Guid storeId, Guid collectionId, ProductSearchParams searchParams)
+    {
+        var collection = await _db.Collections
+            .Include(c => c.Store)
+            .FirstOrDefaultAsync(c => c.Id == collectionId);
+
+        if (collection == null)
+        {
+            throw new ArgumentException("Collection not found");
+        }
+
+        if (collection.StoreId != storeId)
+        {
+            throw new Exception("Collection does not belong to this store");
+        }
+
+        searchParams.CollectionId = collectionId;
+
+        var products = await FilterProductsBySearchParams(searchParams);
+
+        if (products == null)
+        {
+            throw new ArgumentException("Collection not found");
+        }
+
+        return products;
+
     }
 }
