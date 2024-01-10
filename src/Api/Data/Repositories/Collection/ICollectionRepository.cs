@@ -12,7 +12,7 @@ public interface ICollectionRepository
 {
     Task<ECommerce.Models.Entities.Collection> GetCollectionByIdAsync(Guid id);
     Task<IEnumerable<ECommerce.Models.Entities.Collection>> GetRandomCollectionsAsync();
-    Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collectionDto);
+    Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collectionDto, string ownerId, List<string> ownerRoles);
     Task UpdateCollectionAsync(Guid id, CreateCollectionDto collectionDto, string ownerId, List<string> ownerRoles);
     Task DeleteCollectionAsync(Guid id, string ownerId, List<string> ownerRoles);
 }

@@ -12,8 +12,38 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
     {
 
     }
-    public async Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection)
+    public async Task<ECommerce.Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection, string ownerId, List<string> ownerRoles)
     {
+        if (collection == null)
+        {
+            throw new ArgumentException("Request body is empty");
+        }
+        if (Guid.Empty.Equals(ownerId))
+        {
+            throw new UnauthorizedAccessException("OwnerId is empty. Internal error");
+        }
+        if (collection.StoreId == Guid.Empty)
+        {
+            throw new ArgumentException("StoreId is empty");
+        }
+
+        var store = await _db.Stores.FindAsync(collection.StoreId);
+        if (store == null)
+        {
+            throw new ArgumentException("Store not found");
+        }
+
+        // If the user is a Seller, check if they are the owner of the store
+        if (ownerRoles.Contains(UserRoles.Seller) && !ownerRoles.Contains(UserRoles.Admin) && !ownerRoles.Contains(UserRoles.SuperAdmin))
+        {
+            var isOwner = store.OwnerId == ownerId;
+            if (!isOwner)
+            {
+                throw new UnauthorizedAccessException("You are not the owner of any store");
+            }
+        }
+
+
         var coll = new ECommerce.Models.Entities.Collection
         {
             Name = collection.Name,
