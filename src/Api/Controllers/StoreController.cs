@@ -14,7 +14,7 @@ public class StoreController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IStoreRepository _repository;
 
-    public StoreController(IMapper mapper, IStoreRepository repository)
+public StoreController(IMapper mapper, IStoreRepository repository)
     {
         _mapper = mapper;
         _repository = repository;

@@ -18,7 +18,7 @@ public class ProductRepository: BaseRepository, IProductRepository
     
     
     
-    private static void ValidateOnModelLevel(CreateProductDto productDto)
+    private static void ValidateCreateProductDtoOnModelLevel(CreateProductDto productDto)
     {
         if (productDto == null)
         {
@@ -118,7 +118,7 @@ public class ProductRepository: BaseRepository, IProductRepository
 
     public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string username, IEnumerable<string> roles)
     {
-        ValidateOnModelLevel(productDto);
+        ValidateCreateProductDtoOnModelLevel(productDto);
         
         var nonExistingMaterialIds = productDto.Materials
             .Where(m => !_db.Materials.Any(material => material.Id == m.Id))
