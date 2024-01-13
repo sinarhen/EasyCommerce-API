@@ -15,6 +15,11 @@ namespace ECommerce.RequestHelpers;
 
 public class MappingProfiles: Profile
 {
+
+    private void MapBillboardProfiles()
+    {
+        CreateMap<Billboard, BillboardDto>();
+    }
     private void MapCategoryProfiles()
     {
         CreateMap<Category, CategoryDto>();
@@ -37,6 +42,7 @@ public class MappingProfiles: Profile
         MapProductProfiles();
         MapCategoryProfiles();
         MapStoreProfiles();
+        MapBillboardProfiles();
     }
     private void MapProductProfiles()
     {

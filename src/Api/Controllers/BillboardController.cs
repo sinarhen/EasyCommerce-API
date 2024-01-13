@@ -1,5 +1,7 @@
 using AutoMapper;
 using ECommerce.Config;
+using ECommerce.Data.Repositories.Billboard;
+using ECommerce.Models.DTOs.Billboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,18 +11,19 @@ namespace ECommerce.Controllers;
 [Route("api/billboards")]
 public class BillboardController : GenericController
 {
+    private readonly IBillboardRepository _repository;
 
-    public BillboardController(IMapper mapper) : base(mapper)
+    public BillboardController(IMapper mapper, IBillboardRepository repository) : base(mapper)
     {
-        
+        _repository = repository;
     }
 
 
     [HttpGet("{collectionId}")]
     public async Task<IActionResult> GetBillboardsForCollection(Guid collectionId)
     {
-        await Task.Delay(0);
-        return Ok();
+        var billboards = await _repository.GetBillboardsForCollectionAsync(collectionId);
+        return Ok(_mapper.Map<List<BillboardDto>>(billboards));
     }
 
     [HttpGet("{billboardId}")]
