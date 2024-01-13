@@ -1,4 +1,5 @@
 using ECommerce.Data.Repositories.Billboard;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories;
 
@@ -25,9 +26,13 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Models.Entities.Billboard>> GetBillboardsForCollectionAsync(Guid collectionId)
+    public async Task<IEnumerable<Models.Entities.Billboard>> GetBillboardsForCollectionAsync(Guid collectionId)
     {
-        throw new NotImplementedException();
+        return await _db.Billboards.AsNoTracking()
+            .Include(c => c.BillboardFilter)
+            .Where(c => c.CollectionId == collectionId).ToListAsync();
+
+        
     }
 
     public Task<Models.Entities.Billboard> UpdateBillboard(UpdateBillboardDto updateBillboardDto)
