@@ -15,8 +15,8 @@ public class BillboardController : ControllerBase
     }
 
 
-    [HttpGet("{storeId}")]
-    public async Task<IActionResult> GetBillboardsForStore(Guid storeId)
+    [HttpGet("{collectionId}")]
+    public async Task<IActionResult> GetBillboardsForCollection(Guid collectionId)
     {
         await Task.Delay(0);
         return Ok();
@@ -29,9 +29,9 @@ public class BillboardController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("{storeId}")]
+    [HttpPost("{collectionId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
-    public async Task<IActionResult> CreateBillboardForStore(Guid storeId)
+    public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId)
     {
         await Task.Delay(0);
         return Ok();
