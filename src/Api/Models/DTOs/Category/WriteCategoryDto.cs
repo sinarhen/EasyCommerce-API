@@ -1,5 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
-
+﻿namespace ECommerce.Models.DTOs.Category;
 public class WriteCategoryDto
 {
     public string Name { get; set; }

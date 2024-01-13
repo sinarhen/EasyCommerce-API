@@ -1,5 +1,7 @@
-﻿namespace ECommerce.Models.DTOs;
+﻿using ECommerce.Models.DTOs.Material;
+using ECommerce.Models.DTOs.Stock;
 
+namespace ECommerce.Models.DTOs.Product;
 public class UpdateProductDto
 {
     public string Name { get; set; }

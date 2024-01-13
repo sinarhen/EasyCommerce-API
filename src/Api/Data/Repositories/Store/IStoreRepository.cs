@@ -1,4 +1,5 @@
 ﻿using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Store;
 
 namespace ECommerce.Data.Repositories.Store;
 

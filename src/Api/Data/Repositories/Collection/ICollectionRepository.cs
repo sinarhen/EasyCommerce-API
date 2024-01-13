@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Collection;
 using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;

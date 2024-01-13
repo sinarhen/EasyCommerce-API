@@ -1,5 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
-
+﻿namespace ECommerce.Models.DTOs.Product;
 public class ProductDetailsDto : ProductDto
 {
     public List<ReviewDto> Reviews { get; set; } 

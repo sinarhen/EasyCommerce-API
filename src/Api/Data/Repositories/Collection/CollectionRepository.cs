@@ -1,5 +1,6 @@
 ﻿using ECommerce.Config;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Collection;
 using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;
 using Microsoft.EntityFrameworkCore;

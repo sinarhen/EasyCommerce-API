@@ -1,5 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
-
+﻿namespace ECommerce.Models.DTOs.Size;
 public class SizeDto
 {
     public Guid Id { get; set; }

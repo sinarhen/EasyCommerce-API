@@ -1,7 +1,6 @@
 using ECommerce.Models.Entities;
 
-namespace ECommerce.Models.DTOs;
-
+namespace ECommerce.Models.DTOs.Billboard;
 public class BillboardFilterDto
 {
     public Guid Id { get; set; }

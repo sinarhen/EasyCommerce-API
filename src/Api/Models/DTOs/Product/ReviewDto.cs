@@ -1,5 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
-
+﻿namespace ECommerce.Models.DTOs.Product;
 public class ReviewDto
 {
     public string CustomerName { get; set; } 

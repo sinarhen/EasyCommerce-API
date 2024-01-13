@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using ECommerce.Config;
-using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Auth;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Identity;

@@ -2,9 +2,7 @@
 using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Collection;
-using ECommerce.Models.DTOs;
-using ECommerce.RequestHelpers;
-using ECommerce.RequestHelpers.SearchParams;
+using ECommerce.Models.DTOs.Collection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

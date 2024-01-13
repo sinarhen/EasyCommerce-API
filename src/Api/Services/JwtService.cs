@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Auth;
 using Microsoft.IdentityModel.Tokens;
 namespace ECommerce.Services;
 

@@ -1,4 +1,4 @@
-namespace ECommerce.Models.DTOs;
+namespace ECommerce.Models.DTOs.Auth;
 
 public class ClaimDto
 {

@@ -1,5 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
-
+﻿namespace ECommerce.Models.DTOs.Collection;
 
 public class CreateCollectionDto
 {

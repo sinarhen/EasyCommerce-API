@@ -33,4 +33,8 @@
       <ProjectReference Include="..\Lib\Lib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\DTOs\Store\" />
+    </ItemGroup>
+
 </Project>

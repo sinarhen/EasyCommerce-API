@@ -1,4 +1,5 @@
 ﻿using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Product;
 using ECommerce.RequestHelpers;
 
 namespace ECommerce.Data.Repositories.Product;

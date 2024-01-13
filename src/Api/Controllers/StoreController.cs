@@ -2,6 +2,7 @@
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Store;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Store;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

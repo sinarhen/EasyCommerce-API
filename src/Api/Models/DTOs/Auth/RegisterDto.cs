@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ECommerce.Models.DTOs;
+namespace ECommerce.Models.DTOs.Auth;
 
 public class RegisterDto
 {

@@ -1,5 +1,7 @@
-﻿namespace ECommerce.Models.DTOs;
+﻿using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.DTOs.Product;
 
+namespace ECommerce.Models.DTOs.Stock;
 public class StockDto
 {
     public ColorDto Color { get; set; }

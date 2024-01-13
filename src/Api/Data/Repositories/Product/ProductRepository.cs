@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
 using Microsoft.EntityFrameworkCore;

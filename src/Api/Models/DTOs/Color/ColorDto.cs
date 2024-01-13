@@ -1,4 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
+﻿namespace ECommerce.Models.DTOs.Color;
 
 public class ColorDto
 {
@@ -6,8 +6,8 @@ public class ColorDto
     public string Name { get; set; }
     public string HexCode { get; set; }
     public List<string> ImageUrls { get; set; }
-    
+
     public bool? IsAvailable { get; set; }
-    
+
     public int? Quantity { get; set; }
 }

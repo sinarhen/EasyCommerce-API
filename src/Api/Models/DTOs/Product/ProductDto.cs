@@ -1,6 +1,9 @@
 ﻿
-namespace ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.DTOs.Material;
+using ECommerce.Models.DTOs.Size;
 
+namespace ECommerce.Models.DTOs.Product;
 
 public class ProductDto 
 {

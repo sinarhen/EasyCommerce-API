@@ -2,7 +2,7 @@
 using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Category;
-using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Category;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
