@@ -76,6 +76,24 @@ builder.Services.AddAuthentication(options =>
         };       
     });
 
+builder.Services.AddAuthorization(options => 
+{
+    options.AddPolicy(Policies.AdminPolicy, policy => 
+    {
+        policy.RequireRole(UserRoles.Admin, UserRoles.SuperAdmin);
+    });
+
+    options.AddPolicy(Policies.SellerPolicy, policy => 
+    {
+        policy.RequireRole(UserRoles.Seller, UserRoles.Admin, UserRoles.SuperAdmin);
+    });
+
+    options.AddPolicy(Policies.SuperAdminPolicy, policy => 
+    {
+        policy.RequireRole(UserRoles.SuperAdmin);
+    });
+});
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddJwtService();
@@ -84,6 +102,8 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
+
+
 
 var app = builder.Build();
 

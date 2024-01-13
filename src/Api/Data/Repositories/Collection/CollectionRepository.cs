@@ -27,11 +27,7 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
             throw new ArgumentException("StoreId is empty");
         }
 
-        var store = await _db.Stores.FindAsync(collection.StoreId);
-        if (store == null)
-        {
-            throw new ArgumentException("Store not found");
-        }
+        var store = await _db.Stores.FindAsync(collection.StoreId) ?? throw new ArgumentException("Store not found");
 
         // If the user is a Seller, check if they are the owner of the store
         if (ownerRoles.Contains(UserRoles.Seller) && !ownerRoles.Contains(UserRoles.Admin) && !ownerRoles.Contains(UserRoles.SuperAdmin))
