@@ -66,12 +66,18 @@ public class CategoryRepository : BaseRepository, ICategoryRepository
     private async Task UpdateProductCategories(Models.Entities.Category category, Models.Entities.Category newParentCategory)
     {
         var products = category.Products.ToList();
+        var productIds = products.Select(p => p.ProductId).ToList();
+        var allProductCategories = await _db.ProductCategories
+            .Where(pc => productIds.Contains(pc.ProductId) && pc.CategoryId != category.Id)
+            .ToListAsync();
+
         var productCategoriesToRemove = new List<ProductCategory>();
         foreach (var product in products)
         {
-            var productCategories = await _db.ProductCategories
+            var productCategories = allProductCategories
                 .Where(pc => pc.ProductId == product.ProductId && pc.CategoryId != category.Id)
-                .ToListAsync();
+                .ToList();
+                
             productCategoriesToRemove.AddRange(productCategories);
         
             AddToCategories(newParentCategory, product.Product, CalculateDepth(category));

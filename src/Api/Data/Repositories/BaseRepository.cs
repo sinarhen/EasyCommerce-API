@@ -41,16 +41,18 @@ public class BaseRepository
 
     protected void AddToCategories(ECommerce.Models.Entities.Category category, ECommerce.Models.Entities.Product product, int order)
     {
-        product.Categories.Add(new ProductCategory
+        var currentCategory = category;
+        while (currentCategory != null)
         {
-            ProductId = product.Id,
-            CategoryId = category.Id,
-            Order = order
-        });
+            product.Categories.Add(new ProductCategory
+            {
+                ProductId = product.Id,
+                CategoryId = currentCategory.Id,
+                Order = order
+            });
 
-        if (category.ParentCategory != null)
-        {
-            AddToCategories(category.ParentCategory, product, order - 1);
+            order--;
+            currentCategory = currentCategory.ParentCategory;
         }
     }
     protected void ClearProductCategories(ECommerce.Models.Entities.Product product)
