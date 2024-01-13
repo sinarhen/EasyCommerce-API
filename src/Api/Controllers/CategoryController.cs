@@ -10,14 +10,12 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/categories")]
-public class CategoryController : ControllerBase
+public class CategoryController : GenericController
 {
-    private readonly IMapper _mapper;
     private readonly ICategoryRepository _repository;
 
-    public CategoryController(IMapper mapper, ICategoryRepository repository)
+    public CategoryController(IMapper mapper, ICategoryRepository repository) : base(mapper)
     {
-        _mapper = mapper;
         _repository = repository;
     }
 

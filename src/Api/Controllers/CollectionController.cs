@@ -11,14 +11,12 @@ namespace ECommerce.Controllers.Collection;
 
 [ApiController]
 [Route("api/collections")]
-public class CollectionController : ControllerBase
+public class CollectionController : GenericController
 {
-    private readonly IMapper _mapper;
     private readonly ICollectionRepository _repository;
 
-    public CollectionController(IMapper mapper, ICollectionRepository repository)
+    public CollectionController(IMapper mapper, ICollectionRepository repository) : base(mapper)
     {
-        _mapper = mapper;
         _repository = repository;
     }
 

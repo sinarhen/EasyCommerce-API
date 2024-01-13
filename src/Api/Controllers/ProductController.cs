@@ -15,14 +15,13 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/products")]
-public class ProductController : ControllerBase
+public class ProductController : GenericController
 {
-    private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
 
-    public ProductController(IMapper mapper, IProductRepository repository)
+    public ProductController(IMapper mapper, IProductRepository repository) : base(mapper)
     {
-        _mapper = mapper;
+        
         _repository = repository;
     }
 

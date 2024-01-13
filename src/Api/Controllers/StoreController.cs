@@ -10,14 +10,12 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/stores")]
-public class StoreController : ControllerBase
+public class StoreController : GenericController
 {
-    private readonly IMapper _mapper;
     private readonly IStoreRepository _repository;
 
-public StoreController(IMapper mapper, IStoreRepository repository)
+    public StoreController(IMapper mapper, IStoreRepository repository) : base(mapper)
     {
-        _mapper = mapper;
         _repository = repository;
     }
     

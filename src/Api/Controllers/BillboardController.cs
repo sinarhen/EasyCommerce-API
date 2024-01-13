@@ -1,3 +1,4 @@
+using AutoMapper;
 using ECommerce.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,10 +7,10 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/billboards")]
-public class BillboardController : ControllerBase
+public class BillboardController : GenericController
 {
 
-    public BillboardController()
+    public BillboardController(IMapper mapper) : base(mapper)
     {
         
     }
@@ -49,6 +50,7 @@ public class BillboardController : ControllerBase
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> DeleteBillboard(Guid billboardId)
     {
+
         await Task.Delay(0);
         return Ok();
     }

@@ -12,9 +12,8 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController : ControllerBase
+public class AuthController : GenericController
 {
-    private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
     private readonly JwtService _jwtService;
 
@@ -22,9 +21,8 @@ public class AuthController : ControllerBase
         IMapper mapper,
         UserManager<User> userManager,
         JwtService jwtService
-    )
+    ) : base(mapper)
     {
-        _mapper = mapper;
         _userManager = userManager;
         _jwtService = jwtService;
     }
