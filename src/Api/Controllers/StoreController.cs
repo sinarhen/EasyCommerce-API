@@ -33,7 +33,7 @@ public StoreController(IMapper mapper, IStoreRepository repository)
         return Ok(storeDto);
     }
 
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    // [Authorize(Policy = Policies.)] ???
     [HttpGet]
     public async Task<ActionResult> GetStores()
     {
@@ -51,7 +51,7 @@ public StoreController(IMapper mapper, IStoreRepository repository)
         );
     }
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPost]
     public async Task<ActionResult> CreateStore(StoreDto storeDto)
     {
@@ -62,7 +62,7 @@ public StoreController(IMapper mapper, IStoreRepository repository)
     }
     
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
@@ -72,7 +72,7 @@ public StoreController(IMapper mapper, IStoreRepository repository)
     }
     
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteStore(Guid id)
     {

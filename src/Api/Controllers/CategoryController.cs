@@ -55,7 +55,7 @@ public class CategoryController : ControllerBase
         
     }
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.AdminPolicy)]
     [HttpPost]
     public async Task<ActionResult> CreateCategory(WriteCategoryDto categoryDto)
     {
@@ -71,7 +71,7 @@ public class CategoryController : ControllerBase
         return Ok();
     }
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.AdminPolicy)]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCategory(Guid id, WriteCategoryDto categoryDto)
     {
@@ -89,7 +89,7 @@ public class CategoryController : ControllerBase
         return Ok();
     }
 
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.AdminPolicy)]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteCategory(Guid id)
     {

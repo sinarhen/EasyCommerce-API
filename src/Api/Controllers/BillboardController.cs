@@ -30,7 +30,7 @@ public class BillboardController : ControllerBase
     }
 
     [HttpPost("{storeId}")]
-    [Authorize(Roles = UserRoles.Seller + "," + UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> CreateBillboardForStore(Guid storeId)
     {
         await Task.Delay(0);
@@ -38,7 +38,7 @@ public class BillboardController : ControllerBase
     }
 
     [HttpPut("{billboardId}")]
-    [Authorize(Roles = UserRoles.Seller + "," + UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId)
     {
         await Task.Delay(0);
@@ -46,7 +46,7 @@ public class BillboardController : ControllerBase
     }
 
     [HttpDelete("{billboardId}")]
-    [Authorize(Roles = UserRoles.Seller + "," + UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> DeleteBillboard(Guid billboardId)
     {
         await Task.Delay(0);

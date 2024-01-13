@@ -86,7 +86,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(Policies.SellerPolicy, policy => 
     {
         policy.RequireRole(UserRoles.Seller, UserRoles.Admin, UserRoles.SuperAdmin);
-    });
+});
 
     options.AddPolicy(Policies.SuperAdminPolicy, policy => 
     {

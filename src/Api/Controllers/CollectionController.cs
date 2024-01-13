@@ -52,8 +52,10 @@ public class CollectionController : ControllerBase
         var collection = await _repository.GetCollectionByIdAsync(id);
         return Ok(_mapper.Map<CollectionDto>(collection));
     }
+
+
     [HttpPut("{id}")]
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<ActionResult> UpdateCollection(Guid id, CreateCollectionDto collectionDto)
     {
         try
@@ -86,7 +88,7 @@ public class CollectionController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<ActionResult> CreateCollection(CreateCollectionDto collectionDto)
     {
         try

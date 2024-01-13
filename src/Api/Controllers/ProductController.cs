@@ -122,7 +122,7 @@ public class ProductController : ControllerBase
         return Ok(productDto);
     }    
 
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPost]
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto productDto)
     {
@@ -152,7 +152,7 @@ public class ProductController : ControllerBase
         
     }
     
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {
@@ -182,7 +182,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [Authorize(Roles = UserRoles.Admin + "," + UserRoles.SuperAdmin + "," + UserRoles.Seller)]
+    [Authorize(Policy = Policies.SellerPolicy)]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
