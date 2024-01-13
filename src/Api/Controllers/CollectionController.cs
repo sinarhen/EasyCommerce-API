@@ -56,9 +56,8 @@ public class CollectionController : GenericController
     {
         try
         {
-            var ownerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var ownerRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-            await _repository.UpdateCollectionAsync(id, collectionDto, ownerId, ownerRoles);
+            var ownerId = GetUserId();
+            var ownerRoles = GetUserRoles();            await _repository.UpdateCollectionAsync(id, collectionDto, ownerId, ownerRoles);
             return NoContent();
         }
         catch (Exception ex)
@@ -72,9 +71,8 @@ public class CollectionController : GenericController
     {
         try
         {
-            var ownerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var ownerRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-            await _repository.DeleteCollectionAsync(id, ownerId, ownerRoles);
+            var ownerId = GetUserId();
+            var ownerRoles = GetUserRoles();            await _repository.DeleteCollectionAsync(id, ownerId, ownerRoles);
             return NoContent();
         }
         catch (Exception ex)
@@ -89,9 +87,8 @@ public class CollectionController : GenericController
     {
         try
         {
-            var ownerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var ownerRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-            var collection = await _repository.CreateCollectionAsync(collectionDto, ownerId, ownerRoles);
+            var ownerId = GetUserId();
+            var ownerRoles = GetUserRoles();            var collection = await _repository.CreateCollectionAsync(collectionDto, ownerId, ownerRoles);
             return CreatedAtAction(nameof(CreateCollection), new { id = collection.Id }, collection);
         }
         catch (Exception ex)

@@ -21,6 +21,7 @@ public class GenericController : ControllerBase
 
     protected List<string> GetUserRoles()
     {
-        return User.FindAll(ClaimTypes.Role).Select(x => x.Value).ToList();
+        return User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+            
     }
 }
