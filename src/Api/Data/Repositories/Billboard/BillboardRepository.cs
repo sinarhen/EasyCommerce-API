@@ -1,4 +1,6 @@
 using ECommerce.Data.Repositories.Billboard;
+using ECommerce.Models.DTOs.Billboard;
+using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories;
@@ -35,8 +37,55 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         
     }
 
-    public Task<Models.Entities.Billboard> UpdateBillboard(UpdateBillboardDto updateBillboardDto)
+    public async Task<Models.Entities.Billboard> UpdateBillboardAsync(UpdateBillboardDto updateBillboardDto, string userId, Guid billboardId)
     {
-        throw new NotImplementedException();
+        var billboard = await _db.Billboards
+            .Include(b => b.Collection)
+            .ThenInclude(c => c.Store)
+            .FirstOrDefaultAsync(b => b.Id == billboardId) 
+            ?? 
+            throw new ArgumentException($"Billboard not found: {billboardId}");
+
+        if (billboard.Collection.Store.OwnerId != userId)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to update this billboard");
+        }
+
+        billboard.Title = updateBillboardDto.Title;
+        billboard.Subtitle = updateBillboardDto.Subtitle;
+        billboard.ImageUrl = updateBillboardDto.ImageUrl;
+        billboard.CollectionId = updateBillboardDto.CollectionId ?? billboard.CollectionId;
+        
+
+        var filterDto = updateBillboardDto.BillboardFilter;
+        if (filterDto != null)
+        {
+            if (!string.IsNullOrEmpty(filterDto.OrderBy))
+            {
+                billboard.BillboardFilter.OrderBy = filterDto.OrderBy;
+            }
+
+            if (!string.IsNullOrEmpty(filterDto.Search))
+            {
+                billboard.BillboardFilter.Search = filterDto.Search;
+            }
+        
+            billboard.BillboardFilter.FromPrice = filterDto.FromPrice;
+
+            billboard.BillboardFilter.ToPrice = filterDto.ToPrice;
+
+            if (filterDto.Gender != null && !Enum.IsDefined(typeof(Gender), filterDto.Gender))
+            {
+                throw new ArgumentException("Invalid Gender");
+            }
+        }
+
+        billboard.FilterTitle = updateBillboardDto.FilterTitle;
+        billboard.FilterSubtitle = updateBillboardDto.FilterSubtitle;
+
+
+        await SaveChangesAsyncWithTransaction();
+        return billboard;
+
     }
 }
