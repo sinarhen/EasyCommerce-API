@@ -29,6 +29,7 @@ public class BillboardController : GenericController
     [HttpGet("{billboardId}")]
     public async Task<IActionResult> GetBillboard(Guid billboardId)
     {
+        // TODO: Implement
         await Task.Delay(0);
         return Ok();
     }
@@ -37,6 +38,7 @@ public class BillboardController : GenericController
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId)
     {
+        // TODO: Implement
         await Task.Delay(0);
         return Ok();
     }
@@ -45,6 +47,7 @@ public class BillboardController : GenericController
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId)
     {
+        // TODO: Implement
         await Task.Delay(0);
         return Ok();
     }

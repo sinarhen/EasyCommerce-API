@@ -1,9 +1,9 @@
-using ECommerce.Data.Repositories.Billboard;
 using ECommerce.Models.DTOs.Billboard;
 using ECommerce.Models.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Data.Repositories;
+namespace ECommerce.Data.Repositories.Billboard;
 
 
 public class BillboardRepository : BaseRepository, IBillboardRepository
@@ -18,9 +18,15 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         throw new NotImplementedException();
     }
 
-    public Task DeleteBillboard(Guid billboardId)
+    public async Task DeleteBillboard(Guid billboardId)
     {
-        throw new NotImplementedException();
+        var billboard = await _db.FindAsync<Models.Entities.Billboard>(billboardId);
+        if (billboard == null)
+        {
+            throw new ArgumentException("Billboard not found");
+        }
+        _db.Remove("Billboard");
+        await SaveChangesAsyncWithTransaction();
     }
 
     public Task<Models.Entities.Billboard> GetBillboardAsync(Guid billboardId)
@@ -33,16 +39,16 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         return await _db.Billboards.AsNoTracking()
             .Include(c => c.BillboardFilter)
             .Where(c => c.CollectionId == collectionId).ToListAsync();
-
+        
         
     }
 
     public async Task<Models.Entities.Billboard> UpdateBillboardAsync(UpdateBillboardDto updateBillboardDto, string userId, Guid billboardId)
     {
         var billboard = await _db.Billboards
-            .Include(b => b.Collection)
-            .ThenInclude(c => c.Store)
-            .FirstOrDefaultAsync(b => b.Id == billboardId) 
+                            .Include(b => b.Collection)
+                            .ThenInclude(c => c.Store).Include(billboard => billboard.BillboardFilter)
+                            .FirstOrDefaultAsync(b => b.Id == billboardId) 
             ?? 
             throw new ArgumentException($"Billboard not found: {billboardId}");
 
