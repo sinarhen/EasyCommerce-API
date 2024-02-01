@@ -13,27 +13,54 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
 
     }
 
-    public Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(CreateBillboardDto createBillboardDto)
+public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(Guid collectionId, string userId, CreateBillboardDto createBillboardDto)
+{
+    var collection = await _db.Collections
+        .Include(c => c.Store)
+        .SingleOrDefaultAsync(c => c.Id == collectionId) 
+        ?? throw new ArgumentException("Collection not found");
+
+    if (userId != collection.Store.OwnerId)
     {
-        throw new NotImplementedException();
+        throw new UnauthorizedAccessException("You are not authorized to create a billboard for this collection");
+    }
+    var billboard = new Models.Entities.Billboard{
+        Title = createBillboardDto.Title,
+        Subtitle = createBillboardDto.Subtitle,
+        ImageUrl = createBillboardDto.ImageUrl,
+        CollectionId = collectionId,
+    };
+
+    await _db.Billboards.AddAsync(billboard);
+    await SaveChangesAsyncWithTransaction();
+    return billboard;
+}
+
+    public async Task DeleteBillboard(Guid billboardId, string userId)
+    {
+        var billboard = await _db.FindAsync<Models.Entities.Billboard>(billboardId) ?? throw new ArgumentException("Billboard not found");
+        if (billboard.Collection.Store.OwnerId != userId)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to delete this billboard");
+        }
+        _db.Billboards.Remove(billboard);
+
+        await SaveChangesAsyncWithTransaction();
     }
 
-    public async Task DeleteBillboard(Guid billboardId)
+    public async Task<Models.Entities.Billboard> GetBillboardAsync(Guid billboardId)
     {
-        var billboard = await _db.FindAsync<Models.Entities.Billboard>(billboardId);
+        var billboard = await _db.Billboards
+            .Include(b => b.BillboardFilter)
+            .FirstOrDefaultAsync(b => b.Id == billboardId);
+
         if (billboard == null)
         {
             throw new ArgumentException("Billboard not found");
         }
-        _db.Remove("Billboard");
-        await SaveChangesAsyncWithTransaction();
-    }
 
-    public Task<Models.Entities.Billboard> GetBillboardAsync(Guid billboardId)
-    {
-        throw new NotImplementedException();
+        return billboard;
     }
-
     public async Task<IEnumerable<Models.Entities.Billboard>> GetBillboardsForCollectionAsync(Guid collectionId)
     {
         return await _db.Billboards.AsNoTracking()
@@ -63,30 +90,30 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         billboard.CollectionId = updateBillboardDto.CollectionId ?? billboard.CollectionId;
         
 
-        var filterDto = updateBillboardDto.BillboardFilter;
-        if (filterDto != null)
-        {
-            if (!string.IsNullOrEmpty(filterDto.OrderBy))
-            {
-                billboard.BillboardFilter.OrderBy = filterDto.OrderBy;
-            }
+        // var filterDto = updateBillboardDto.BillboardFilter;
+        // if (filterDto != null)
+        // {
+        //     if (!string.IsNullOrEmpty(filterDto.OrderBy))
+        //     {
+        //         billboard.BillboardFilter.OrderBy = filterDto.OrderBy;
+        //     }
 
-            if (!string.IsNullOrEmpty(filterDto.Search))
-            {
-                billboard.BillboardFilter.Search = filterDto.Search;
-            }
+        //     if (!string.IsNullOrEmpty(filterDto.Search))
+        //     {
+        //         billboard.BillboardFilter.Search = filterDto.Search;
+        //     }
         
-            billboard.BillboardFilter.FromPrice = filterDto.FromPrice;
+        //     billboard.BillboardFilter.FromPrice = filterDto.FromPrice;
 
-            billboard.BillboardFilter.ToPrice = filterDto.ToPrice;
+        //     billboard.BillboardFilter.ToPrice = filterDto.ToPrice;
 
-            if (filterDto.Gender != null && !Enum.IsDefined(typeof(Gender), filterDto.Gender))
-            {
-                throw new ArgumentException("Invalid Gender");
-            }
-            billboard.BillboardFilter.Title = filterDto.Title;
-            billboard.BillboardFilter.Subtitle = filterDto.Subtitle;
-        }
+        //     if (filterDto.Gender != null && !Enum.IsDefined(typeof(Gender), filterDto.Gender))
+        //     {
+        //         throw new ArgumentException("Invalid Gender");
+        //     }
+        //     billboard.BillboardFilter.Title = filterDto.Title;
+        //     billboard.BillboardFilter.Subtitle = filterDto.Subtitle;
+        // }
 
 
         await SaveChangesAsyncWithTransaction();

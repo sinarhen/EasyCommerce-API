@@ -11,6 +11,4 @@ public class WriteBillboardDto
     
     public Guid? CollectionId { get; set; }
     
-    public BillboardFilterDto BillboardFilter { get; set; }
- 
 }
