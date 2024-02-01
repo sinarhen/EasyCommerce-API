@@ -1,6 +1,4 @@
 using ECommerce.Models.DTOs.Billboard;
-using ECommerce.Models.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Billboard;
@@ -24,7 +22,8 @@ public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(G
     {
         throw new UnauthorizedAccessException("You are not authorized to create a billboard for this collection");
     }
-    var billboard = new Models.Entities.Billboard{
+    var billboard = new Models.Entities.Billboard
+    {
         Title = createBillboardDto.Title,
         Subtitle = createBillboardDto.Subtitle,
         ImageUrl = createBillboardDto.ImageUrl,

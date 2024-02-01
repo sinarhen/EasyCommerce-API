@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Billboard;
@@ -11,7 +12,7 @@ namespace ECommerce.Controllers;
 [Route("api/billboards")]
 public class BillboardController : GenericController
 {
-private readonly IBillboardRepository _repository;
+    private readonly IBillboardRepository _repository;
 
     public BillboardController(IMapper mapper, IBillboardRepository repository) : base(mapper)
     {
@@ -26,38 +27,30 @@ private readonly IBillboardRepository _repository;
         return Ok(_mapper.Map<List<BillboardDto>>(billboards));
     }
 
-    [HttpGet("{billboardId}")]
-    public async Task<IActionResult> GetBillboard(Guid billboardId)
-    {
-        // TODO: Implement
-        await Task.Delay(0);
-        return Ok();
-    }
-
     [HttpPost("{collectionId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
-    public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId)
+    public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId, [FromBody] CreateBillboardDto createBillboardDto)
     {
-        // TODO: Implement
-        await Task.Delay(0);
-        return Ok();
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var billboard = await _repository.CreateBillboardForCollectionAsync(collectionId, userId, createBillboardDto);
+        return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
     [HttpPut("{billboardId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
-    public async Task<IActionResult> UpdateBillboard(Guid billboardId)
+    public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)
     {
-        // TODO: Implement
-        await Task.Delay(0);
-        return Ok();
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var billboard = await _repository.UpdateBillboardAsync(updateBillboardDto, userId, billboardId);
+        return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
     [HttpDelete("{billboardId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> DeleteBillboard(Guid billboardId)
     {
-
-        await Task.Delay(0);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        await _repository.DeleteBillboard(billboardId, userId);
         return Ok();
     }
 

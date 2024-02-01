@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
 using ECommerce.Data;
+using ECommerce.Data.Repositories.Billboard;
 using ECommerce.Data.Repositories.Category;
 using ECommerce.Data.Repositories.Collection;
 using ECommerce.Data.Repositories.Product;
@@ -102,7 +103,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
-
+builder.Services.AddScoped<IBillboardRepository, BillboardRepository>();
 
 
 var app = builder.Build();
