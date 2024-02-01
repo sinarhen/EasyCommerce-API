@@ -117,7 +117,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         return product;
     }
 
-    public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string username, IEnumerable<string> roles)
+    public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string userId, bool isAdmin)
     {
         ValidateCreateProductDtoOnModelLevel(productDto);
         
@@ -149,18 +149,8 @@ public class ProductRepository: BaseRepository, IProductRepository
             throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
         }
         
-        var enumerable = roles as string[] ?? roles.ToArray();
-        
-        // check if role is seller
-        // TODO: remake this to use base repository methods to validate user permissions
-        if (!enumerable.Contains(UserRoles.Seller) && !enumerable.Contains(UserRoles.Admin) && !enumerable.Contains(UserRoles.SuperAdmin))
-        {
-            throw new UnauthorizedAccessException("You are not a seller");
-        }
-        // TODO: remake this to use base repository methods to validate user permissions
-        if (existingCollection.Store.Owner.UserName != username 
-            && !enumerable.Contains(UserRoles.Admin) 
-            && !enumerable.Contains(UserRoles.SuperAdmin))
+        var isOwner = ValidateOwner(userId, existingCollection.Store.OwnerId, isAdmin);
+        if (!isOwner)
         {
             throw new UnauthorizedAccessException("You are not the owner of this store");
         }
@@ -227,7 +217,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         return product;
     }
 
-    public async Task<Models.Entities.Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string username, IEnumerable<string> roles)
+    public async Task<Models.Entities.Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string userId, bool isAdmin)
     {
         var product = await _db.Products
             .Include(product => product.Stocks)
@@ -244,13 +234,11 @@ public class ProductRepository: BaseRepository, IProductRepository
         }
 
 
-        var storeOwner = product.Collection.Store.Owner.UserName;
+        var ownerId = product.Collection.Store.OwnerId;
         
-        if (storeOwner != username 
-            && !roles.Contains(UserRoles.Admin) 
-            && !roles.Contains(UserRoles.SuperAdmin))
+        if (!ValidateOwner(userId, ownerId, isAdmin))
         {
-            throw new UnauthorizedAccessException("You are not the owner of this store");
+            throw new UnauthorizedAccessException("You have no permission to update this product");
         }
 
         var categories = await _db.Categories.ToListAsync();
@@ -407,7 +395,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         return product;
     }
     
-    public async Task DeleteProductAsync(Guid id)
+    public async Task DeleteProductAsync(Guid id, string userId, bool isAdmin)
     {
         var product = await _db.Products
             .Include(product => product.Stocks)
@@ -420,7 +408,9 @@ public class ProductRepository: BaseRepository, IProductRepository
         {
             throw new ArgumentException($"Product with ID {id} does not exist");
         }
-        
+        var ownerId = product.Collection.Store.OwnerId;
+        ValidateOwner(userId, ownerId, isAdmin);
+
         ClearProductCategories(product);
         ClearProductMaterials(product);
         ClearProductStocks(product);

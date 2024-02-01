@@ -38,7 +38,7 @@ public class BaseRepository
         return depth;
     }
     
-    protected static bool ValidateOwner(string userId, string ownerId, bool? isAdmin)
+    protected static bool ValidateOwner(string userId, string ownerId, bool? isAdmin = false)
     {
         bool isAdminValue = isAdmin.HasValue && isAdmin.Value;
         return (ownerId == userId || isAdminValue);

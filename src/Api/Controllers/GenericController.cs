@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using AutoMapper;
+using ECommerce.Config;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers;
@@ -7,10 +9,11 @@ namespace ECommerce.Controllers;
 public class GenericController : ControllerBase
 {
     protected readonly IMapper _mapper;
-
-    public GenericController(IMapper mapper)
+    private readonly IAuthorizationService _authorizationService;
+    public GenericController(IMapper mapper, IAuthorizationService authorizationService)
     {
         _mapper = mapper;
+        _authorizationService = authorizationService;
     }
 
 
@@ -21,7 +24,12 @@ public class GenericController : ControllerBase
 
     protected bool IsAdmin()
     {
-        return User.IsInRole("Admin") || User.IsInRole("SuperAdmin");
+        return User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.SuperAdmin);
+    }
+
+    protected bool IsSuperAdmin()
+    {
+        return User.IsInRole(UserRoles.SuperAdmin);
     }
 
     protected List<string> GetUserRoles()
