@@ -19,6 +19,7 @@ public class MappingProfiles: Profile
     private void MapBillboardProfiles()
     {
         CreateMap<Billboard, BillboardDto>();
+        CreateMap<BillboardFilter, BillboardFilterDto>();
     }
     private void MapCategoryProfiles()
     {
@@ -31,11 +32,6 @@ public class MappingProfiles: Profile
 
         CreateMap<Collection, CollectionDto>()
             .ForMember(dest => dest.Billboards, opt => opt.MapFrom(src => src.Billboards));
-
-        CreateMap<Billboard, BillboardDto>()
-            .ForMember(dest => dest.BillboardFilter, opt => opt.MapFrom(src => src.BillboardFilter));
-
-        CreateMap<BillboardFilter, BillboardFilterDto>();
     }
     public MappingProfiles()
     {

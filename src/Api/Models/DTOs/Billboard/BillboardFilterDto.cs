@@ -8,8 +8,8 @@ public class BillboardFilterDto
     public Gender? Gender { get; set; }
     public Season? Season { get; set; }
     public string OrderBy { get; set; }
-    public decimal FromPrice { get; set; } = 0;
-    public decimal ToPrice { get; set; } = decimal.MaxValue;
+    public decimal? FromPrice { get; set; } = 0;
+    public decimal? ToPrice { get; set; } = decimal.MaxValue;
     public string Search { get; set; }
     public Guid? CategoryId { get; set; }
     public Guid? ColorId { get; set; }

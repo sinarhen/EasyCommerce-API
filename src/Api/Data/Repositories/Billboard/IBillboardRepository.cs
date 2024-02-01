@@ -1,5 +1,4 @@
 using ECommerce.Models.DTOs.Billboard;
-using ECommerce.Models.Entities;
 
 namespace ECommerce.Data.Repositories.Billboard;
 
