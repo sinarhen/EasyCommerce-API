@@ -84,10 +84,9 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
             {
                 throw new ArgumentException("Invalid Gender");
             }
+            billboard.BillboardFilter.Title = filterDto.Title;
+            billboard.BillboardFilter.Subtitle = filterDto.Subtitle;
         }
-
-        billboard.FilterTitle = updateBillboardDto.FilterTitle;
-        billboard.FilterSubtitle = updateBillboardDto.FilterSubtitle;
 
 
         await SaveChangesAsyncWithTransaction();

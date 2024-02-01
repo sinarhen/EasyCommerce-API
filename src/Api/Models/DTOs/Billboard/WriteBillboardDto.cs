@@ -12,10 +12,5 @@ public class WriteBillboardDto
     public Guid? CollectionId { get; set; }
     
     public BillboardFilterDto BillboardFilter { get; set; }
-    
-    public string FilterTitle { get; set; }
-    
-    public string FilterSubtitle { get; set; }
-    
-
+ 
 }

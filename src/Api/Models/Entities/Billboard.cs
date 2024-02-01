@@ -17,10 +17,6 @@ public class Billboard : BaseEntity
     
     public Guid BillboardFilterId { get; set; }
     
-    public string FilterTitle { get; set; }
-    
-    public string FilterSubtitle { get; set; }
-    
     // Navigation properties
     public Collection Collection { get; set; }
     

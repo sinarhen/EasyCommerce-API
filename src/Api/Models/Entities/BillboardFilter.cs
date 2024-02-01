@@ -7,6 +7,8 @@ public class BillboardFilter : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
+    public string Title { get; set; }
+    public string Subtitle { get; set; }
 
     public Gender? Gender { get; set; }
 

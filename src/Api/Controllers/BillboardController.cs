@@ -11,7 +11,7 @@ namespace ECommerce.Controllers;
 [Route("api/billboards")]
 public class BillboardController : GenericController
 {
-    private readonly IBillboardRepository _repository;
+private readonly IBillboardRepository _repository;
 
     public BillboardController(IMapper mapper, IBillboardRepository repository) : base(mapper)
     {
