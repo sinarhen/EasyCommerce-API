@@ -11,7 +11,7 @@ public class BillboardFilterRepository : BaseRepository, IBillboardFilterReposit
     }
 
     
-    public async Task<Models.Entities.BillboardFilter> CreateBillboardFilterAsync(Guid billboardId, string userId, BillboardFilterDto writeBillboardFilterDto, bool? isAdmin)
+    public async Task<Models.Entities.BillboardFilter> CreateBillboardFilterAsync(Guid billboardId, string userId, BillboardFilterDto writeBillboardFilterDto, bool isAdmin = false)
     {
         var billboard = await _db.Billboards.Include(b => b.Collection).ThenInclude(c => c.Store).FirstOrDefaultAsync(b => b.Id == billboardId);
         if (billboard == null)
@@ -19,7 +19,7 @@ public class BillboardFilterRepository : BaseRepository, IBillboardFilterReposit
             throw new ArgumentException("Billboard not found");
         }
         var ownerId = billboard.Collection.Store.OwnerId;
-        ValidateUser(userId, ownerId, isAdmin.Value);
+        ValidateOwner(userId, ownerId, isAdmin);
         var billboardFilter = new Models.Entities.BillboardFilter
         {
             Title = writeBillboardFilterDto.Title,
@@ -54,24 +54,13 @@ public class BillboardFilterRepository : BaseRepository, IBillboardFilterReposit
             throw new ArgumentException("BillboardFilter not found");
         }
 
-        if (billboardFilter.Billboard.Collection.Store.OwnerId != userId)
-        {
-            throw new UnauthorizedAccessException("You do not have permission to delete this BillboardFilter");
-        }
-
+        var ownerId = billboardFilter.Billboard.Collection.Store.OwnerId;
+        ValidateOwner(userId, ownerId, isAdmin.Value);
 
         _db.BillboardFilters.Remove(billboardFilter);
         await _db.SaveChangesAsync();
     }
-    private static void ValidateUser(string userId, string ownerId, bool? isAdmin)
-    {
-        if (ownerId != userId && !isAdmin.Value)
-        {
-            throw new UnauthorizedAccessException("You do not have permission to delete this BillboardFilter");
-        }
-    }
-
-    public async Task<Models.Entities.BillboardFilter> GetBillboardFilterAsync(string userId, Guid id, bool? isAdmin)
+    public async Task<Models.Entities.BillboardFilter> GetBillboardFilterAsync(string userId, Guid id, bool isAdmin = false)
     {
         var billboardFilter = await _db.BillboardFilters.FirstOrDefaultAsync(b => b.Id == id);
         if (billboardFilter == null)
@@ -80,13 +69,13 @@ public class BillboardFilterRepository : BaseRepository, IBillboardFilterReposit
         }
 
         var ownerId = billboardFilter.Billboard.Collection.Store.OwnerId;
-        ValidateUser(userId, ownerId, isAdmin.Value);
+        ValidateOwner(userId, ownerId, isAdmin);
 
         return billboardFilter;
     }
 
 
-    public async Task<Models.Entities.BillboardFilter> UpdateBillboardFilterAsync(string userId, Guid id, BillboardFilterDto writeBillboardFilterDto, bool? isAdmin)
+    public async Task<Models.Entities.BillboardFilter> UpdateBillboardFilterAsync(string userId, Guid id, BillboardFilterDto writeBillboardFilterDto, bool isAdmin = false)
     {
         var billboardFilter = await _db.BillboardFilters.Include(bf => bf.Billboard).ThenInclude(b => b.Collection).ThenInclude(c => c.Store).FirstOrDefaultAsync(b => b.Id == id);
         if (billboardFilter == null)
@@ -94,7 +83,7 @@ public class BillboardFilterRepository : BaseRepository, IBillboardFilterReposit
             throw new ArgumentException("BillboardFilter not found");
         }
         var ownerId = billboardFilter.Billboard.Collection.Store.OwnerId;
-        ValidateUser(userId, ownerId, isAdmin.Value);
+        ValidateOwner(userId, ownerId, isAdmin);
 
         billboardFilter.Title = writeBillboardFilterDto.Title;
         billboardFilter.Subtitle = writeBillboardFilterDto.Subtitle;

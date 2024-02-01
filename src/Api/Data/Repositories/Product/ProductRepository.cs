@@ -152,11 +152,12 @@ public class ProductRepository: BaseRepository, IProductRepository
         var enumerable = roles as string[] ?? roles.ToArray();
         
         // check if role is seller
+        // TODO: remake this to use base repository methods to validate user permissions
         if (!enumerable.Contains(UserRoles.Seller) && !enumerable.Contains(UserRoles.Admin) && !enumerable.Contains(UserRoles.SuperAdmin))
         {
             throw new UnauthorizedAccessException("You are not a seller");
         }
-        
+        // TODO: remake this to use base repository methods to validate user permissions
         if (existingCollection.Store.Owner.UserName != username 
             && !enumerable.Contains(UserRoles.Admin) 
             && !enumerable.Contains(UserRoles.SuperAdmin))

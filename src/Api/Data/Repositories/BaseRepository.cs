@@ -38,6 +38,12 @@ public class BaseRepository
         return depth;
     }
     
+    protected static bool ValidateOwner(string userId, string ownerId, bool? isAdmin)
+    {
+        bool isAdminValue = isAdmin.HasValue && isAdmin.Value;
+        return (ownerId == userId || isAdminValue);
+    }
+
 
     protected void AddToCategories(ECommerce.Models.Entities.Category category, ECommerce.Models.Entities.Product product, int order)
     {
