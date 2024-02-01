@@ -9,11 +9,9 @@ namespace ECommerce.Controllers;
 public class GenericController : ControllerBase
 {
     protected readonly IMapper _mapper;
-    private readonly IAuthorizationService _authorizationService;
-    public GenericController(IMapper mapper, IAuthorizationService authorizationService)
+    public GenericController(IMapper mapper)
     {
         _mapper = mapper;
-        _authorizationService = authorizationService;
     }
 
 

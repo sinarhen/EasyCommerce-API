@@ -128,13 +128,10 @@ public class ProductController : GenericController
     [HttpPost]
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto productDto)
     {
-        var username = User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Username)?.Value;
-        
-        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
 
         try
         {
-            var product = await _repository.CreateProductAsync(productDto, username, roles);
+            var product = await _repository.CreateProductAsync(productDto, GetUserId(), IsAdmin());
             
             return _mapper.Map<ProductDto>(product);
         }
@@ -160,9 +157,7 @@ public class ProductController : GenericController
     {
         try
         {
-            var username = User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Username)?.Value;
-            var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
-            var product = await _repository.UpdateProductAsync(id, productDto, username, roles);
+            var product = await _repository.UpdateProductAsync(id, productDto, GetUserId(), IsAdmin());
 
             if (product == null)
             {
@@ -188,7 +183,7 @@ public class ProductController : GenericController
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
-        await _repository.DeleteProductAsync(id);
+        await _repository.DeleteProductAsync(id, GetUserId(), IsAdmin());
         
         
         return Ok();        
