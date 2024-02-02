@@ -31,7 +31,7 @@ public class BillboardController : GenericController
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId, [FromBody] CreateBillboardDto createBillboardDto)
     {
-        var billboard = await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto);
+        var billboard = await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto, IsAdmin());
         return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
@@ -39,7 +39,7 @@ public class BillboardController : GenericController
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)
     {
-        var billboard = await _repository.UpdateBillboardAsync(updateBillboardDto, GetUserId(), billboardId);
+        var billboard = await _repository.UpdateBillboardAsync(updateBillboardDto, GetUserId(), billboardId, IsAdmin());
         return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
@@ -47,7 +47,7 @@ public class BillboardController : GenericController
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> DeleteBillboard(Guid billboardId)
     {
-        await _repository.DeleteBillboard(billboardId, GetUserId());
+        await _repository.DeleteBillboardAsync(billboardId, GetUserId(), IsAdmin());
         return Ok();
     }
 
