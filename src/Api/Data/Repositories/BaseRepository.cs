@@ -89,10 +89,9 @@ public class BaseRepository
 
     private static IQueryable<ECommerce.Models.Entities.Product> ApplyCategoryFilter(IQueryable<ECommerce.Models.Entities.Product> query, ProductSearchParams searchParams)
     {
-        if (!string.IsNullOrEmpty(searchParams.Category))
+        if (Guid.Empty != searchParams.CategoryId)
         {
-            var categories = SplitAndLowercase(searchParams.Category);
-            query = query.Where(p => p.Categories.Any(pc => categories.Contains(pc.Category.Name.ToLower()) || categories.Contains(pc.CategoryId.ToString())));
+            query = query.Where(p => p.Categories.Any(pc => pc.CategoryId == searchParams.CategoryId));
         }
         return query;
     }
@@ -201,8 +200,8 @@ public class BaseRepository
             .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
             .Include(p => p.Occasion)
             .Include(p => p.MainMaterial)
-            .Include(p => p.Stocks).ThenInclude(s => s.Color)
-            .Include(p => p.Stocks).ThenInclude(s => s.Size)
+            // .Include(p => p.Stocks).ThenInclude(s => s.Color)
+            // .Include(p => p.Stocks).ThenInclude(s => s.Size)
             .Include(p => p.Images)
             .Include(p => p.Materials).ThenInclude(m => m.Material)
             .Include(product => product.Reviews)

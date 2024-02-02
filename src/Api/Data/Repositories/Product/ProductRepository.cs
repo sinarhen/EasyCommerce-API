@@ -141,8 +141,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         var existingMainMaterial = await _db.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
         var existingOccasion = await _db.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
         var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
-        var existingCollection = await _db.Collections.Include(collection => collection.Store)
-            .ThenInclude(store => store.Owner).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
+        var existingCollection = await _db.Collections.Include(collection => collection.Store).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
 
         if (existingCollection == null)
         {
@@ -185,14 +184,14 @@ public class ProductRepository: BaseRepository, IProductRepository
         var product = _mapper.Map<Models.Entities.Product>(productDto);
         
         
-        product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
-        {
-            Product = product,
-            Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-            Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
-            Stock = stockDto.Sizes.First().Stock,
-            Price = stockDto.Sizes.First().Price
-        }).ToList();
+        // product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+        // {
+        //     Product = product,
+        //     Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+        //     Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+        //     Stock = stockDto.Sizes.First().Stock,
+        //     Price = stockDto.Sizes.First().Price
+        // }).ToList();
         
         product.Materials = productDto.Materials.Select(material => new ProductMaterial
         {
@@ -246,8 +245,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         var colors = await _db.Colors.ToListAsync();
         var sizes = await _db.Sizes.ToListAsync();
         var occasions = await _db.Occasions.ToListAsync();
-        var collections = await _db.Collections.Include(collection => collection.Store)
-                .ThenInclude(store => store.Owner).ToListAsync();
+        var collections = await _db.Collections.Include(collection => collection.Store).ToListAsync();
 
         if (!string.IsNullOrEmpty(productDto.Name))
         {
@@ -356,38 +354,38 @@ public class ProductRepository: BaseRepository, IProductRepository
             }).ToList();
         }
         
-        if (productDto.Stocks is { Count: > 0 })
-        {
-            var nonExistingColors = productDto.Stocks
-                .Where(s => colors.All(color => color.Id != s.ColorId))
-                .Select(color => color.ColorId)
-                .ToList();
+        // if (productDto.Stocks is { Count: > 0 })
+        // {
+        //     var nonExistingColors = productDto.Stocks
+        //         .Where(s => colors.All(color => color.Id != s.ColorId))
+        //         .Select(color => color.ColorId)
+        //         .ToList();
             
-            var nonExistingSizes = productDto.Stocks
-                .SelectMany(s => s.Sizes)
-                .Select(size => sizes.FirstOrDefault(s => s.Id == size.SizeId))
-                .Where(size => size == null)
-                .ToList();
+        //     var nonExistingSizes = productDto.Stocks
+        //         .SelectMany(s => s.Sizes)
+        //         .Select(size => sizes.FirstOrDefault(s => s.Id == size.SizeId))
+        //         .Where(size => size == null)
+        //         .ToList();
             
-            if (nonExistingColors.Any())
-            {
-                throw new ArgumentException($"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
-            }
-            if (nonExistingSizes.Any())
-            {
-                throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
-            }
+        //     if (nonExistingColors.Any())
+        //     {
+        //         throw new ArgumentException($"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
+        //     }
+        //     if (nonExistingSizes.Any())
+        //     {
+        //         throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
+        //     }
             
-            ClearProductStocks(product);
-            product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
-            {
-                Product = product,
-                Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-                Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
-                Stock = stockDto.Sizes.First().Stock,
-                Price = stockDto.Sizes.First().Price
-            }).ToList();
-        }
+        //     ClearProductStocks(product);
+        //     product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+        //     {
+        //         Product = product,
+        //         Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+        //         Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+        //         Stock = stockDto.Sizes.First().Stock,
+        //         Price = stockDto.Sizes.First().Price
+        //     }).ToList();
+        // }
 
 
         await SaveChangesAsyncWithTransaction();

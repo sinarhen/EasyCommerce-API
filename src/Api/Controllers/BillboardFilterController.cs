@@ -25,7 +25,7 @@ namespace ECommerce.Controllers
 
         [Authorize(Policy = Policies.SellerPolicy)]
         [HttpPost]
-        public async Task<ActionResult<BillboardFilterDto>> CreateBillboardFilter(Guid billboardId, BillboardFilterDto createBillboardFilterDto)
+        public async Task<ActionResult<BillboardFilterDto>> CreateBillboardFilter(Guid billboardId, [FromBody]BillboardFilterDto createBillboardFilterDto)
         {
 
             var billboardFilter = await _billboardRepository.CreateBillboardFilterAsync(billboardId, GetUserId(), createBillboardFilterDto, IsAdmin());
@@ -46,7 +46,7 @@ namespace ECommerce.Controllers
 
         [Authorize(Policy = Policies.SellerPolicy)]
         [HttpPut("{id}")]
-        public async Task<ActionResult<BillboardFilterDto>> UpdateBillboardFilter(Guid billboardId, Guid id, BillboardFilterDto updateBillboardFilterDto)
+        public async Task<ActionResult<BillboardFilterDto>> UpdateBillboardFilter(Guid billboardId, Guid id, [FromBody] BillboardFilterDto updateBillboardFilterDto)
         {
             var billboardFilter = await _billboardRepository.UpdateBillboardFilterAsync(GetUserId(), id, updateBillboardFilterDto, IsAdmin());
             if (billboardFilter == null)

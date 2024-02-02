@@ -12,7 +12,7 @@ public class ProductSearchParams
     
     public string SearchTerm { get; set; }
     
-    public string Category { get; set; }
+    public Guid CategoryId { get; set; }
     
     public string Color { get; set; }
     

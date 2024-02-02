@@ -69,12 +69,6 @@ namespace ECommerce.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FilterSubtitle")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FilterTitle")
-                        .HasColumnType("text");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
@@ -129,6 +123,12 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<Guid?>("SizeId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
 
                     b.Property<decimal?>("ToPrice")
                         .HasColumnType("numeric");

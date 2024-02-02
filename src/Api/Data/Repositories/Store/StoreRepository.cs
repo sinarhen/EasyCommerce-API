@@ -46,6 +46,7 @@ public class StoreRepository : BaseRepository, IStoreRepository
         {
             throw new Exception("User id not provided. Internal Error");
         }
+        
         var store = new Models.Entities.Store
         {
             Name = storeDto.Name,

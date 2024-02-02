@@ -32,7 +32,7 @@ public class StoreController : GenericController
         return Ok(storeDto);
     }
 
-    // [Authorize(Policy = Policies.)] ???
+    // TODO: [Authorize(Policy = Policies.)] ??? 
     [HttpGet]
     public async Task<ActionResult> GetStores()
     {
@@ -65,7 +65,6 @@ public class StoreController : GenericController
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
-        Console.WriteLine("[PUT] StoreId: " + id);
         await _repository.UpdateStoreAsync(id, storeDto);
         return Ok();
     }
@@ -79,8 +78,7 @@ public class StoreController : GenericController
         var store = await _repository.GetStoreAsync(id);
         
 
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (currentUserId != store.OwnerId)
+        if (GetUserId() != store.OwnerId)
         {
             return Unauthorized();
         }

@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240110083744_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240201223352_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,12 +72,6 @@ namespace ECommerce.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FilterSubtitle")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FilterTitle")
-                        .HasColumnType("text");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
@@ -132,6 +126,12 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<Guid?>("SizeId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
 
                     b.Property<decimal?>("ToPrice")
                         .HasColumnType("numeric");

@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -393,8 +393,6 @@ namespace ECommerce.Data.Migrations
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
                     CollectionId = table.Column<Guid>(type: "uuid", nullable: false),
                     BillboardFilterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FilterTitle = table.Column<string>(type: "text", nullable: true),
-                    FilterSubtitle = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -458,6 +456,8 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: true),
+                    Subtitle = table.Column<string>(type: "text", nullable: true),
                     Gender = table.Column<int>(type: "integer", nullable: true),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: true),
                     Season = table.Column<int>(type: "integer", nullable: true),
