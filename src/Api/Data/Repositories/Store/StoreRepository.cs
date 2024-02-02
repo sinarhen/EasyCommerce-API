@@ -102,19 +102,6 @@ public class StoreRepository : BaseRepository, IStoreRepository
             throw new ArgumentException($"Store not found: {id}");
         }
         
-        foreach (var collection in store.Collections)
-        {
-            // Remove products from collection
-            var products = collection.Products;
-            products.ForEach(p =>
-            {
-                ClearProductCategories(p);
-                ClearProductMaterials(p);
-                ClearProductStocks(p);
-            });
-            _db.Products.RemoveRange(products);
-        }
-        
         _db.Stores.Remove(store);
         await SaveChangesAsyncWithTransaction();
     }
