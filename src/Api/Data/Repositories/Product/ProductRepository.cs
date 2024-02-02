@@ -240,12 +240,6 @@ public class ProductRepository: BaseRepository, IProductRepository
             throw new UnauthorizedAccessException("You have no permission to update this product");
         }
 
-        var categories = await _db.Categories.ToListAsync();
-        var materials = await _db.Materials.ToListAsync();
-        var colors = await _db.Colors.ToListAsync();
-        var sizes = await _db.Sizes.ToListAsync();
-        var occasions = await _db.Occasions.ToListAsync();
-        var collections = await _db.Collections.Include(collection => collection.Store).ToListAsync();
 
         if (!string.IsNullOrEmpty(productDto.Name))
         {
@@ -253,10 +247,10 @@ public class ProductRepository: BaseRepository, IProductRepository
         }
            
         // checking if category id is not empty
-        if (!string.IsNullOrEmpty(productDto.CategoryId))
+        if (productDto.CategoryId != Guid.Empty && productDto.CategoryId != product.Categories.First().CategoryId)
         {
             // checking if category with given id exists
-            var category = categories.FirstOrDefault(c => c.Id == Guid.Parse(productDto.CategoryId));
+            var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
             if (category == null)
             {
                 throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
@@ -274,10 +268,6 @@ public class ProductRepository: BaseRepository, IProductRepository
         {
             product.Description = productDto.Description;
         }
-        // if (productDto.Discount.HasValue) Extracted to ProductStock
-        // {
-        //     product.Discount = productDto.Discount.Value;
-        // }
         if (!string.IsNullOrEmpty(productDto.SizeChartImageUrl))
         {
             product.SizeChartImageUrl = productDto.SizeChartImageUrl;
@@ -314,7 +304,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         
         if (productDto.OccasionId != Guid.Empty)
         {
-            var occasion = occasions.FirstOrDefault(o => o.Id == productDto.OccasionId);
+            var occasion = await _db.Occasions.FirstOrDefaultAsync(o => o.Id == productDto.OccasionId);
             if (occasion == null)
             {
                 throw new ArgumentException($"Occasion with ID {productDto.OccasionId} does not exist");
@@ -334,6 +324,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         
         if (productDto.Materials is { Count: > 0 })
         {
+            var materials = await _db.Materials.AsNoTracking().ToListAsync();
             var nonExistingMaterialIds = productDto.Materials
                 .Where(m => !materials.Any(material => material.Id == m.Id))
                 .Select(m => m.Id)
@@ -354,38 +345,41 @@ public class ProductRepository: BaseRepository, IProductRepository
             }).ToList();
         }
         
-        // if (productDto.Stocks is { Count: > 0 })
-        // {
-        //     var nonExistingColors = productDto.Stocks
-        //         .Where(s => colors.All(color => color.Id != s.ColorId))
-        //         .Select(color => color.ColorId)
-        //         .ToList();
+        if (productDto.Stocks is { Count: > 0 })
+        {
+            var colors = await _db.Colors.AsNoTracking().ToListAsync();
+            var sizes = await _db.Sizes.AsNoTracking().ToListAsync();
             
-        //     var nonExistingSizes = productDto.Stocks
-        //         .SelectMany(s => s.Sizes)
-        //         .Select(size => sizes.FirstOrDefault(s => s.Id == size.SizeId))
-        //         .Where(size => size == null)
-        //         .ToList();
+            var nonExistingColors = productDto.Stocks
+                .Where(s => colors.All(color => color.Id != s.ColorId))
+                .Select(color => color.ColorId)
+                .ToList();
             
-        //     if (nonExistingColors.Any())
-        //     {
-        //         throw new ArgumentException($"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
-        //     }
-        //     if (nonExistingSizes.Any())
-        //     {
-        //         throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
-        //     }
+            var nonExistingSizes = productDto.Stocks
+                .SelectMany(s => s.Sizes)
+                .Select(size => sizes.FirstOrDefault(s => s.Id == size.SizeId))
+                .Where(size => size == null)
+                .ToList();
             
-        //     ClearProductStocks(product);
-        //     product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
-        //     {
-        //         Product = product,
-        //         Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-        //         Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
-        //         Stock = stockDto.Sizes.First().Stock,
-        //         Price = stockDto.Sizes.First().Price
-        //     }).ToList();
-        // }
+            if (nonExistingColors.Any())
+            {
+                throw new ArgumentException($"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
+            }
+            if (nonExistingSizes.Any())
+            {
+                throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
+            }
+            
+            ClearProductStocks(product);
+            product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+            {
+                Product = product,
+                Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+                Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+                Stock = stockDto.Sizes.First().Stock,
+                Price = stockDto.Sizes.First().Price
+            }).ToList();
+        }
 
 
         await SaveChangesAsyncWithTransaction();
