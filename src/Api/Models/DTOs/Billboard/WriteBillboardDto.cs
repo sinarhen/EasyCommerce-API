@@ -10,5 +10,8 @@ public class WriteBillboardDto
     public string ImageUrl { get; set; }
     
     public Guid? CollectionId { get; set; }
+
+    public BillboardFilterDto BillboardFilter { get; set; }
     
+
 }

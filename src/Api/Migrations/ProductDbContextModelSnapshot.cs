@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ECommerce.Data.Migrations
+namespace ECommerce.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
     partial class ProductDbContextModelSnapshot : ModelSnapshot
@@ -439,9 +439,6 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<double?>("Discount")
-                        .HasColumnType("double precision");
-
                     b.Property<int?>("Gender")
                         .HasColumnType("integer");
 
@@ -564,6 +561,9 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Discount")
+                        .HasColumnType("double precision");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");

@@ -200,13 +200,14 @@ public class BaseRepository
             .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
             .Include(p => p.Occasion)
             .Include(p => p.MainMaterial)
-            // .Include(p => p.Stocks).ThenInclude(s => s.Color)
-            // .Include(p => p.Stocks).ThenInclude(s => s.Size)
+            .Include(p => p.Stocks).ThenInclude(s => s.Color)
+            .Include(p => p.Stocks).ThenInclude(s => s.Size)
             .Include(p => p.Images)
             .Include(p => p.Materials).ThenInclude(m => m.Material)
             .Include(product => product.Reviews)
             .Include(product => product.Orders)
             .Include(product => product.Collection)
+            .AsNoTracking()
             .ToListAsync();
         return products;
     }

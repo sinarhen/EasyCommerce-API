@@ -5,7 +5,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ECommerce.Data.Migrations
+namespace ECommerce.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -414,7 +414,6 @@ namespace ECommerce.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Discount = table.Column<double>(type: "double precision", nullable: true),
                     OccasionId = table.Column<Guid>(type: "uuid", nullable: true),
                     SizeChartImageUrl = table.Column<string>(type: "text", nullable: true),
                     Gender = table.Column<int>(type: "integer", nullable: true),
@@ -671,6 +670,7 @@ namespace ECommerce.Data.Migrations
                     SizeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Stock = table.Column<int>(type: "integer", nullable: false),
+                    Discount = table.Column<double>(type: "double precision", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

@@ -105,7 +105,6 @@ builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
 builder.Services.AddScoped<IBillboardRepository, BillboardRepository>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
