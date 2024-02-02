@@ -12,18 +12,19 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
 
     }
 
-    public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(Guid collectionId, string userId, CreateBillboardDto createBillboardDto)
+    public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(Guid collectionId, string userId, CreateBillboardDto createBillboardDto, bool isAdmin)
     {
         var collection = await _db.Collections
             .Include(c => c.Store)
             .SingleOrDefaultAsync(c => c.Id == collectionId) 
             ?? throw new ArgumentException("Collection not found");
 
-        if (userId != collection.Store.OwnerId)
+        var isOwner = ValidateOwner(collection.Store.OwnerId, userId, isAdmin);
+        if (!isOwner)
         {
             throw new UnauthorizedAccessException("You are not authorized to create a billboard for this collection");
         }
-        
+
         var billboard = new Models.Entities.Billboard
         {
             Title = createBillboardDto.Title,
@@ -80,10 +81,11 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         return billboard;
     }
 
-    public async Task DeleteBillboard(Guid billboardId, string userId)
+    public async Task DeleteBillboardAsync(Guid billboardId, string userId, bool isAdmin)
     {
         var billboard = await _db.FindAsync<Models.Entities.Billboard>(billboardId) ?? throw new ArgumentException("Billboard not found");
-        if (billboard.Collection.Store.OwnerId != userId)
+        var isOwner = ValidateOwner(billboard.Collection.Store.OwnerId, userId, isAdmin);
+        if (!isOwner)
         {
             throw new UnauthorizedAccessException("You are not authorized to delete this billboard");
         }
@@ -114,7 +116,7 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         
     }
 
-    public async Task<Models.Entities.Billboard> UpdateBillboardAsync(UpdateBillboardDto updateBillboardDto, string userId, Guid billboardId)
+    public async Task<Models.Entities.Billboard> UpdateBillboardAsync(UpdateBillboardDto updateBillboardDto, string userId, Guid billboardId, bool isAdmin)
     {
         var billboard = await _db.Billboards
                             .Include(b => b.Collection)
@@ -123,11 +125,11 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
             ?? 
             throw new ArgumentException($"Billboard not found: {billboardId}");
 
-        if (billboard.Collection.Store.OwnerId != userId)
+        var isOwner = ValidateOwner(billboard.Collection.Store.OwnerId, userId);
+        if (!isOwner)
         {
             throw new UnauthorizedAccessException("You are not authorized to update this billboard");
         }
-
         billboard.Title = updateBillboardDto.Title;
         billboard.Subtitle = updateBillboardDto.Subtitle;
         billboard.ImageUrl = updateBillboardDto.ImageUrl;

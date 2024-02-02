@@ -65,12 +65,17 @@ public class StoreRepository : BaseRepository, IStoreRepository
         return store;
     }
 
-    public async Task UpdateStoreAsync(Guid storeId, StoreDto storeDto)
+    public async Task UpdateStoreAsync(Guid storeId, StoreDto storeDto, string userId, bool isAdmin )
     {
         var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
         if (store == null)
         {
             throw new ArgumentException($"Store not found: {storeId}");
+        }
+        var isOwner = ValidateOwner(store.OwnerId, userId, isAdmin);
+        if (!isOwner)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to update this store");
         }
         store.Name = storeDto.Name;
         store.Description = storeDto.Description;
@@ -83,7 +88,7 @@ public class StoreRepository : BaseRepository, IStoreRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public async Task DeleteStoreAsync(Guid id)
+    public async Task DeleteStoreAsync(Guid id, string userId, bool isAdmin)
     {
         var store = await _db.Stores
             .Include(store => store.Collections)
@@ -100,6 +105,11 @@ public class StoreRepository : BaseRepository, IStoreRepository
         if (store == null)
         {
             throw new ArgumentException($"Store not found: {id}");
+        }
+        var isOwner = ValidateOwner(store.OwnerId, userId, isAdmin);
+        if (!isOwner)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to delete this store");
         }
         
         _db.Stores.Remove(store);

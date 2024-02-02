@@ -73,9 +73,7 @@ public class StoreController : GenericController
     [HttpPost]
     public async Task<ActionResult> CreateStore(StoreDto storeDto)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        await _repository.CreateStoreAsync(storeDto, userId);
+        await _repository.CreateStoreAsync(storeDto, GetUserId());
         return Ok();
     }
     
