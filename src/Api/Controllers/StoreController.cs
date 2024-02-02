@@ -18,7 +18,26 @@ public class StoreController : GenericController
     {
         _repository = repository;
     }
-    
+
+    [Authorize(Policy = Policies.SellerPolicy)]
+    [HttpGet("my")]
+    public async Task<ActionResult> GetMyStores()
+    {
+        var userId = GetUserId();
+        var stores = await _repository.GetStoresForUserAsync(userId);
+        if (stores == null)
+        {
+            return NotFound();
+        }
+        var storesDto = _mapper.Map<IEnumerable<StoreDto>>(stores);
+
+        return Ok(new 
+            { 
+                Stores = storesDto
+            }
+        );
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<StoreDto>> GetStore(Guid id)
     {

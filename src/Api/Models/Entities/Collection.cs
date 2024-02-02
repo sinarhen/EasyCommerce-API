@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models.Entities;
 
@@ -15,6 +16,9 @@ public class Collection : BaseEntity
     // Navigation properties
     [ForeignKey("StoreId")]
     public Store Store { get; set; }
+    
+    [Required]
     public List<Product> Products { get; set; }
+    [Required]
     public List<Billboard> Billboards { get; set; }
 }

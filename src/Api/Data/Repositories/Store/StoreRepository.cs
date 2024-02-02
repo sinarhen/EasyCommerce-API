@@ -118,4 +118,17 @@ public class StoreRepository : BaseRepository, IStoreRepository
         _db.Stores.Remove(store);
         await SaveChangesAsyncWithTransaction();
     }
+
+    public async Task<List<Models.Entities.Store>> GetStoresForUserAsync(string userId)
+    {
+        return await _db.Stores
+            .AsNoTracking()
+            .Where(s => s.OwnerId == userId)
+            .Include(s => s.Collections)
+            .ThenInclude(c => c.Billboards)
+            .ThenInclude(b => b.BillboardFilter)
+            .Include(s => s.Owner)
+            .ToListAsync();
+
+    }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models.Entities;
 
@@ -21,6 +22,8 @@ public class Store : BaseEntity
     // Navigation properties
     [ForeignKey("OwnerId")]
     public User Owner { get; set; }
+
+    [Required]
     public List<Collection> Collections { get; set; }
     
     
