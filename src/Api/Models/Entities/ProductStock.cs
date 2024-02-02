@@ -20,6 +20,7 @@ public class ProductStock : BaseEntity
     public decimal Price { get; set; }
     public int Stock { get; set; }
     
+    public double Discount { get; set; }
     
     // Navigation properties
     [ForeignKey("ProductId")]

@@ -80,7 +80,7 @@ public class BaseRepository
         return searchParams.FilterBy switch
         {
             "in_stock" => query.Where(p => p.Stocks.Any(s => s.Stock > 0)),
-            "discount" => query.Where(p => p.Discount > 0),
+            "discount" => query.Where(p => p.Stocks.Any(s => s.Discount > 0)),
             "out_of_stock" => query.Where(p => p.Stocks.All(s => s.Stock == 0)),
             "new" => query.Where(p => p.CreatedAt > DateTime.Now.AddDays(-7)),
             _ => query,

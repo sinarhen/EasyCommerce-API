@@ -15,8 +15,6 @@ public class Product : BaseEntity
     public string Description { get; set; }
 
 
-    public double? Discount { get; set; }
-
     [Key]
     public Guid? OccasionId { get; set; }
 

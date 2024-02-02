@@ -2,6 +2,7 @@
 using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Material;
 using ECommerce.Models.DTOs.Size;
+using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.Product;
 

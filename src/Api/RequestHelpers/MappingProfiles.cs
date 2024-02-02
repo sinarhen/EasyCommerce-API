@@ -72,7 +72,7 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.AvgRating, opt => 
                 opt.MapFrom(x => x.Reviews.Count == 0 ? 0 : x.Reviews.Average(r => r.Rating)))
             .ForMember(dest => dest.IsNew, opt => opt.MapFrom(x => x.CreatedAt > DateTime.Now - TimeSpan.FromDays(30)))
-            .ForMember(dest => dest.IsOnSale, opt => opt.MapFrom(x => x.Discount != null && x.Discount > 0))
+            // .ForMember(dest => dest.IsOnSale, opt => opt.MapFrom(x => x.Stocks.Any != null && x.Discount > 0))
             .ForMember(dest => dest.IsBestseller, opt => opt.MapFrom(x => x.Orders.Count > 10))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(x => x.CreatedAt))
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(x => x.UpdatedAt))
@@ -107,9 +107,8 @@ public class MappingProfiles: Profile
                 })))
             .ForMember(dest => dest.MinPrice, 
                 opt => opt.MapFrom(src => src.Stocks.Any() ? src.Stocks.Min(s => s.Price) : 0))
-            .ForMember(dest => dest.DiscountPrice, opt => opt.MapFrom(s => s.Discount != null && s.Discount > 0
-                ? s.Stocks.Any() ? s.Stocks.Min(productStock => productStock.Price) * (1 - (decimal) s.Discount) : 0
-                : 0));
+            .ForMember(dest => dest.DiscountPrice, 
+                opt => opt.MapFrom(src => src.Stocks.Any() ? src.Stocks.Min(s => s.Price) * (decimal)(1 - src.Stocks.Average(s => s.Discount) / 100) : 0));
 
 
         CreateMap<CreateProductDto, Product>()

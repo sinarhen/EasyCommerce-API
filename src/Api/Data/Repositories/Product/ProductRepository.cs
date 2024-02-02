@@ -184,14 +184,14 @@ public class ProductRepository: BaseRepository, IProductRepository
         var product = _mapper.Map<Models.Entities.Product>(productDto);
         
         
-        // product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
-        // {
-        //     Product = product,
-        //     Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-        //     Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
-        //     Stock = stockDto.Sizes.First().Stock,
-        //     Price = stockDto.Sizes.First().Price
-        // }).ToList();
+        product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+        {
+            Product = product,
+            Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
+            Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
+            Stock = stockDto.Sizes.First().Stock,
+            Price = stockDto.Sizes.First().Price
+        }).ToList();
         
         product.Materials = productDto.Materials.Select(material => new ProductMaterial
         {
@@ -274,18 +274,18 @@ public class ProductRepository: BaseRepository, IProductRepository
         {
             product.Description = productDto.Description;
         }
-        if (productDto.Discount.HasValue)
-        {
-            product.Discount = productDto.Discount.Value;
-        }
+        // if (productDto.Discount.HasValue) Extracted to ProductStock
+        // {
+        //     product.Discount = productDto.Discount.Value;
+        // }
         if (!string.IsNullOrEmpty(productDto.SizeChartImageUrl))
         {
             product.SizeChartImageUrl = productDto.SizeChartImageUrl;
         }
 
-        if (!string.IsNullOrEmpty(productDto.MainMaterialId))
+        if (productDto.MainMaterialId != Guid.Empty)
         {
-            var mainMaterial = materials.FirstOrDefault(m => m.Id == Guid.Parse(productDto.MainMaterialId));
+            var mainMaterial = await _db.Materials.FirstOrDefaultAsync(m => m.Id == productDto.MainMaterialId);
             if (mainMaterial == null)
             {
                 throw new ArgumentException($"Main material with ID {productDto.MainMaterialId} does not exist");
@@ -312,9 +312,9 @@ public class ProductRepository: BaseRepository, IProductRepository
             product.Season = season;
         }
         
-        if (!string.IsNullOrEmpty(productDto.OccasionId))
+        if (productDto.OccasionId != Guid.Empty)
         {
-            var occasion = occasions.FirstOrDefault(o => o.Id == Guid.Parse(productDto.OccasionId));
+            var occasion = occasions.FirstOrDefault(o => o.Id == productDto.OccasionId);
             if (occasion == null)
             {
                 throw new ArgumentException($"Occasion with ID {productDto.OccasionId} does not exist");
@@ -322,9 +322,9 @@ public class ProductRepository: BaseRepository, IProductRepository
             product.Occasion = occasion;
         }
 
-        if (!string.IsNullOrEmpty(productDto.CollectionId))
+        if (productDto.CollectionId != Guid.Empty)
         {
-            var collection = collections.FirstOrDefault(c => c.Id == Guid.Parse(productDto.CollectionId));
+            var collection = await _db.Collections.FirstOrDefaultAsync(c => c.Id == productDto.CollectionId);
             if (collection == null)
             {
                 throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
