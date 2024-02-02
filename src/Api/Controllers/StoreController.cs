@@ -41,40 +41,69 @@ public class StoreController : GenericController
     [HttpGet("{id}")]
     public async Task<ActionResult<StoreDto>> GetStore(Guid id)
     {
-        var store = await _repository.GetStoreAsync(id);
-        if (store == null)
+        try 
         {
-            return NotFound();
-        }
-        var storeDto = _mapper.Map<StoreDto>(store);
+            var store = await _repository.GetStoreAsync(id);
+            if (store == null)
+            {
+                return NotFound();
+            }
+            var storeDto = _mapper.Map<StoreDto>(store);
+            
+            return Ok(storeDto);
         
-        return Ok(storeDto);
+        } 
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 
     // TODO: [Authorize(Policy = Policies.)] ??? 
     [HttpGet]
     public async Task<ActionResult> GetStores()
     {
-        var stores = await _repository.GetStoresAsync();
-        if (stores == null)
-        {
-            return NotFound();
-        }
-        var storesDto = _mapper.Map<IEnumerable<StoreDto>>(stores);
-
-        return Ok(new 
-            { 
-                Stores = storesDto
+        try {
+            var stores = await _repository.GetStoresAsync();
+            if (stores == null)
+            {
+                return NotFound();
             }
-        );
+            var storesDto = _mapper.Map<IEnumerable<StoreDto>>(stores);
+
+            return Ok(new 
+                { 
+                    Stores = storesDto
+                }
+            );
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+        
     }
     
     [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPost]
     public async Task<ActionResult> CreateStore(StoreDto storeDto)
     {
-        await _repository.CreateStoreAsync(storeDto, GetUserId());
-        return Ok();
+        try 
+        {
+            await _repository.CreateStoreAsync(storeDto, GetUserId());
+            return Ok();
+        } 
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (UnauthorizedAccessException e) {
+            return Unauthorized(e.Message);
+        } 
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
     
     
@@ -82,8 +111,22 @@ public class StoreController : GenericController
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
-        await _repository.UpdateStoreAsync(id, storeDto, GetUserId(), IsAdmin());
-        return Ok();
+        try {
+            await _repository.UpdateStoreAsync(id, storeDto, GetUserId(), IsAdmin());
+            return Ok();
+        
+        } 
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (UnauthorizedAccessException e) {
+            return Unauthorized(e.Message);
+        } 
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
     
     
@@ -92,18 +135,31 @@ public class StoreController : GenericController
     public async Task<ActionResult> DeleteStore(Guid id)
     {
         
-        var store = await _repository.GetStoreAsync(id);
-        
+        try {
+            var store = await _repository.GetStoreAsync(id);
+            
 
-        if (GetUserId() != store.OwnerId)
-        {
-            return Unauthorized();
+            if (GetUserId() != store.OwnerId)
+            {
+                return Unauthorized();
+            }
+
+
+            await _repository.DeleteStoreAsync(id, GetUserId(), IsAdmin());
+            return Ok();
         }
-
-
-        await _repository.DeleteStoreAsync(id, GetUserId(), IsAdmin());
-        return Ok();
+        catch (ArgumentException e){
+            return BadRequest(e.Message);
+        }
+        catch (UnauthorizedAccessException e) {
+            return Unauthorized(e.Message);
+        } 
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
-    
-    
 }
+
+    
+
