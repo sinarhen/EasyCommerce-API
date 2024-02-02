@@ -82,7 +82,7 @@ public class StoreController : GenericController
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
-        await _repository.UpdateStoreAsync(id, storeDto);
+        await _repository.UpdateStoreAsync(id, storeDto, GetUserId(), IsAdmin());
         return Ok();
     }
     
@@ -101,7 +101,7 @@ public class StoreController : GenericController
         }
 
 
-        await _repository.DeleteStoreAsync(id);
+        await _repository.DeleteStoreAsync(id, GetUserId(), IsAdmin());
         return Ok();
     }
     
