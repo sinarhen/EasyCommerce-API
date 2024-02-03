@@ -63,7 +63,7 @@ public class ProductRepository: BaseRepository, IProductRepository
         
     }
             
-    public async Task<IEnumerable<Models.DTOs.Product.ProductDto>> GetProductsAsync(ProductSearchParams searchParams)
+    public async Task<IEnumerable<ProductDto>> GetProductsAsync(ProductSearchParams searchParams)
     {
         return await FilterProductsBySearchParams(searchParams);
         
@@ -71,22 +71,9 @@ public class ProductRepository: BaseRepository, IProductRepository
     }
     
 
-    public async Task<Models.Entities.Product> GetProductAsync(Guid id)
+    public async Task<ProductDto> GetProductAsync(Guid id)
     {
-        var product = await _db.Products.AsNoTracking().AsSplitQuery()
-            .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
-            .Include(p => p.Occasion)
-            .Include(p => p.MainMaterial)
-            .Include(p => p.Stocks).ThenInclude(s => s.Color)
-            .Include(p => p.Stocks).ThenInclude(s => s.Size)
-            .Include(p => p.Images)
-            .Include(p => p.Materials).ThenInclude(m => m.Material)
-            .Include(product => product.Reviews)
-            .Include(product => product.Orders)
-            .Include(product => product.Collection)
-            .FirstOrDefaultAsync(p => p.Id == id);
-
-        return product;
+        return await GetProductDtoById(id);
     }
 
     public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string userId, bool isAdmin)

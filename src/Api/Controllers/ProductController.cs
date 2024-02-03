@@ -99,28 +99,11 @@ public class ProductController : GenericController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
+    public async Task<ActionResult<ProductDto>> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
     {
         var product = await _repository.GetProductAsync(id);
 
-        if (product == null)
-        {
-            return NotFound();
-        }
-        var productDto = _mapper.Map<ProductDetailsDto>(product);
-        
-        if (sizeId.HasValue && colorId.HasValue)
-        {
-            var stock = product.Stocks.FirstOrDefault(s => s.SizeId == sizeId.Value && s.ColorId == colorId.Value);
-            if (stock != null)
-            {
-                productDto.Availability = new AvailabilityDto { Quantity = stock.Stock, Price = stock.Price };
-            }
-        }
-
-        productDto.Colors = GetColorDtos(product.Stocks, (sizeId.HasValue && colorId.HasValue) ? sizeId : null);
-        productDto.Sizes = GetSizeDtos(product.Stocks, (sizeId.HasValue && colorId.HasValue) ? colorId : null);
-        return Ok(productDto);
+        return Ok(product);
     }    
 
     [Authorize(Policy = Policies.SellerPolicy)]
@@ -132,7 +115,7 @@ public class ProductController : GenericController
         {
             var product = await _repository.CreateProductAsync(productDto, GetUserId(), IsAdmin());
             
-            return Ok(CreatedAtAction(nameof(GetProduct), new { id = product.Id }, _mapper.Map<ProductDto>(product)));
+            return StatusCode(201);
         }
         catch (ArgumentException e)
         {
