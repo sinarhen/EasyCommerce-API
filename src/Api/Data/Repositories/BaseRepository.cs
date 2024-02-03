@@ -1,4 +1,8 @@
-﻿using ECommerce.Models.Entities;
+﻿using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.DTOs.Product;
+using ECommerce.Models.DTOs.Size;
+using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
 using Microsoft.EntityFrameworkCore;
 
@@ -177,7 +181,7 @@ public class BaseRepository
             .Skip(searchParams.PageSize * (searchParams.PageNumber - 1))
             .Take(searchParams.PageSize);
     }
-    protected async Task<List<Models.Entities.Product>> FilterProductsBySearchParams(ProductSearchParams searchParams)
+    protected async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
         var query = _db.Products.AsNoTracking().AsSplitQuery();
 
@@ -192,19 +196,70 @@ public class BaseRepository
         query = ApplyOrderBy(query, searchParams);
         query = ApplyPaging(query, searchParams);
 
-        var products = await query
-            .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
-            .Include(p => p.Occasion)
-            .Include(p => p.MainMaterial)
-            .Include(p => p.Stocks).ThenInclude(s => s.Color)
-            .Include(p => p.Stocks).ThenInclude(s => s.Size)
-            .Include(p => p.Images)
-            .Include(p => p.Materials).ThenInclude(m => m.Material)
-            .Include(product => product.Reviews)
-            .Include(product => product.Orders)
-            .Include(product => product.Collection)
-            .AsNoTracking()
+        var products = await _db.Products
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Collection = new IdNameDto
+                {
+                    Id = p.Collection.Id,
+                    Name = p.Collection.Name
+                },
+                Categories = p.Categories
+                    .Select(pc => new ProductCategoryDto
+                    {
+                        Id = pc.Category.Id,
+                        Name = pc.Category.Name,
+                        Order = pc.Order
+                    })
+                    .OrderBy(pc => pc.Order)
+                    .ToArray(),
+                Occasion = new IdNameDto
+                {
+                    Id = p.Occasion.Id,
+                    Name = p.Occasion.Name
+                },
+                MainMaterialName = p.MainMaterial.Name,
+                Name = p.Name,
+                Description = p.Description,
+
+                OrdersCount = p.Orders.Count,
+                OrdersCountLastMonth = p.Orders.Count(o => o.CreatedAt > DateTime.Now - TimeSpan.FromDays(30)),
+                ReviewsCount = p.Reviews.Count,
+                AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Rating),
+                IsNew = p.CreatedAt > DateTime.Now - TimeSpan.FromDays(30),
+                IsBestseller = p.Orders.Count > 10,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                Sizes = p.Stocks
+                    .Select(ps => new SizeDto
+                    {
+                        Id = ps.Size.Id,
+                        Name = ps.Size.Name,
+                        Value = ps.Size.Value
+                    })
+                    .OrderBy(ps => ps.Value)
+                    .ToList(),
+                IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
+                Colors = p.Stocks
+                    .Select(ps => new ColorDto
+                    {
+                        Id = ps.Color.Id,
+                        Name = ps.Color.Name,
+                        HexCode = ps.Color.HexCode,
+                        ImageUrls = ps.Product.Images
+                            .Where(i => i.ColorId == ps.ColorId)
+                            .SelectMany(i => i.ImageUrls)
+                            .ToList(),
+                        IsAvailable = ps.Stock > 0,
+                        Quantity = ps.Stock
+                    })
+                    .ToList(),
+                MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0,
+                DiscountPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) * (decimal)(1 - p.Stocks.Average(s => s.Discount) / 100) : 0
+            })
             .ToListAsync();
+
         return products;
     }
 

@@ -34,7 +34,6 @@ public class ProductDto
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     
-    public List<MaterialDto> Materials { get; set; }
     public List<SizeDto> Sizes { get; set; }
     public List<ColorDto> Colors { get; set; }
 }

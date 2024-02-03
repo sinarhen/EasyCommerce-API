@@ -193,32 +193,4 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         _db.Collections.Update(existingCollection);
         await _db.SaveChangesAsync();
     }
-    public async Task<IEnumerable<ECommerce.Models.Entities.Product>> GetProductsInCollectionAsync(Guid storeId, Guid collectionId, ProductSearchParams searchParams)
-    {
-        var collection = await _db.Collections
-            .Include(c => c.Store)
-            .FirstOrDefaultAsync(c => c.Id == collectionId);
-
-        if (collection == null)
-        {
-            throw new ArgumentException("Collection not found");
-        }
-
-        if (collection.StoreId != storeId)
-        {
-            throw new Exception("Collection does not belong to this store");
-        }
-
-        searchParams.CollectionId = collectionId;
-
-        var products = await FilterProductsBySearchParams(searchParams);
-
-        if (products == null)
-        {
-            throw new ArgumentException("Collection not found");
-        }
-
-        return products;
-
-    }
 }

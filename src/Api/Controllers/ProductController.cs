@@ -36,11 +36,10 @@ public class ProductController : GenericController
             {
                 return NotFound();
             }
-            var productDtos = _mapper.Map<List<ProductDto>>(products);
             return Ok(new
             {
-                Products = productDtos,
-                Total = productDtos.Count,
+                Products = products,
+                Total = products.Count(),
                 PageNumber = searchParams.PageNumber,
                 PageSize = searchParams.PageSize
             });

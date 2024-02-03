@@ -63,11 +63,10 @@ public class ProductRepository: BaseRepository, IProductRepository
         
     }
             
-    public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(ProductSearchParams searchParams)
+    public async Task<IEnumerable<Models.DTOs.Product.ProductDto>> GetProductsAsync(ProductSearchParams searchParams)
     {
-        var products = await FilterProductsBySearchParams(searchParams);
+        return await FilterProductsBySearchParams(searchParams);
         
-        return products;
 
     }
     
