@@ -45,10 +45,7 @@ public class BillboardController : GenericController
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId, [FromBody] CreateBillboardDto createBillboardDto)
     {
         try {
-            Console.WriteLine("User id: " + GetUserId());
-            Console.WriteLine("Is admin: " + IsAdmin());
-            Console.WriteLine("Collection ids: " + collectionId);
-            
+     
             var billboard = await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto, IsAdmin());
             return Ok(_mapper.Map<BillboardDto>(billboard));
     
@@ -71,7 +68,7 @@ public class BillboardController : GenericController
     public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)
     {
         try {
-            var billboard = await _repository.UpdateBillboardAsync(updateBillboardDto, GetUserId(), billboardId, IsAdmin());
+            var billboard = await _repository.UpdateBillboardAsync(billboardId, updateBillboardDto, GetUserId(), IsAdmin());
             return Ok(_mapper.Map<BillboardDto>(billboard));
     
         } 
@@ -89,9 +86,9 @@ public class BillboardController : GenericController
 
     [HttpDelete("{billboardId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
-    public async Task<IActionResult> DeleteBillboard(Guid billboardId)
+    public async Task<IActionResult> DeleteBillboard(Guid controllerId, Guid billboardId)
     {
-        await _repository.DeleteBillboardAsync(billboardId, GetUserId(), IsAdmin());
+        await _repository.DeleteBillboardAsync(controllerId, billboardId, GetUserId(), IsAdmin());
         return Ok();
     }
 

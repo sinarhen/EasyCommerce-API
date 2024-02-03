@@ -14,7 +14,6 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
 
     public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(Guid collectionId, string userId, CreateBillboardDto createBillboardDto, bool isAdmin)
     {
-        Console.WriteLine("Entered the function" + userId);
         if (createBillboardDto == null)
         {
             throw new ArgumentException("Request body is empty");
@@ -48,15 +47,12 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         {
             if (createBillboardDto.BillboardFilter.CategoryId != Guid.Empty)
             {
-                var category = await _db.Categories.FindAsync(createBillboardDto.BillboardFilter.CategoryId);
-                if (category == null)
-                {
-                    throw new ArgumentException("Category for billboard filter not found");
-                }
+                var category = await _db.Categories.FindAsync(createBillboardDto.BillboardFilter.CategoryId) ?? throw new ArgumentException("Category for billboard filter not found");
             }
             if (createBillboardDto.BillboardFilter.ColorId != Guid.Empty)
             {
-                var color = await _db.Colors.FindAsync(createBillboardDto.BillboardFilter.ColorId) ?? throw new ArgumentException("Color for billboard filter not found");
+                var color = await _db.Colors.FindAsync(createBillboardDto.BillboardFilter.ColorId) 
+                    ?? throw new ArgumentException("Color for billboard filter not found");
             }
             if (createBillboardDto.BillboardFilter.SizeId != Guid.Empty)
             {
@@ -83,14 +79,19 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         return billboard;
     }
 
-    public async Task DeleteBillboardAsync(Guid billboardId, string userId, bool isAdmin)
+    public async Task DeleteBillboardAsync(Guid collectionId, Guid billboardId, string userId, bool isAdmin)
     {
         var billboard = await _db.FindAsync<Models.Entities.Billboard>(billboardId) ?? throw new ArgumentException("Billboard not found");
+        if (billboard.CollectionId != collectionId)
+        {
+            throw new ArgumentException("Billboard does not belong to the collection");
+        }
         var isOwner = ValidateOwner(billboard.Collection.Store.OwnerId, userId, isAdmin);
         if (!isOwner)
         {
             throw new UnauthorizedAccessException("You are not authorized to delete this billboard");
         }
+
         _db.Billboards.Remove(billboard);
 
         await SaveChangesAsyncWithTransaction();
@@ -118,7 +119,7 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         
     }
 
-    public async Task<Models.Entities.Billboard> UpdateBillboardAsync(UpdateBillboardDto updateBillboardDto, string userId, Guid billboardId, bool isAdmin)
+    public async Task<Models.Entities.Billboard> UpdateBillboardAsync(Guid billboardId, UpdateBillboardDto updateBillboardDto, string userId,  bool isAdmin)
     {
         var billboard = await _db.Billboards
                             .Include(b => b.Collection)
