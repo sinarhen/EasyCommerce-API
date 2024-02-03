@@ -40,6 +40,13 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<ProductImage>()
+            .Property(p => p.ImageUrls)
+            .HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+            );
     }
 
     public override int SaveChanges()

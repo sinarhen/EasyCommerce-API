@@ -245,14 +245,17 @@ public class BaseRepository
                     .OrderBy(ps => ps.Value)
                     .ToList(),
                 Colors = p.Stocks
-                    .GroupBy(ps => ps.ColorId)
-                    .Select(g => new ColorDto
+                    .Select(ps => new ColorDto
                     {
-                        Id = g.First().Color.Id,
-                        Name = g.First().Color.Name,
-                        HexCode = g.First().Color.HexCode,
-                        IsAvailable = g.Any(ps => ps.Stock > 0),
-                        Quantity = g.Sum(ps => ps.Stock)
+                        Id = ps.Color.Id,
+                        Name = ps.Color.Name,
+                        HexCode = ps.Color.HexCode,
+                        ImageUrls = ps.Product.Images
+                            .Where(i => i.ColorId == ps.ColorId)
+                            .SelectMany(i => i.ImageUrls)
+                            .ToList(),
+                        IsAvailable = p.Stocks.Any(stock => stock.Stock > 0),
+                        Quantity = ps.Stock
                     })
                     .ToList(),
                 IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
