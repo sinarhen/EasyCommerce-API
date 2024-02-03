@@ -183,7 +183,8 @@ public class BaseRepository
     }
     protected async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
-        var query = _db.Products.AsNoTracking().AsSplitQuery();
+        var query = _db.Products
+            .AsNoTracking().AsSplitQuery();
 
         query = ApplyFilterBy(query, searchParams);
         query = ApplyCategoryFilter(query, searchParams);
@@ -196,7 +197,9 @@ public class BaseRepository
         query = ApplyOrderBy(query, searchParams);
         query = ApplyPaging(query, searchParams);
 
-        var products = await _db.Products
+        
+
+        var products = await query
             .Select(p => new ProductDto
             {
                 Id = p.Id,
@@ -205,6 +208,7 @@ public class BaseRepository
                     Id = p.Collection.Id,
                     Name = p.Collection.Name
                 },
+
                 Categories = p.Categories
                     .Select(pc => new ProductCategoryDto
                     {
@@ -224,10 +228,10 @@ public class BaseRepository
                 Description = p.Description,
 
                 OrdersCount = p.Orders.Count,
-                OrdersCountLastMonth = p.Orders.Count(o => o.CreatedAt > DateTime.Now - TimeSpan.FromDays(30)),
+                // OrdersCountLastMonth = p.Orders.Count(o => o.CreatedAt > DateTime.Now - TimeSpan.FromDays(30)),
                 ReviewsCount = p.Reviews.Count,
                 AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Rating),
-                IsNew = p.CreatedAt > DateTime.Now - TimeSpan.FromDays(30),
+                // IsNew = p.CreatedAt > DateTime.Now - TimeSpan.FromDays(30),
                 IsBestseller = p.Orders.Count > 10,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
@@ -240,26 +244,24 @@ public class BaseRepository
                     })
                     .OrderBy(ps => ps.Value)
                     .ToList(),
-                IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
                 Colors = p.Stocks
-                    .Select(ps => new ColorDto
+                    .GroupBy(ps => ps.ColorId)
+                    .Select(g => new ColorDto
                     {
-                        Id = ps.Color.Id,
-                        Name = ps.Color.Name,
-                        HexCode = ps.Color.HexCode,
-                        ImageUrls = ps.Product.Images
-                            .Where(i => i.ColorId == ps.ColorId)
-                            .SelectMany(i => i.ImageUrls)
-                            .ToList(),
-                        IsAvailable = ps.Stock > 0,
-                        Quantity = ps.Stock
+                        Id = g.First().Color.Id,
+                        Name = g.First().Color.Name,
+                        HexCode = g.First().Color.HexCode,
+                        IsAvailable = g.Any(ps => ps.Stock > 0),
+                        Quantity = g.Sum(ps => ps.Stock)
                     })
                     .ToList(),
+                IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
                 MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0,
                 DiscountPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) * (decimal)(1 - p.Stocks.Average(s => s.Discount) / 100) : 0
             })
             .ToListAsync();
 
+        
         return products;
     }
 

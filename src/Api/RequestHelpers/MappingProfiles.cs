@@ -98,6 +98,7 @@ public class MappingProfiles: Profile
             //             .SelectMany(i => i.ImageUrls)
             //             .ToList()
             //     })))
+            // .ForAllMembers(opt => opt.Ignore())
             // .ForMember(dest => dest.MinPrice, 
             //     opt => opt.MapFrom(src => src.Stocks.Any() ? src.Stocks.Min(s => s.Price) : 0))
             // .ForMember(dest => dest.DiscountPrice, 
