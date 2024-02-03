@@ -86,11 +86,10 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
     }
     public async Task<ECommerce.Models.Entities.Collection> GetCollectionByIdAsync(Guid id)
     {
-        var collection = await _db.Collections.FindAsync(id);
-        if (collection == null)
-        {
-            throw new ArgumentException("Collection not found");
-        }
+        var collection = await _db.Collections
+        .Include(c => c.Billboards)
+            .ThenInclude(b => b.BillboardFilter)
+        .AsNoTracking().AsSplitQuery().FirstOrDefaultAsync(c => c.Id == id) ?? throw new ArgumentException("Collection not found");
         return collection;
     }    
 
