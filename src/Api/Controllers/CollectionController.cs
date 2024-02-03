@@ -72,7 +72,8 @@ public class CollectionController : GenericController
         try
         {
             var ownerId = GetUserId();
-            var ownerRoles = GetUserRoles();            await _repository.DeleteCollectionAsync(id, ownerId, ownerRoles);
+            var ownerRoles = GetUserRoles();            
+            await _repository.DeleteCollectionAsync(id, ownerId, ownerRoles);
             return NoContent();
         }
         catch (Exception ex)

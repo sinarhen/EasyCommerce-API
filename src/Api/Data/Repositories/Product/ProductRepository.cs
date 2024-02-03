@@ -26,33 +26,9 @@ public class ProductRepository: BaseRepository, IProductRepository
             throw new ArgumentException("Request body is empty");
         }
         
-        if (productDto.Stocks == null || productDto.Stocks.Count == 0)
+        if (productDto.Stocks.Any(s => s.SizeId == Guid.Empty || s.ColorId == Guid.Empty || s.Stock <= 0 || s.Price <= 0))
         {
-            throw new ArgumentException("Product must have at least one stock");
-        }
-        if (productDto.Stocks.Any(s => s.Sizes == null || s.Sizes.Count == 0))
-        {
-            throw new ArgumentException("Product stock must have at least one size");
-        }
-        if (productDto.Stocks.Any(s => s.Sizes.Any(size => size.Stock <= 0)))
-        {
-            throw new ArgumentException("Product stock must have at least one size with stock greater than 0");
-        }
-        if (productDto.Stocks.Any(s => s.Sizes.Any(size => size.Price <= 0)))
-        {
-            throw new ArgumentException("Product stock must have at least one size with price greater than 0");
-        }
-        if (productDto.Stocks.Any(s => s.Sizes.All(size => size.SizeId == Guid.Empty)))
-        {
-            throw new ArgumentException("Product stock has invalid size id");
-        }
-        if (productDto.Stocks.Any(s => s.ColorId == Guid.Empty))
-        {
-            throw new ArgumentException("Product stock must have valid color id");
-        }
-        if (productDto.Materials == null || productDto.Materials.Count == 0)
-        {
-            throw new ArgumentException("Product must have at least one material");
+            throw new ArgumentException("Product stock must have valid size, color, stock and price");
         }
         if (productDto.Materials.Any(m => m.Id == Guid.Empty))
         {
@@ -131,16 +107,21 @@ public class ProductRepository: BaseRepository, IProductRepository
             .Select(color => color.ColorId)
             .ToList();
         
+        if (nonExistingColors.Any())
+        {
+            throw new ArgumentException($"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
+        }
 
         var nonExistingSizes = productDto.Stocks
-            .SelectMany(s => s.Sizes)
             .Select(size => _db.Sizes.FirstOrDefault(s => s.Id == size.SizeId))
             .Where(size => size == null)
             .ToList();
         
-        var existingMainMaterial = await _db.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
-        var existingOccasion = await _db.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
-        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
+        if (nonExistingSizes.Any())
+        {
+            throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
+        }
+
         var existingCollection = await _db.Collections.Include(collection => collection.Store).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
 
         if (existingCollection == null)
@@ -166,16 +147,20 @@ public class ProductRepository: BaseRepository, IProductRepository
         {
             throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
         }
+        var existingMainMaterial = await _db.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
+
         if (existingMainMaterial == null)
         {
             throw new ArgumentException($"Main material with ID {productDto.MainMaterialId} does not exist");
         }
+        var existingOccasion = await _db.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
         
         if (existingOccasion == null)
         {
             throw new ArgumentException($"Occasion with ID {productDto.OccasionId} does not exist");
         }
 
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
         if (productDto.CategoryId == Guid.Empty || category == null)
         {
             throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
@@ -185,13 +170,13 @@ public class ProductRepository: BaseRepository, IProductRepository
         
         
         product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
-        {
-            Product = product,
-            Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-            Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
-            Stock = stockDto.Sizes.First().Stock,
-            Price = stockDto.Sizes.First().Price
-        }).ToList();
+            {
+                Product = product,
+                ColorId = stockDto.ColorId,
+                SizeId = stockDto.SizeId,
+                Stock = stockDto.Stock,
+                Price = stockDto.Price
+            }).ToList();
         
         product.Materials = productDto.Materials.Select(material => new ProductMaterial
         {
@@ -200,11 +185,11 @@ public class ProductRepository: BaseRepository, IProductRepository
             Percentage = material.Percentage
         }).ToList();
         
-        product.Images = productDto.Stocks.Select(stockDto => new ProductImage
+        product.Images = productDto.Images.Select(imageDto => new ProductImage
         {
             Product = product,
-            Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-            ImageUrls = stockDto.ImageUrls
+            Color = _db.Colors.FirstOrDefault(c => c.Id == imageDto.ColorId),
+            ImageUrls = imageDto.ImageUrls
         }).ToList();
         
         int initialOrder = CalculateDepth(category);
@@ -356,9 +341,8 @@ public class ProductRepository: BaseRepository, IProductRepository
                 .ToList();
             
             var nonExistingSizes = productDto.Stocks
-                .SelectMany(s => s.Sizes)
-                .Select(size => sizes.FirstOrDefault(s => s.Id == size.SizeId))
-                .Where(size => size == null)
+                .Where(size => sizes.All(s => s.Id != size.SizeId))
+                .Select(s => s.SizeId)
                 .ToList();
             
             if (nonExistingColors.Any())
@@ -374,10 +358,10 @@ public class ProductRepository: BaseRepository, IProductRepository
             product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
             {
                 Product = product,
-                Color = _db.Colors.FirstOrDefault(color => color.Id == stockDto.ColorId),
-                Size = _db.Sizes.FirstOrDefault(s => s.Id == stockDto.Sizes.First().SizeId),
-                Stock = stockDto.Sizes.First().Stock,
-                Price = stockDto.Sizes.First().Price
+                ColorId = stockDto.ColorId,
+                SizeId = stockDto.SizeId,
+                Stock = stockDto.Stock,
+                Price = stockDto.Price
             }).ToList();
         }
 

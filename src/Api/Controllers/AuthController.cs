@@ -12,6 +12,7 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/auth")]
+//TODO: Extract the db logic to a repository
 public class AuthController : GenericController
 {
     private readonly UserManager<User> _userManager;

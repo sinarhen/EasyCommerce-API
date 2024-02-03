@@ -2,6 +2,9 @@
 public class ProductStockDto
 {
     public Guid ColorId { get; set; }
-    public List<ProductStockSizeDto> Sizes { get; set; }
-    public List<string> ImageUrls { get; set; }
+    public Guid SizeId { get; set; }
+    public decimal Price { get; set; }
+    public int Stock { get; set; }
+    public double Discount { get; set; }
+    
 }

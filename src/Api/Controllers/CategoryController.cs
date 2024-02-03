@@ -22,13 +22,19 @@ public class CategoryController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
-        var categories = await _repository.GetCategoriesAsync();
-        return Ok(
-            new 
-            {
-                Categories = _mapper.Map<List<CategoryDto>>(categories)   
-            }
-        );
+        try {
+            var categories = await _repository.GetCategoriesAsync();
+            return Ok(
+                new 
+                {
+                    Categories = _mapper.Map<List<CategoryDto>>(categories)   
+                }
+            );
+        } catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+        
     }
 
     [HttpGet("{id}")]

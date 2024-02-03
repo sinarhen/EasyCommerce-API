@@ -18,4 +18,13 @@ public class CreateProductDto
     public Guid CollectionId { get; set; }
     public List<MaterialDto> Materials { get; set; }
     public List<ProductStockDto> Stocks { get; set; }
+    public List<ProductImageDto> Images { get; set; }
+}
+
+public class ProductImageDto
+{
+    public Guid ProductId { get; set; }
+    public Guid ColorId { get; set; }
+    public List<string> ImageUrls { get; set; }
+
 }
