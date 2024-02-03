@@ -86,7 +86,7 @@ public class BaseRepository
             "in_stock" => query.Where(p => p.Stocks.Any(s => s.Stock > 0)),
             "discount" => query.Where(p => p.Stocks.Any(s => s.Discount > 0)),
             "out_of_stock" => query.Where(p => p.Stocks.All(s => s.Stock == 0)),
-            "new" => query.Where(p => p.CreatedAt > DateTime.Now.AddDays(-7)),
+            "new" => query.Where(p => p.CreatedAt > DateTimeOffset.UtcNow.AddDays(-7)),
             _ => query,
         };
     }
@@ -229,12 +229,14 @@ public class BaseRepository
                 MainMaterialName = p.MainMaterial.Name,
                 Name = p.Name,
                 Description = p.Description,
-
+                Gender = p.Gender.ToString(),
+                Season = p.Season.ToString(),
                 OrdersCount = p.Orders.Count,
-                // OrdersCountLastMonth = p.Orders.Count(o => o.CreatedAt > DateTime.Now - TimeSpan.FromDays(30)),
+                OrdersCountLastMonth = p.Orders.Count(o => o.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30)),
                 ReviewsCount = p.Reviews.Count,
                 AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Rating),
-                // IsNew = p.CreatedAt > DateTime.Now - TimeSpan.FromDays(30),
+                IsNew = p.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
+                IsOnSale = p.Stocks.Any(s => s.Discount > 0),
                 IsBestseller = p.Orders.Count > 10,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
