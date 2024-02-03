@@ -181,6 +181,88 @@ public class BaseRepository
             .Skip(searchParams.PageSize * (searchParams.PageNumber - 1))
             .Take(searchParams.PageSize);
     }
+
+    // TODO: FIX REDUNDANT CODE
+    protected async Task<ProductDto> GetProductDtoById(Guid id)
+    {
+        return await _db.Products
+            .Include(p => p.Stocks)
+                .ThenInclude(ps => ps.Color)
+            .Include(p => p.Images)
+            .AsNoTracking()
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Collection = new IdNameDto
+                {
+                    Id = p.Collection.Id,
+                    Name = p.Collection.Name
+                },
+
+                Categories = p.Categories
+                    .Select(pc => new ProductCategoryDto
+                    {
+                        Id = pc.Category.Id,
+                        Name = pc.Category.Name,
+                        Order = pc.Order
+                    })
+                    .OrderBy(pc => pc.Order)
+                    .ToArray(),
+                Occasion = new IdNameDto
+                {
+                    Id = p.Occasion.Id,
+                    Name = p.Occasion.Name
+                },
+                MainMaterial = new IdNameDto
+                {
+                    Id = p.MainMaterial.Id,
+                    Name = p.MainMaterial.Name
+                },
+                Name = p.Name,
+                Description = p.Description,
+                Gender = p.Gender.ToString(),
+                Season = p.Season.ToString(),
+                OrdersCount = p.Orders.Count,
+                OrdersCountLastMonth = p.Orders.Count(o => o.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30)),
+                ReviewsCount = p.Reviews.Count,
+                AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => r.Rating),
+                IsNew = p.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
+                IsOnSale = p.Stocks.Any(s => s.Discount > 0),
+                IsBestseller = p.Orders.Count > 10,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt,
+                Sizes = p.Stocks
+                    .Select(ps => new SizeDto
+                    {
+                        Id = ps.Size.Id,
+                        Name = ps.Size.Name,
+                        Value = ps.Size.Value
+                    })
+                    .OrderBy(ps => ps.Value)
+                    .ToList(),
+                Colors = p.Stocks
+                    .Select(ps => new ColorDto
+                    {
+                        Id = ps.Color.Id,
+                        Name = ps.Color.Name,
+                        HexCode = ps.Color.HexCode,
+                        // ImageUrls = ps.Product.Images
+                            // .Where(i => i.ColorId == ps.ColorId)
+                            // .SelectMany(i => i.ImageUrls)
+                            // .ToList(),
+                        IsAvailable = p.Stocks.Any(stock => stock.Stock > 0),
+                        Quantity = ps.Stock
+                    })
+                    .ToList(),
+                IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
+                MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0,
+                DiscountPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) * (decimal)(1 - p.Stocks.Average(s => s.Discount) / 100) : 0
+            }
+            )
+            .FirstOrDefaultAsync(p => p.Id == id);
+        
+    }
+
     protected async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
         var query = _db.Products
@@ -260,9 +342,9 @@ public class BaseRepository
                         Name = ps.Color.Name,
                         HexCode = ps.Color.HexCode,
                         // ImageUrls = ps.Product.Images
-                        //     .Where(i => i.ColorId == ps.ColorId)
-                        //     .SelectMany(i => i.ImageUrls)
-                        //     .ToList(),
+                            // .Where(i => i.ColorId == ps.ColorId)
+                            // .SelectMany(i => i.ImageUrls)
+                            // .ToList(),
                         IsAvailable = p.Stocks.Any(stock => stock.Stock > 0),
                         Quantity = ps.Stock
                     })
@@ -291,5 +373,6 @@ public class BaseRepository
         }
         return products;
     }
+    
 
 }

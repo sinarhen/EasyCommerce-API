@@ -2,6 +2,7 @@
 
 public class ProductSearchParams
 {
+    public Guid? ProductId { get; set; }
     public string OrderBy { get; set; }
     
     public string FilterBy { get; set; }
