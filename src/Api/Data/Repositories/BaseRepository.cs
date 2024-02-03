@@ -184,6 +184,9 @@ public class BaseRepository
     protected async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
         var query = _db.Products
+            .Include(p => p.Stocks)
+                .ThenInclude(ps => ps.Color)
+            .Include(p => p.Images)
             .AsNoTracking().AsSplitQuery();
 
         query = ApplyFilterBy(query, searchParams);
@@ -250,10 +253,10 @@ public class BaseRepository
                         Id = ps.Color.Id,
                         Name = ps.Color.Name,
                         HexCode = ps.Color.HexCode,
-                        ImageUrls = ps.Product.Images
-                            .Where(i => i.ColorId == ps.ColorId)
-                            .SelectMany(i => i.ImageUrls)
-                            .ToList(),
+                        // ImageUrls = ps.Product.Images
+                        //     .Where(i => i.ColorId == ps.ColorId)
+                        //     .SelectMany(i => i.ImageUrls)
+                        //     .ToList(),
                         IsAvailable = p.Stocks.Any(stock => stock.Stock > 0),
                         Quantity = ps.Stock
                     })
@@ -264,7 +267,22 @@ public class BaseRepository
             })
             .ToListAsync();
 
-        
+        // Load the ImageUrls separately
+        var imageUrls = await query
+            .SelectMany(p => p.Images)
+            .Select(i => new { i.ColorId, i.ImageUrls })
+            .ToListAsync();
+
+        foreach (var product in products)
+        {
+            foreach (var colorDto in product.Colors)
+            {
+                colorDto.ImageUrls = imageUrls
+                    .Where(i => i.ColorId == colorDto.Id)
+                    .SelectMany(i => i.ImageUrls)
+                    .ToList();
+            }
+        }
         return products;
     }
 
