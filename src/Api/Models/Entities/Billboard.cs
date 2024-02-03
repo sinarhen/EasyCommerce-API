@@ -20,6 +20,6 @@ public class Billboard : BaseEntity
     // Navigation properties
     public Collection Collection { get; set; }
     
-    
+    [Required]    
     public BillboardFilter BillboardFilter { get; set; }
 }

@@ -86,9 +86,9 @@ public class BillboardController : GenericController
 
     [HttpDelete("{billboardId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
-    public async Task<IActionResult> DeleteBillboard(Guid controllerId, Guid billboardId)
+    public async Task<IActionResult> DeleteBillboard(Guid collectionId, Guid billboardId)
     {
-        await _repository.DeleteBillboardAsync(controllerId, billboardId, GetUserId(), IsAdmin());
+        await _repository.DeleteBillboardAsync(collectionId, billboardId, GetUserId(), IsAdmin());
         return Ok();
     }
 

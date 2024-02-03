@@ -132,7 +132,7 @@ public class ProductController : GenericController
         {
             var product = await _repository.CreateProductAsync(productDto, GetUserId(), IsAdmin());
             
-            return _mapper.Map<ProductDto>(product);
+            return Ok(CreatedAtAction(nameof(GetProduct), new { id = product.Id }, _mapper.Map<ProductDto>(product)));
         }
         catch (ArgumentException e)
         {

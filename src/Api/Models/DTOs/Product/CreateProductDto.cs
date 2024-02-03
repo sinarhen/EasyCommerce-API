@@ -23,7 +23,6 @@ public class CreateProductDto
 
 public class ProductImageDto
 {
-    public Guid ProductId { get; set; }
     public Guid ColorId { get; set; }
     public List<string> ImageUrls { get; set; }
 

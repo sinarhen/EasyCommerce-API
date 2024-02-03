@@ -226,7 +226,11 @@ public class BaseRepository
                     Id = p.Occasion.Id,
                     Name = p.Occasion.Name
                 },
-                MainMaterialName = p.MainMaterial.Name,
+                MainMaterial = new IdNameDto
+                {
+                    Id = p.MainMaterial.Id,
+                    Name = p.MainMaterial.Name
+                },
                 Name = p.Name,
                 Description = p.Description,
                 Gender = p.Gender.ToString(),

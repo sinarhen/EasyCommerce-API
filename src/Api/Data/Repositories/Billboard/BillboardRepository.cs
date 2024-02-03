@@ -81,7 +81,8 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
 
     public async Task DeleteBillboardAsync(Guid collectionId, Guid billboardId, string userId, bool isAdmin)
     {
-        var billboard = await _db.FindAsync<Models.Entities.Billboard>(billboardId) ?? throw new ArgumentException("Billboard not found");
+        var billboard = await _db.Billboards.Include(b => b.Collection).ThenInclude(c => c.Store).FirstOrDefaultAsync(b => b.Id == billboardId) 
+            ?? throw new ArgumentException("Billboard not found");
         if (billboard.CollectionId != collectionId)
         {
             throw new ArgumentException("Billboard does not belong to the collection");
