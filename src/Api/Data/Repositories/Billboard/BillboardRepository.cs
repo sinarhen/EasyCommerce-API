@@ -14,6 +14,11 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
 
     public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(Guid collectionId, string userId, CreateBillboardDto createBillboardDto, bool isAdmin)
     {
+        Console.WriteLine("Entered the function" + userId);
+        if (createBillboardDto == null)
+        {
+            throw new ArgumentException("Request body is empty");
+        }
         var collection = await _db.Collections
             .Include(c => c.Store)
             .SingleOrDefaultAsync(c => c.Id == collectionId) 
@@ -24,56 +29,49 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         {
             throw new UnauthorizedAccessException("You are not authorized to create a billboard for this collection");
         }
-
+        Console.WriteLine("Stage: 1");
+        
         var billboard = new Models.Entities.Billboard
         {
             Title = createBillboardDto.Title,
             Subtitle = createBillboardDto.Subtitle,
             ImageUrl = createBillboardDto.ImageUrl,
             CollectionId = collectionId,
+            BillboardFilter = new Models.Entities.BillboardFilter()
+        };
+
+        if (createBillboardDto.BillboardFilter != null)
+        {
+            if (createBillboardDto.BillboardFilter.CategoryId != Guid.Empty)
+            {
+                var category = await _db.Categories.FindAsync(createBillboardDto.BillboardFilter.CategoryId);
+                if (category == null)
+                {
+                    throw new ArgumentException("Category for billboard filter not found");
+                }
+            }
+            if (createBillboardDto.BillboardFilter.ColorId != Guid.Empty)
+            {
+                var color = await _db.Colors.FindAsync(createBillboardDto.BillboardFilter.ColorId) ?? throw new ArgumentException("Color for billboard filter not found");
+            }
+            if (createBillboardDto.BillboardFilter.SizeId != Guid.Empty)
+            {
+                var size = await _db.Sizes.FindAsync(createBillboardDto.BillboardFilter.SizeId) 
+                    ?? throw new ArgumentException("Size for billboard filter not found");
+            }
+            if (!string.IsNullOrEmpty(createBillboardDto.BillboardFilter.OrderBy))
+            {
+                billboard.BillboardFilter.OrderBy = createBillboardDto.BillboardFilter.OrderBy;
+            }
+            if (!string.IsNullOrEmpty(createBillboardDto.BillboardFilter.Search))
+            {
+                billboard.BillboardFilter.Search = createBillboardDto.BillboardFilter.Search;
+            }
+            billboard.BillboardFilter.FromPrice = createBillboardDto.BillboardFilter.FromPrice;
+            billboard.BillboardFilter.ToPrice = createBillboardDto.BillboardFilter.ToPrice;
+
+        }
         
-        };
-
-        if (createBillboardDto.BillboardFilter.CategoryId != Guid.Empty)
-        {
-            var category = await _db.Categories.FindAsync(createBillboardDto.BillboardFilter.CategoryId);
-            if (category == null)
-            {
-                throw new ArgumentException("Category for billboard filter not found");
-            }
-        }
-        if (createBillboardDto.BillboardFilter.ColorId != Guid.Empty)
-        {
-            var color = await _db.Colors.FindAsync(createBillboardDto.BillboardFilter.ColorId);
-            if (color == null)
-            {
-                throw new ArgumentException("Color for billboard filter not found");
-            }
-        }
-        if (createBillboardDto.BillboardFilter.SizeId != Guid.Empty)
-        {
-            var size = await _db.Sizes.FindAsync(createBillboardDto.BillboardFilter.SizeId);
-            if (size == null)
-            {
-                throw new ArgumentException("Size for billboard filter not found");
-            }
-        }
-        var billboardFilter = new Models.Entities.BillboardFilter
-        {
-            FromPrice = createBillboardDto.BillboardFilter.FromPrice,
-            ToPrice = createBillboardDto.BillboardFilter.ToPrice,
-            OrderBy = createBillboardDto.BillboardFilter.OrderBy,
-            Search = createBillboardDto.BillboardFilter.Search,
-            Gender = createBillboardDto.BillboardFilter.Gender,
-            Title = createBillboardDto.BillboardFilter.Title,
-            Subtitle = createBillboardDto.BillboardFilter.Subtitle,
-            Season = createBillboardDto.BillboardFilter.Season,
-            CategoryId = createBillboardDto.BillboardFilter.CategoryId,
-            ColorId = createBillboardDto.BillboardFilter.ColorId,
-            SizeId = createBillboardDto.BillboardFilter.SizeId
-        };
-
-        billboard.BillboardFilter = billboardFilter;
 
         await _db.Billboards.AddAsync(billboard);
         await SaveChangesAsyncWithTransaction();

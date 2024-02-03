@@ -12,6 +12,8 @@ public class Cart : BaseEntity
 
     [Key] public string CustomerId { get; set; }
 
+    // TODO: Implement CartItem entity
+
     // Navigation properties
     public User Customer { get; set; }
     

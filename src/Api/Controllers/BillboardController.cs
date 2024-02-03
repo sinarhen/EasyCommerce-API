@@ -45,6 +45,10 @@ public class BillboardController : GenericController
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId, [FromBody] CreateBillboardDto createBillboardDto)
     {
         try {
+            Console.WriteLine("User id: " + GetUserId());
+            Console.WriteLine("Is admin: " + IsAdmin());
+            Console.WriteLine("Collection ids: " + collectionId);
+            
             var billboard = await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto, IsAdmin());
             return Ok(_mapper.Map<BillboardDto>(billboard));
     
