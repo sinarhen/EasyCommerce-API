@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using ECommerce.Config;
-using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
@@ -68,7 +66,6 @@ public class ProductRepository: BaseRepository, IProductRepository
     public async Task<IEnumerable<Models.Entities.Product>> GetProductsAsync(ProductSearchParams searchParams)
     {
         var products = await FilterProductsBySearchParams(searchParams);
-        await SaveChangesAsyncWithTransaction();
         
         return products;
 
@@ -95,6 +92,13 @@ public class ProductRepository: BaseRepository, IProductRepository
 
     public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string userId, bool isAdmin)
     {
+
+        var existingCollection = await _db.Collections.Include(collection => collection.Store).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId) ?? throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
+        var isOwner = ValidateOwner(userId, existingCollection.Store.OwnerId, isAdmin);
+        if (!isOwner)
+        {
+            throw new UnauthorizedAccessException("You are not the owner of this store");
+        }
         ValidateCreateProductDtoOnModelLevel(productDto);
         
         var nonExistingMaterialIds = productDto.Materials
@@ -122,18 +126,6 @@ public class ProductRepository: BaseRepository, IProductRepository
             throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
         }
 
-        var existingCollection = await _db.Collections.Include(collection => collection.Store).FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId);
-
-        if (existingCollection == null)
-        {
-            throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
-        }
-        
-        var isOwner = ValidateOwner(userId, existingCollection.Store.OwnerId, isAdmin);
-        if (!isOwner)
-        {
-            throw new UnauthorizedAccessException("You are not the owner of this store");
-        }
 
         if (nonExistingMaterialIds.Any())
         {
@@ -147,19 +139,8 @@ public class ProductRepository: BaseRepository, IProductRepository
         {
             throw new ArgumentException($"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
         }
-        var existingMainMaterial = await _db.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId);
-
-        if (existingMainMaterial == null)
-        {
-            throw new ArgumentException($"Main material with ID {productDto.MainMaterialId} does not exist");
-        }
-        var existingOccasion = await _db.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId);
-        
-        if (existingOccasion == null)
-        {
-            throw new ArgumentException($"Occasion with ID {productDto.OccasionId} does not exist");
-        }
-
+        var existingMainMaterial = await _db.Materials.FirstOrDefaultAsync(material => material.Id == productDto.MainMaterialId) ?? throw new ArgumentException($"Main material with ID {productDto.MainMaterialId} does not exist");
+        var existingOccasion = await _db.Occasions.FirstOrDefaultAsync(occasion => occasion.Id == productDto.OccasionId) ?? throw new ArgumentException($"Occasion with ID {productDto.OccasionId} does not exist");
         var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
         if (productDto.CategoryId == Guid.Empty || category == null)
         {

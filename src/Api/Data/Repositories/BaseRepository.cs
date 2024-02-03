@@ -103,10 +103,9 @@ public class BaseRepository
     }
     private static IQueryable<ECommerce.Models.Entities.Product> ApplySizeFilter(IQueryable<ECommerce.Models.Entities.Product> query, ProductSearchParams searchParams)
     {
-        if (!string.IsNullOrEmpty(searchParams.Size))
+        if (searchParams.SizeId != Guid.Empty)
         {
-            var sizes = SplitAndLowercase(searchParams.Size);
-            query = query.Where(p => p.Stocks.Any(s => sizes.Contains(s.Size.Name.ToLower())));
+            query = query.Where(p => p.Stocks.Any(s => s.SizeId == searchParams.SizeId));
         }
         return query;
     }
@@ -122,30 +121,27 @@ public class BaseRepository
 
     private static IQueryable<ECommerce.Models.Entities.Product> ApplyColorFilter(IQueryable<ECommerce.Models.Entities.Product> query, ProductSearchParams searchParams)
     {
-        if (!string.IsNullOrEmpty(searchParams.Color))
+        if (searchParams.ColorId != Guid.Empty)
         {
-            var colors = SplitAndLowercase(searchParams.Color);
-            query = query.Where(p => p.Stocks.Any(s => colors.Contains(s.Color.Name.ToLower())));
+            query = query.Where(p => p.Stocks.Any(s => s.ColorId == searchParams.ColorId));
         }
         return query;
     }
 
     private static IQueryable<ECommerce.Models.Entities.Product> ApplyOccasionFilter(IQueryable<ECommerce.Models.Entities.Product> query, ProductSearchParams searchParams)
     {
-        if (!string.IsNullOrEmpty(searchParams.Occasion))
+        if (searchParams.OccasionId != Guid.Empty)
         {
-            var occasions = SplitAndLowercase(searchParams.Occasion);
-            query = query.Where(p => occasions.Contains(p.Occasion.Name.ToLower()));
+            query = query.Where(p => p.OccasionId == searchParams.OccasionId);
         }
         return query;
     }
 
     private static IQueryable<ECommerce.Models.Entities.Product> ApplyMaterialFilter(IQueryable<ECommerce.Models.Entities.Product> query, ProductSearchParams searchParams)
     {
-        if (!string.IsNullOrEmpty(searchParams.Material))
+        if (searchParams.MaterialId != Guid.Empty)
         {
-            var materials = SplitAndLowercase(searchParams.Material);
-            query = query.Where(p => p.Materials.Any(pm => materials.Contains(pm.Material.Name.ToLower())));
+            query = query.Where(p => p.Materials.Any(pm => pm.MaterialId == searchParams.MaterialId));
         }
         return query;
     }

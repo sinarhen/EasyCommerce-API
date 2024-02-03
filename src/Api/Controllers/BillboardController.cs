@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.Controllers;
 
 [ApiController]
-[Route("api/billboards")]
+[Route("api/collections/{collectionId}/billboards")]
 public class BillboardController : GenericController
 {
     private readonly IBillboardRepository _repository;
@@ -20,7 +20,7 @@ public class BillboardController : GenericController
     }
 
 
-    [HttpGet("{collectionId}")]
+    [HttpGet]
     public async Task<IActionResult> GetBillboardsForCollection(Guid collectionId)
     {
         try {
@@ -40,7 +40,7 @@ public class BillboardController : GenericController
         }
     }
 
-    [HttpPost("{collectionId}")]
+    [HttpPost]
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId, [FromBody] CreateBillboardDto createBillboardDto)
     {

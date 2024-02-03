@@ -14,15 +14,15 @@ public class ProductSearchParams
     
     public Guid CategoryId { get; set; }
     
-    public string Color { get; set; }
+    public Guid ColorId { get; set; }
     
-    public string Size { get; set; }
+    public Guid SizeId { get; set; }
     
     public Guid CollectionId { get; set; }
     
-    public string Material { get; set; }
+    public Guid MaterialId { get; set; }
     
-    public string Occasion { get; set; }
+    public Guid OccasionId { get; set; }
 
     public decimal MinPrice { get; set; } = 0;
 

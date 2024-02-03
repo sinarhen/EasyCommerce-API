@@ -133,7 +133,7 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         billboard.Title = updateBillboardDto.Title;
         billboard.Subtitle = updateBillboardDto.Subtitle;
         billboard.ImageUrl = updateBillboardDto.ImageUrl;
-        billboard.CollectionId = updateBillboardDto.CollectionId ?? billboard.CollectionId;
+        billboard.CollectionId = updateBillboardDto.CollectionId != Guid.Empty ? updateBillboardDto.CollectionId : billboard.CollectionId;
         
 
         var filterDto = updateBillboardDto.BillboardFilter;
