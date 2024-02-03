@@ -57,7 +57,8 @@ public class CollectionController : GenericController
         try
         {
             var ownerId = GetUserId();
-            var ownerRoles = GetUserRoles();            await _repository.UpdateCollectionAsync(id, collectionDto, ownerId, ownerRoles);
+            var ownerRoles = GetUserRoles();            
+            await _repository.UpdateCollectionAsync(id, collectionDto, ownerId, ownerRoles);
             return NoContent();
         }
         catch (Exception ex)

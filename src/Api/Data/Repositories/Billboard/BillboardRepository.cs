@@ -21,6 +21,7 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         }
         var collection = await _db.Collections
             .Include(c => c.Store)
+            .Include(c => c.Billboards)
             .SingleOrDefaultAsync(c => c.Id == collectionId) 
             ?? throw new ArgumentException("Collection not found");
 
@@ -29,8 +30,11 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         {
             throw new UnauthorizedAccessException("You are not authorized to create a billboard for this collection");
         }
-        Console.WriteLine("Stage: 1");
-        
+
+        if (collection.Billboards.Any(b => b.Title == createBillboardDto.Title))
+        {
+            throw new ArgumentException("Billboard with the same title already exists");
+        }
         var billboard = new Models.Entities.Billboard
         {
             Title = createBillboardDto.Title,
