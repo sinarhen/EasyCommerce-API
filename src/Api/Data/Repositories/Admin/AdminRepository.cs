@@ -20,16 +20,19 @@ public class AdminRepository: BaseRepository, IAdminRepository
     }
     public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
-        var users = await _db.Users.Select(u => new UserDto
-        {
-            Id = u.Id,
-            Username = u.UserName,
-            Email = u.Email,
-            Role = GetHighestUserRole(u.Id),
-            IsBanned = _db.BannedUsers.Any(b => b.UserId == u.Id),
-            CreatedAt = u.CreatedAt,
-            UpdatedAt = u.UpdatedAt
-        }).ToListAsync();
+        var users = await _db.Users
+            .Select(u => new UserDto
+            {
+                Id = u.Id,
+                Username = u.UserName,
+                Email = u.Email,
+                Role = GetHighestUserRole(u.Id),
+                IsBanned = _db.BannedUsers.Any(b => b.UserId == u.Id),
+                CreatedAt = u.CreatedAt,
+                UpdatedAt = u.UpdatedAt
+            })
+            .AsNoTracking()
+            .ToListAsync();
         return users;
     }
 
