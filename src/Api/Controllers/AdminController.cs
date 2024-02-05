@@ -1,5 +1,6 @@
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Admin;
+using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,17 @@ namespace ECommerce.Controllers
         }
         // GET: api/admin/users
         [HttpGet("users")]
-        public ActionResult<IEnumerable<User>> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
-            // TODO: Implement logic to get all users
-            throw new NotImplementedException();
+            try
+            {
+                return Ok(await _repository.GetAllUsers());
+                
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+            
         }
 
         // DELETE: api/admin/users/{id}

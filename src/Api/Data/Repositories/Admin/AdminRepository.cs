@@ -1,39 +1,62 @@
 ﻿using ECommerce.Config;
 using ECommerce.Models.DTOs.User;
-using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Admin;
 
 public class AdminRepository: BaseRepository, IAdminRepository
 {
-    protected AdminRepository(ProductDbContext db) : base(db)
+    public AdminRepository(ProductDbContext db) : base(db)
     {
     }
-    
-    private string GetHighestUserRole(string userId)
+    private async Task<IEnumerable<string>> GetUserRoles(string userId)
     {
-        var userRoles = _db.UserRoles.Where(ur => ur.UserId == userId);
-        var roles = _db.Roles.Where(r => userRoles.Any(ur => ur.RoleId == r.Id));
-        var highestRole = roles.OrderByDescending(r => UserRoles.RoleHierarchy[r.Name]).FirstOrDefault();
-        return highestRole?.Name;
+        var roles = await _db.UserRoles
+            .Where(r => r.UserId == userId)
+            .Select(r => r.RoleId)
+            .ToListAsync();
+
+        var roleNames = await _db.Roles
+            .Where(r => roles.Contains(r.Id))
+            .Select(r => r.Name)
+            .ToListAsync();
+
+        return roleNames;
     }
     public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
         var users = await _db.Users
-            .Select(u => new UserDto
-            {
-                Id = u.Id,
-                Username = u.UserName,
-                Email = u.Email,
-                Role = GetHighestUserRole(u.Id),
-                IsBanned = _db.BannedUsers.Any(b => b.UserId == u.Id),
-                CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt
-            })
             .AsNoTracking()
             .ToListAsync();
-        return users;
+
+        var userDtos = new List<UserDto>();
+
+        foreach (var user in users)
+        {
+            var roles = await GetUserRoles(user.Id);
+            var highestRole = GetHighestUserRole(roles);
+            var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                Email = user.Email,
+                Role = highestRole,
+                IsBanned = isBanned,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
+            };
+
+            userDtos.Add(userDto);
+        }
+
+        return userDtos;
+    }
+    private string GetHighestUserRole(IEnumerable<string> roles)
+    {
+        var highestRole = roles.MaxBy(r => UserRoles.RoleHierarchy[r ?? UserRoles.Customer]);
+        return highestRole ?? UserRoles.Customer;
     }
 
     public Task<UserDto> GetUserById(int id)
