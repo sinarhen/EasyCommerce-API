@@ -7,4 +7,11 @@ public static class UserRoles
     public const string Customer = "Customer";
     public const string SuperAdmin = "SuperAdmin";
     
+    public static Dictionary<string, int> RoleHierarchy = new()
+    {
+        { SuperAdmin, 4 },
+        { Admin, 3 },
+        { Seller, 2 },
+        { Customer, 1 }
+    };
 }

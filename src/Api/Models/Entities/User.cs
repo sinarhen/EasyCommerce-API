@@ -13,6 +13,9 @@ public class User : IdentityUser
     public string PostalCode { get; set; }
     public Guid? CartId { get; set; }
     
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    
     // Navigation properties
     public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<Store> Stores { get; set; } = new List<Store>();

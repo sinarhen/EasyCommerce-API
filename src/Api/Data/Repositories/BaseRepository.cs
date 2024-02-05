@@ -47,8 +47,9 @@ public class BaseRepository
         bool isAdminValue = isAdmin.HasValue && isAdmin.Value;
         return (ownerId == userId || isAdminValue);
     }
-
-
+    
+    
+    
     protected void AddToCategories(ECommerce.Models.Entities.Category category, ECommerce.Models.Entities.Product product, int order)
     {
         var currentCategory = category;

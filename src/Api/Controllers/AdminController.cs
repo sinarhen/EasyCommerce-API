@@ -1,4 +1,5 @@
 using ECommerce.Config;
+using ECommerce.Data.Repositories.Admin;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,12 @@ namespace ECommerce.Controllers
     [Route("api/admin")]
     public class AdminController : ControllerBase
     {
+        private readonly IAdminRepository _repository;
+
+        public AdminController(IAdminRepository repository)
+        {
+            _repository = repository;
+        }
         // GET: api/admin/users
         [HttpGet("users")]
         public ActionResult<IEnumerable<User>> GetAllUsers()

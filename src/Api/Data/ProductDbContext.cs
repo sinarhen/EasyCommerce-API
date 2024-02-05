@@ -16,6 +16,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<Billboard> Billboards { get; set; }
     public DbSet<BillboardFilter> BillboardFilters { get; set; }
     public DbSet<BannedStore> BannedStores { get; set; }
+    public DbSet<BannedUser> BannedUsers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductStock> ProductStocks { get; set; }
     public DbSet<ProductCategory> ProductCategories { get; set; }
@@ -60,7 +61,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.Entity is BaseEntity && (
+            .Where(e => (e.Entity is BaseEntity || e.Entity is User) && (
                 e.State == EntityState.Added
                 || e.State == EntityState.Modified));
 
