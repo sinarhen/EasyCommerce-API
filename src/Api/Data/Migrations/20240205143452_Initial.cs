@@ -182,6 +182,46 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BillboardFilters",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: true),
+                    Subtitle = table.Column<string>(type: "text", nullable: true),
+                    Gender = table.Column<int>(type: "integer", nullable: true),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Season = table.Column<int>(type: "integer", nullable: true),
+                    ColorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    OrderBy = table.Column<string>(type: "text", nullable: true),
+                    FromPrice = table.Column<decimal>(type: "numeric", nullable: true),
+                    ToPrice = table.Column<decimal>(type: "numeric", nullable: true),
+                    SizeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Search = table.Column<string>(type: "text", nullable: true),
+                    BillboardId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BillboardFilters", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BillboardFilters_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_BillboardFilters_Colors_ColorId",
+                        column: x => x.ColorId,
+                        principalTable: "Colors",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_BillboardFilters_Sizes_SizeId",
+                        column: x => x.SizeId,
+                        principalTable: "Sizes",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CategorySizes",
                 columns: table => new
                 {
@@ -422,6 +462,12 @@ namespace ECommerce.Data.Migrations
                 {
                     table.PrimaryKey("PK_Billboards", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Billboards_BillboardFilters_BillboardFilterId",
+                        column: x => x.BillboardFilterId,
+                        principalTable: "BillboardFilters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Billboards_Collections_CollectionId",
                         column: x => x.CollectionId,
                         principalTable: "Collections",
@@ -467,51 +513,6 @@ namespace ECommerce.Data.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Products_Sizes_SizeId",
-                        column: x => x.SizeId,
-                        principalTable: "Sizes",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BillboardFilters",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: true),
-                    Subtitle = table.Column<string>(type: "text", nullable: true),
-                    Gender = table.Column<int>(type: "integer", nullable: true),
-                    CategoryId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Season = table.Column<int>(type: "integer", nullable: true),
-                    ColorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    OrderBy = table.Column<string>(type: "text", nullable: true),
-                    FromPrice = table.Column<decimal>(type: "numeric", nullable: true),
-                    ToPrice = table.Column<decimal>(type: "numeric", nullable: true),
-                    SizeId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Search = table.Column<string>(type: "text", nullable: true),
-                    BillboardId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BillboardFilters", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BillboardFilters_Billboards_BillboardId",
-                        column: x => x.BillboardId,
-                        principalTable: "Billboards",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BillboardFilters_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BillboardFilters_Colors_ColorId",
-                        column: x => x.ColorId,
-                        principalTable: "Colors",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BillboardFilters_Sizes_SizeId",
                         column: x => x.SizeId,
                         principalTable: "Sizes",
                         principalColumn: "Id");
@@ -797,12 +798,6 @@ namespace ECommerce.Data.Migrations
                 column: "StoreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BillboardFilters_BillboardId",
-                table: "BillboardFilters",
-                column: "BillboardId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BillboardFilters_CategoryId",
                 table: "BillboardFilters",
                 column: "CategoryId");
@@ -816,6 +811,12 @@ namespace ECommerce.Data.Migrations
                 name: "IX_BillboardFilters_SizeId",
                 table: "BillboardFilters",
                 column: "SizeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Billboards_BillboardFilterId",
+                table: "Billboards",
+                column: "BillboardFilterId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Billboards_CollectionId",
@@ -968,7 +969,7 @@ namespace ECommerce.Data.Migrations
                 name: "BannedUsers");
 
             migrationBuilder.DropTable(
-                name: "BillboardFilters");
+                name: "Billboards");
 
             migrationBuilder.DropTable(
                 name: "CartProducts");
@@ -998,19 +999,19 @@ namespace ECommerce.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Billboards");
+                name: "BillboardFilters");
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Colors");
-
-            migrationBuilder.DropTable(
-                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Collections");

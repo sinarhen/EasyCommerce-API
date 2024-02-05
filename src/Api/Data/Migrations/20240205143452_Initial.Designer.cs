@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240205142619_Initial")]
+    [Migration("20240205143452_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -105,6 +105,9 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BillboardFilterId")
+                        .IsUnique();
+
                     b.HasIndex("CollectionId");
 
                     b.ToTable("Billboards");
@@ -159,9 +162,6 @@ namespace ECommerce.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BillboardId")
-                        .IsUnique();
 
                     b.HasIndex("CategoryId");
 
@@ -960,21 +960,25 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.Billboard", b =>
                 {
+                    b.HasOne("ECommerce.Models.Entities.BillboardFilter", "BillboardFilter")
+                        .WithOne("Billboard")
+                        .HasForeignKey("ECommerce.Models.Entities.Billboard", "BillboardFilterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ECommerce.Models.Entities.Collection", "Collection")
                         .WithMany("Billboards")
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("BillboardFilter");
+
                     b.Navigation("Collection");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.BillboardFilter", b =>
                 {
-                    b.HasOne("ECommerce.Models.Entities.Billboard", "Billboard")
-                        .WithOne("BillboardFilter")
-                        .HasForeignKey("ECommerce.Models.Entities.BillboardFilter", "BillboardId");
-
                     b.HasOne("ECommerce.Models.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId");
@@ -986,8 +990,6 @@ namespace ECommerce.Data.Migrations
                     b.HasOne("ECommerce.Models.Entities.Size", "Size")
                         .WithMany()
                         .HasForeignKey("SizeId");
-
-                    b.Navigation("Billboard");
 
                     b.Navigation("Category");
 
@@ -1311,10 +1313,9 @@ namespace ECommerce.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Models.Entities.Billboard", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.BillboardFilter", b =>
                 {
-                    b.Navigation("BillboardFilter")
-                        .IsRequired();
+                    b.Navigation("Billboard");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Cart", b =>

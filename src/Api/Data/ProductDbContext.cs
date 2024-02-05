@@ -67,11 +67,23 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
 
         foreach (var entityEntry in entries)
         {
-            ((BaseEntity)entityEntry.Entity).UpdatedAt = DateTime.UtcNow;
-
-            if (entityEntry.State == EntityState.Added)
+            if (entityEntry.Entity is BaseEntity baseEntity)
             {
-                ((BaseEntity)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
+                baseEntity.UpdatedAt = DateTime.UtcNow;
+
+                if (entityEntry.State == EntityState.Added)
+                {
+                    baseEntity.CreatedAt = DateTime.UtcNow;
+                }
+            }
+            else if (entityEntry.Entity is User user)
+            {
+                user.UpdatedAt = DateTime.UtcNow;
+
+                if (entityEntry.State == EntityState.Added)
+                {
+                    user.CreatedAt = DateTime.UtcNow;
+                }
             }
         }
     }

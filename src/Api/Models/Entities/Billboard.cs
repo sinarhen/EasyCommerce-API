@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models.Entities;
 
@@ -18,8 +19,10 @@ public class Billboard : BaseEntity
     public Guid BillboardFilterId { get; set; }
     
     // Navigation properties
+    [ForeignKey("CollectionId")]
     public Collection Collection { get; set; }
     
-    [Required]    
+    [Required]
+    [ForeignKey("BillboardFilterId")]
     public BillboardFilter BillboardFilter { get; set; }
 }

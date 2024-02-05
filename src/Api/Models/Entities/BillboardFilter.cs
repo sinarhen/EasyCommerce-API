@@ -31,7 +31,6 @@ public class BillboardFilter : BaseEntity
     public Guid? BillboardId { get; set; }
     
     // Navigation property
-    [ForeignKey("BillboardId")]
     public Billboard Billboard { get; set; }
     
     [ForeignKey("CategoryId")]
