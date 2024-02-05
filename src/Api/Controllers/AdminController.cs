@@ -1,12 +1,13 @@
-using System;
-using System.Collections.Generic;
+using ECommerce.Config;
 using ECommerce.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace YourNamespace.Controllers
+namespace ECommerce.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Authorize(Policy = Policies.AdminPolicy)]
+    [Route("api/admin")]
     public class AdminController : ControllerBase
     {
         // GET: api/admin/users
@@ -41,7 +42,7 @@ namespace YourNamespace.Controllers
             throw new NotImplementedException();
         }
 
-        // PUT: api/admin/users/{id}/role
+        [Authorize(Policy = Policies.SuperAdminPolicy)]
         [HttpPut("users/{id}/role")]
         public ActionResult UpdateUserRole(int id, [FromBody] string role)
         {
