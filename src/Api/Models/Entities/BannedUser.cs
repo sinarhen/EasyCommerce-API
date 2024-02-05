@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
 
@@ -11,5 +12,6 @@ public class BannedUser
     public DateTime BanEndTime { get; set; }
     
     // Navigation properties
+    [ForeignKey("UserId")]
     public User User { get; set; }
 }
