@@ -11,5 +11,6 @@ public interface IAdminRepository
     Task DeleteUser(string id);
     Task<BannedUser> BanUser(string id, BanUserDto data);
     Task UpdateUserRole(string id, string role);
+    Task UnbanUser(string id);
     Task<IEnumerable<BannedUser>> GetBannedUsers();
 }

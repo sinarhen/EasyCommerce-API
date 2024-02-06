@@ -2,32 +2,34 @@
 using ECommerce.Models.DTOs.Admin;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Admin;
 
 public class AdminRepository: BaseRepository, IAdminRepository
 {
-    public AdminRepository(ProductDbContext db) : base(db)
+    private readonly UserManager<User> _userManager;
+    public AdminRepository(ProductDbContext db, UserManager<User> userManager) : base(db)
     {
+        _userManager = userManager;
     }
-    private async Task<IEnumerable<string>> GetUserRoles(string userId)
+    private async Task<IEnumerable<string>> GetUserRoles(User user)
     {
-        var roles = await _db.UserRoles
-            .Where(r => r.UserId == userId)
-            .Select(r => r.RoleId)
-            .ToListAsync();
-
-        var roleNames = await _db.Roles
-            .Where(r => roles.Contains(r.Id))
-            .Select(r => r.Name)
-            .ToListAsync();
-
-        return roleNames;
+        var roles = await _userManager.GetRolesAsync(user);
+        return roles;
+        
     }
+
+    private async Task<User> FindUser(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        return user;
+    }
+
     public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
-        var users = await _db.Users
+        var users = await _userManager.Users
             .AsNoTracking()
             .ToListAsync();
 
@@ -35,7 +37,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         foreach (var user in users)
         {
-            var roles = await GetUserRoles(user.Id);
+            var roles = await GetUserRoles(user);
             var highestRole = GetHighestUserRole(roles);
             var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
@@ -55,7 +57,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         return userDtos;
     }
-    private string GetHighestUserRole(IEnumerable<string> roles)
+    private static string GetHighestUserRole(IEnumerable<string> roles)
     {
         var highestRole = roles.MaxBy(r => UserRoles.RoleHierarchy[r ?? UserRoles.Customer]);
         return highestRole ?? UserRoles.Customer;
@@ -63,11 +65,9 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
     public async Task<UserDto> GetUserById(string id)
     {
-        var user = await _db.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new ArgumentException("User not found");
+        var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
-        var roles = await GetUserRoles(user.Id);
+        var roles = await GetUserRoles(user);
         var highestRole = GetHighestUserRole(roles);
         var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
@@ -92,10 +92,9 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
     public async Task<BannedUser> BanUser(string id, BanUserDto data)
     {
-        var user = await _db.Users
-            .AnyAsync(u => u.Id == id);
+        var user = FindUser(id) ?? throw new ArgumentException("User not found");
 
-        if (!user)
+        if (user == null)
         {
             throw new ArgumentException("User not found");
         }
@@ -119,6 +118,19 @@ public class AdminRepository: BaseRepository, IAdminRepository
         return bannedUser;
     }
 
+    public async Task UnbanUser(string id)
+    {
+        var user = FindUser(id) ?? throw new ArgumentException("User not found");
+
+        var bannedUser = await _db.BannedUsers
+            .FirstOrDefaultAsync(b => b.UserId == id) ?? throw new ArgumentException("User is not banned");
+        
+        _db.BannedUsers.Remove(bannedUser);
+        await _db.SaveChangesAsync();
+
+        return;
+    }
+
     public async Task<IEnumerable<BannedUser>> GetBannedUsers()
     {
         var bannedUsers = await _db.BannedUsers
@@ -127,8 +139,14 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         return bannedUsers;
     }
-    public Task UpdateUserRole(string id, string role)
+    public async Task UpdateUserRole(string id, string role)
     {
-        throw new NotImplementedException();
+        var user = FindUser(id) ?? throw new ArgumentException("User not found");
+
+        var userRoles = await _db.UserRoles
+            .Where(r => r.UserId == id)
+            .ToListAsync();
+
+        // TODO: Complete the implementation of updating user's role    
     }
 }

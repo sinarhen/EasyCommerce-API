@@ -86,6 +86,24 @@ namespace ECommerce.Controllers
             }
         }
 
+                // PUT: api/admin/users/{id}/ban
+        [HttpPut("users/{id}/unban")]
+        public async Task<ActionResult> UnbanUser(string id, [FromBody] BanUserDto data)
+        {
+            try {
+                await _repository.UnbanUser(id);
+                return Ok(new {
+                    message = "User has been unbanned",
+                });
+            } catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
         // GET: api/admin/banned-users
         [HttpGet("banned-users")]
         public async Task<ActionResult<IEnumerable<BannedUser>>> GetBannedUsers()
