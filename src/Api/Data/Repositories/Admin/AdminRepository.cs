@@ -92,7 +92,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
     public async Task<BannedUser> BanUser(string id, BanUserDto data)
     {
-        var user = FindUser(id) ?? throw new ArgumentException("User not found");
+        var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
         if (user == null)
         {
@@ -113,20 +113,21 @@ public class AdminRepository: BaseRepository, IAdminRepository
             BanStartTime = DateTime.UtcNow
         };
         await _db.BannedUsers.AddAsync(bannedUser);
-        await _db.SaveChangesAsync();
+        await SaveChangesAsyncWithTransaction();
+
 
         return bannedUser;
     }
 
     public async Task UnbanUser(string id)
     {
-        var user = FindUser(id) ?? throw new ArgumentException("User not found");
+        var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
         var bannedUser = await _db.BannedUsers
             .FirstOrDefaultAsync(b => b.UserId == id) ?? throw new ArgumentException("User is not banned");
         
         _db.BannedUsers.Remove(bannedUser);
-        await _db.SaveChangesAsync();
+        await SaveChangesAsyncWithTransaction();
 
         return;
     }
@@ -139,14 +140,39 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         return bannedUsers;
     }
-    public async Task UpdateUserRole(string id, string role)
+    public async Task UpdateUserRole(string id, string role, string adminRole)
     {
-        var user = FindUser(id) ?? throw new ArgumentException("User not found");
+        var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
-        var userRoles = await _db.UserRoles
-            .Where(r => r.UserId == id)
-            .ToListAsync();
+        var userRoles = await GetUserRoles(user);
+        
+        if (userRoles.Contains(role))
+        {
+            throw new ArgumentException("User already in this role");
+        }
 
-        // TODO: Complete the implementation of updating user's role    
+        if (UserRoles.RoleHierarchy[role] >= UserRoles.RoleHierarchy[adminRole])
+        {
+            throw new ArgumentException("You cannot assign a role higher than your own or equal to your role");
+        }
+
+        var level = UserRoles.RoleHierarchy[role];
+        var rolesToRemove = userRoles.Where(r => UserRoles.RoleHierarchy[r] > level);
+        var result = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+        if (!result.Succeeded)
+        {
+            throw new Exception("Failed to remove user from roles");
+        }
+        var rolesToAdd = userRoles.Where(r => UserRoles.RoleHierarchy[r] <= level);
+        result = await _userManager.AddToRolesAsync(user, rolesToAdd);
+        if (!result.Succeeded)
+        {
+            throw new Exception("Failed to add user to roles");
+        }
+
+
+        await SaveChangesAsyncWithTransaction();
+        return;
+
     }
 }
