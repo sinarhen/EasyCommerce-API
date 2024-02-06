@@ -21,7 +21,6 @@ public class ProductDto
     public string Season { get; set; }
 
     public int OrdersCount { get; set; }
-    public int OrdersCountLastMonth { get; set; }
     public int ReviewsCount { get; set; }
     public double AvgRating { get; set; }
     public decimal MinPrice { get; set; }
@@ -36,6 +35,8 @@ public class ProductDto
     
     public List<SizeDto> Sizes { get; set; }
     public List<ColorDto> Colors { get; set; }
+
+    public List<ProductImageDto> Images { get; set; }
 }
 
 public class ProductCategoryDto

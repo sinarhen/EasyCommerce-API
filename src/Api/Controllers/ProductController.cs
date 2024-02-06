@@ -56,47 +56,6 @@ public class ProductController : GenericController
         
     }
 
-    private List<ColorDto> GetColorDtos(IEnumerable<ProductStock> stocks, Guid? sizeId = null)
-    {
-        var query = stocks.AsQueryable();
-
-        if (sizeId.HasValue)
-        {
-            query = query.Where(ps => ps.SizeId == sizeId.Value);
-        }
-
-        return query.Select(ps => new ColorDto
-            {
-                Id = ps.Color.Id,
-                Name = ps.Color.Name,
-                HexCode = ps.Color.HexCode,
-                ImageUrls = ps.Product.Images
-                    .Where(i => i.ColorId == ps.ColorId)
-                    .SelectMany(i => i.ImageUrls)
-                    .ToList(),
-                IsAvailable = ps.Stock > 0,
-                Quantity = ps.Stock
-            })
-            .ToList();
-    }
-
-    private List<SizeDto> GetSizeDtos(IEnumerable<ProductStock> stocks, Guid? colorId = null)
-    {
-        var query = stocks.AsQueryable();
-
-        if (colorId.HasValue)
-        {
-            query = query.Where(s => s.ColorId == colorId.Value);
-        }
-
-        return query
-            .Select(s => new SizeDto {
-                Id = s.SizeId, 
-                Name = s.Size.Name, 
-                Quantity = s.Stock })
-            .OrderBy(s => s.Value)
-            .ToList();
-    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
