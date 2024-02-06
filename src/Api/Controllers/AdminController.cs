@@ -1,3 +1,4 @@
+using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Admin;
 using ECommerce.Models.DTOs.Admin;
@@ -15,7 +16,7 @@ namespace ECommerce.Controllers
     {
         private readonly IAdminRepository _repository;
 
-        public AdminController(IAdminRepository repository)
+        public AdminController(IAdminRepository repository, IMapper mapper) : base(mapper)
         {
             _repository = repository;
         }
@@ -88,7 +89,7 @@ namespace ECommerce.Controllers
 
                 // PUT: api/admin/users/{id}/ban
         [HttpPut("users/{id}/unban")]
-        public async Task<ActionResult> UnbanUser(string id, [FromBody] BanUserDto data)
+        public async Task<ActionResult> UnbanUser(string id)
         {
             try {
                 await _repository.UnbanUser(id);

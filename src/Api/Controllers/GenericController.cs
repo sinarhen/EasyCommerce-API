@@ -8,8 +8,10 @@ namespace ECommerce.Controllers;
 
 public class GenericController : ControllerBase
 {
-    public GenericController()
+    protected readonly IMapper _mapper;
+    public GenericController(IMapper mapper)
     {
+        _mapper = mapper;
     }
 
 
