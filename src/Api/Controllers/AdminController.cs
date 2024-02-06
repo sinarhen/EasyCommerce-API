@@ -82,6 +82,18 @@ namespace ECommerce.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+        // GET: api/admin/banned-users
+        [HttpGet("banned-users")]
+        public ActionResult<IEnumerable<BannedUser>> GetBannedUsers()
+        {
+            try {
+                return Ok(_repository.GetBannedUsers());
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
         
 
         [Authorize(Policy = Policies.SuperAdminPolicy)]

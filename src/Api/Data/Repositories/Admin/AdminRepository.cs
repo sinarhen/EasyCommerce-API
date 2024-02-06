@@ -116,6 +116,14 @@ public class AdminRepository: BaseRepository, IAdminRepository
         
     }
 
+    public async Task<IEnumerable<BannedUser>> GetBannedUsers()
+    {
+        var bannedUsers = await _db.BannedUsers
+            .AsNoTracking()
+            .ToListAsync();
+
+        return bannedUsers;
+    }
     public Task UpdateUserRole(string id, string role)
     {
         throw new NotImplementedException();
