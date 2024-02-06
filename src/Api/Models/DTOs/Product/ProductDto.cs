@@ -32,8 +32,6 @@ public class ProductDto
     public bool IsBestseller { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    
-    public List<SizeDto> Sizes { get; set; }
     public List<ColorDto> Colors { get; set; }
 
     public List<ProductImageDto> Images { get; set; }

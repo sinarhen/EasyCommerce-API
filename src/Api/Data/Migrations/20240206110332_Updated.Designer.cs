@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240206095520_Updated")]
+    [Migration("20240206110332_Updated")]
     partial class Updated
     {
         /// <inheritdoc />

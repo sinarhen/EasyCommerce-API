@@ -1,14 +1,12 @@
-﻿namespace ECommerce.Models.DTOs.Product;
+﻿using ECommerce.Models.DTOs.Material;
+using ECommerce.Models.DTOs.Size;
+
+namespace ECommerce.Models.DTOs.Product;
 public class ProductDetailsDto : ProductDto
 {
+    public string SizeChartImageUrl { get; set; }
+    public List<MaterialDto> Materials { get; set; }
+    public List<SizeDto> Sizes { get; set; }
     public List<ReviewDto> Reviews { get; set; } 
-    
-    public AvailabilityDto Availability { get; set; }
-    
-}
-
-public class AvailabilityDto
-{
-    public decimal Price { get; set; }
-    public int Quantity { get; set; }
+        
 }

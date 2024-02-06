@@ -1,5 +1,6 @@
 ﻿using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.DTOs.Material;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.Entities;
@@ -211,7 +212,11 @@ public class BaseRepository
                     Name = p.Occasion.Name
                 }
                 ,
-                MainMaterial = GetMainMaterial(p),
+                MainMaterial = new IdNameDto
+                {
+                    Id = p.Materials.First().Material.Id,
+                    Name = p.Materials.First().Material.Name
+                },
                 Name = p.Name,
                 Description = p.Description,
                 Gender = p.Gender.ToString(),
@@ -224,15 +229,6 @@ public class BaseRepository
                 IsBestseller = p.Orders.Count > 10,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
-                Sizes = p.Stocks
-                    .Select(ps => new SizeDto
-                    {
-                        Id = ps.Size.Id,
-                        Name = ps.Size.Name,
-                        Value = ps.Size.Value
-                    })
-                    .OrderBy(ps => ps.Value)
-                    .ToList(),
                 Colors = p.Stocks
                     .Select(ps => new ColorDto
                     {
@@ -252,11 +248,11 @@ public class BaseRepository
                 DiscountPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) * (decimal)(1 - p.Stocks.Average(s => s.Discount) / 100) : 0
             });
     }
-    protected async Task<ProductDto> GetProductDtoById(Guid id)
+    protected async Task<ProductDetailsDto> GetProductDtoById(Guid id)
     {
         return await _db.Products
             .AsNoTracking()
-            .Select(p => new ProductDto
+            .Select(p => new ProductDetailsDto
             {
                 Id = p.Id,
                 Collection = new IdNameDto
@@ -280,7 +276,38 @@ public class BaseRepository
                     Name = p.Occasion.Name
                 }
                 ,
-                MainMaterial = GetMainMaterial(p),
+                MainMaterial = new IdNameDto
+                {
+                    Id = p.Materials.MaxBy(m => m.Percentage).Material.Id,
+                    Name = p.Materials.MaxBy(m => m.Percentage).Material.Name
+                },
+                Materials = p.Materials
+                    .Select(pm => new MaterialDto
+                    {
+                        Id = pm.Material.Id,
+                        Name = pm.Material.Name,
+                        Percentage = pm.Percentage
+                    })
+                    .ToList(),
+                Sizes = p.Stocks
+                    .Select(ps => new SizeDto
+                    {
+                        Id = ps.Size.Id,
+                        Name = ps.Size.Name,
+                        Quantity = ps.Stock
+                    })
+                    .ToList(),
+                Reviews = p.Reviews.Select(r => new ReviewDto {
+                    CustomerName = r.User.UserName,
+                    Title = r.Title,
+                    Content = r.Content,
+                    Rating = r.Rating,
+                    CreatedAt = r.CreatedAt,
+
+                }).ToList(),
+                
+                SizeChartImageUrl = p.SizeChartImageUrl,
+
                 Name = p.Name,
                 Description = p.Description,
                 Gender = p.Gender.ToString(),
@@ -293,15 +320,6 @@ public class BaseRepository
                 IsBestseller = p.Orders.Count > 10,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
-                Sizes = p.Stocks
-                    .Select(ps => new SizeDto
-                    {
-                        Id = ps.Size.Id,
-                        Name = ps.Size.Name,
-                        Value = ps.Size.Value
-                    })
-                    .OrderBy(ps => ps.Value)
-                    .ToList(),
                 Colors = p.Stocks
                     .Select(ps => new ColorDto
                     {
@@ -324,16 +342,6 @@ public class BaseRepository
         
     }
 
-    private static IdNameDto GetMainMaterial(Models.Entities.Product product)
-    {
-        Material material = product.Materials.MaxBy(pm => pm.Percentage).Material;
-    
-        return new IdNameDto
-        {
-            Id = material.Id,
-            Name = material.Name
-        };
-    }
 
     protected async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
