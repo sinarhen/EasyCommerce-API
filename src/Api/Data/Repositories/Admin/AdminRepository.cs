@@ -1,5 +1,7 @@
 ﻿using ECommerce.Config;
+using ECommerce.Models.DTOs.Admin;
 using ECommerce.Models.DTOs.User;
+using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Admin;
@@ -88,9 +90,29 @@ public class AdminRepository: BaseRepository, IAdminRepository
         throw new NotImplementedException();
     }
 
-    public Task BanUser(string id)
+    public async Task BanUser(BanUserDto data)
     {
-        throw new NotImplementedException();
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.Id == data.UserId) ?? throw new ArgumentException("User not found");
+
+        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
+        if (isBanned)
+        {
+            throw new ArgumentException("User is already banned");
+        }
+        
+        var bannedUser = new BannedUser
+        {
+            UserId = user.Id,
+            Reason = data.Reason,
+            BanEndTime = data.BanEndTime ?? DateTime.MaxValue,
+            BanStartTime = DateTime.UtcNow
+        }; 
+
+        await _db.BannedUsers.AddAsync(bannedUser);
+        await _db.SaveChangesAsync();
+
+        
     }
 
     public Task UpdateUserRole(string id, string role)
