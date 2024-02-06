@@ -1,5 +1,6 @@
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Admin;
+using ECommerce.Models.DTOs.Admin;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -68,11 +69,20 @@ namespace ECommerce.Controllers
 
         // PUT: api/admin/users/{id}/ban
         [HttpPut("users/{id}/ban")]
-        public ActionResult BanUser(int id)
+        public ActionResult BanUser(string id, [FromBody] BanUserDto data)
         {
-            // TODO: Implement logic to ban user by id
-            throw new NotImplementedException();
+            try {
+                _repository.BanUser(data);
+                return Ok("Successfully banned user");
+            } catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
+        
 
         [Authorize(Policy = Policies.SuperAdminPolicy)]
         [HttpPut("users/{id}/role")]

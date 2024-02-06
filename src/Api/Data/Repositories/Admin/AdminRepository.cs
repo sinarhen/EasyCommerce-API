@@ -95,12 +95,13 @@ public class AdminRepository: BaseRepository, IAdminRepository
         var user = await _db.Users
             .FirstOrDefaultAsync(u => u.Id == data.UserId) ?? throw new ArgumentException("User not found");
 
+
         var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
         if (isBanned)
         {
             throw new ArgumentException("User is already banned");
         }
-        
+
         var bannedUser = new BannedUser
         {
             UserId = user.Id,
