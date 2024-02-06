@@ -61,6 +61,7 @@ public class AuthController : GenericController
             nameof(Register),
             new
             {
+                id = user.Id,                
                 email = user.Email,
                 token = tokenAsString,
                 expiresTo = token.ValidTo,

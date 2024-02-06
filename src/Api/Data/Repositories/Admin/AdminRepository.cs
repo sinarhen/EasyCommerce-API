@@ -64,17 +64,17 @@ public class AdminRepository: BaseRepository, IAdminRepository
         throw new NotImplementedException();
     }
 
-    public Task DeleteUser(int id)
+    public Task DeleteUser(string id)
     {
         throw new NotImplementedException();
     }
 
-    public Task BanUser(int id)
+    public Task BanUser(string id)
     {
         throw new NotImplementedException();
     }
 
-    public Task UpdateUserRole(int id, string role)
+    public Task UpdateUserRole(string id, string role)
     {
         throw new NotImplementedException();
     }

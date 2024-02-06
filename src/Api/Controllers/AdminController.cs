@@ -35,7 +35,7 @@ namespace ECommerce.Controllers
 
         // DELETE: api/admin/users/{id}
         [HttpDelete("users/{id}")]
-        public ActionResult DeleteUser(int id)
+        public ActionResult DeleteUser(string id)
         {
             // TODO: Implement logic to delete specific user by id
             throw new NotImplementedException();
@@ -43,7 +43,7 @@ namespace ECommerce.Controllers
 
         // GET: api/admin/users/{id}
         [HttpGet("users/{id}")]
-        public ActionResult<User> GetUserById(int id)
+        public ActionResult<User> GetUserById(string id)
         {
             // TODO: Implement logic to get user by id
             throw new NotImplementedException();
