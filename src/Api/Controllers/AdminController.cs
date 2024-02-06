@@ -120,10 +120,10 @@ namespace ECommerce.Controllers
 
         [Authorize(Policy = Policies.AdminPolicy)]
         [HttpPut("users/{id}/role")]
-        public ActionResult UpdateUserRole(string id, [FromBody] string role)
+        public ActionResult UpdateUserRole(string id, [FromBody] ChangeUserRoleDto dto)
         {
             try {
-                _repository.UpdateUserRole(id, role, UserRoles.GetHighestUserRole(GetUserRoles()));
+                _repository.UpdateUserRole(id, dto.Role, UserRoles.GetHighestUserRole(GetUserRoles()));
                 return Ok("User role has been updated");
             } catch (ArgumentException e)
             {
