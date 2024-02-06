@@ -225,16 +225,6 @@ public class ProductRepository: BaseRepository, IProductRepository
             product.SizeChartImageUrl = productDto.SizeChartImageUrl;
         }
 
-        if (productDto.MainMaterialId != Guid.Empty)
-        {
-            var mainMaterial = await _db.Materials.FirstOrDefaultAsync(m => m.Id == productDto.MainMaterialId);
-            if (mainMaterial == null)
-            {
-                throw new ArgumentException($"Main material with ID {productDto.MainMaterialId} does not exist");
-            }
-            product.MainMaterial = mainMaterial;
-        }
-
         if (!string.IsNullOrEmpty(productDto.Gender))
         {
             if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
