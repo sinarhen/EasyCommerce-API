@@ -24,7 +24,6 @@ public class Product : BaseEntity
 
     public Season? Season { get; set; }
 
-    public Guid MainMaterialId { get; set; }
     
     public Guid? CollectionId { get; set; }
     
@@ -32,8 +31,6 @@ public class Product : BaseEntity
     [ForeignKey("OccasionId")]
     public Occasion Occasion { get; set; }
 
-    [ForeignKey("MainMaterialId")]
-    public Material MainMaterial { get; set; }
     
     [ForeignKey("CollectionId")]
     public Collection Collection { get; set; }

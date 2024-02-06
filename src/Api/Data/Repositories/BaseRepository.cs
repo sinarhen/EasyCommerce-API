@@ -184,6 +184,8 @@ public class BaseRepository
     }
 
     // TODO: FIX REDUNDANT CODE
+
+
     protected async Task<ProductDto> GetProductDtoById(Guid id)
     {
         return await _db.Products
@@ -263,6 +265,17 @@ public class BaseRepository
         
     }
 
+    private static IdNameDto GetMainMaterial(Models.Entities.Product product)
+    {
+        Material material = product.Materials.MaxBy(pm => pm.Percentage).Material;
+    
+        return new IdNameDto
+        {
+            Id = material.Id,
+            Name = material.Name
+        };
+    }
+
     protected async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
         var query = _db.Products
@@ -308,11 +321,7 @@ public class BaseRepository
                     Id = p.Occasion.Id,
                     Name = p.Occasion.Name
                 },
-                MainMaterial = new IdNameDto
-                {
-                    Id = p.MainMaterial.Id,
-                    Name = p.MainMaterial.Name
-                },
+                MainMaterial = GetMainMaterial(p),
                 Name = p.Name,
                 Description = p.Description,
                 Gender = p.Gender.ToString(),
