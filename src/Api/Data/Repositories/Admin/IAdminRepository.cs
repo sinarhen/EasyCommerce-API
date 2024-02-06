@@ -9,7 +9,7 @@ public interface IAdminRepository
     Task<IEnumerable<UserDto>> GetAllUsers();
     Task<UserDto> GetUserById(string id);
     Task DeleteUser(string id);
-    Task BanUser(BanUserDto data);
+    Task<BannedUser> BanUser(string id, BanUserDto data);
     Task UpdateUserRole(string id, string role);
     Task<IEnumerable<BannedUser>> GetBannedUsers();
 }

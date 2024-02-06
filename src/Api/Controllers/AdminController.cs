@@ -69,11 +69,14 @@ namespace ECommerce.Controllers
 
         // PUT: api/admin/users/{id}/ban
         [HttpPut("users/{id}/ban")]
-        public ActionResult BanUser(string id, [FromBody] BanUserDto data)
+        public async Task<ActionResult> BanUser(string id, [FromBody] BanUserDto data)
         {
             try {
-                _repository.BanUser(data);
-                return Ok("Successfully banned user");
+                var bannedUser = await _repository.BanUser(id, data);
+                return Ok(new {
+                    message = "User has been banned",
+                    bannedUser
+                });
             } catch (ArgumentException e)
             {
                 return BadRequest(e.Message);
@@ -85,10 +88,10 @@ namespace ECommerce.Controllers
 
         // GET: api/admin/banned-users
         [HttpGet("banned-users")]
-        public ActionResult<IEnumerable<BannedUser>> GetBannedUsers()
+        public async Task<ActionResult<IEnumerable<BannedUser>>> GetBannedUsers()
         {
             try {
-                return Ok(_repository.GetBannedUsers());
+                return Ok(await _repository.GetBannedUsers());
             } catch (Exception e)
             {
                 return StatusCode(500, e.Message);

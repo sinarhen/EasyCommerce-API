@@ -90,13 +90,17 @@ public class AdminRepository: BaseRepository, IAdminRepository
         throw new NotImplementedException();
     }
 
-    public async Task BanUser(BanUserDto data)
+    public async Task<BannedUser> BanUser(string id, BanUserDto data)
     {
         var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.Id == data.UserId) ?? throw new ArgumentException("User not found");
+            .AnyAsync(u => u.Id == id);
 
+        if (!user)
+        {
+            throw new ArgumentException("User not found");
+        }
 
-        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
+        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == id);
         if (isBanned)
         {
             throw new ArgumentException("User is already banned");
@@ -104,16 +108,15 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         var bannedUser = new BannedUser
         {
-            UserId = user.Id,
+            UserId = id,
             Reason = data.Reason,
             BanEndTime = data.BanEndTime ?? DateTime.MaxValue,
             BanStartTime = DateTime.UtcNow
-        }; 
-
+        };
         await _db.BannedUsers.AddAsync(bannedUser);
         await _db.SaveChangesAsync();
 
-        
+        return bannedUser;
     }
 
     public async Task<IEnumerable<BannedUser>> GetBannedUsers()
