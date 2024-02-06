@@ -74,7 +74,10 @@ public class ProductController : GenericController
         {
             var product = await _repository.CreateProductAsync(productDto, GetUserId(), IsAdmin());
             
-            return StatusCode(201);
+            return StatusCode(201, new {
+                Id = product.Id
+            
+            });
         }
         catch (ArgumentException e)
         {
