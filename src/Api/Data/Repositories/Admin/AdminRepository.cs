@@ -38,7 +38,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
         foreach (var user in users)
         {
             var roles = await GetUserRoles(user);
-            var highestRole = GetHighestUserRole(roles);
+            var highestRole = UserRoles.GetHighestUserRole(roles);
             var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
             var userDto = new UserDto
@@ -57,18 +57,13 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         return userDtos;
     }
-    private static string GetHighestUserRole(IEnumerable<string> roles)
-    {
-        var highestRole = roles.MaxBy(r => UserRoles.RoleHierarchy[r ?? UserRoles.Customer]);
-        return highestRole ?? UserRoles.Customer;
-    }
 
     public async Task<UserDto> GetUserById(string id)
     {
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
         var roles = await GetUserRoles(user);
-        var highestRole = GetHighestUserRole(roles);
+        var highestRole = UserRoles.GetHighestUserRole(roles);
         var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
         var userDto = new UserDto

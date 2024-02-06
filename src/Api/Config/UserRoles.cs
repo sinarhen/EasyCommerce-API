@@ -14,4 +14,12 @@ public static class UserRoles
         { Seller, 2 },
         { Customer, 1 }
     };
+
+    public static string GetHighestUserRole(IEnumerable<string> roles)
+    {
+        var highestRole = roles.MaxBy(r => RoleHierarchy[r ?? Customer]);
+        return highestRole ?? Customer;
+    }
+
+    
 }

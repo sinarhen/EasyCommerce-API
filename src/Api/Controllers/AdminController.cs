@@ -11,7 +11,7 @@ namespace ECommerce.Controllers
     [ApiController]
     [Authorize(Policy = Policies.AdminPolicy)]
     [Route("api/admin")]
-    public class AdminController : ControllerBase
+    public class AdminController : GenericController
     {
         private readonly IAdminRepository _repository;
 
@@ -117,12 +117,20 @@ namespace ECommerce.Controllers
         }
         
 
-        [Authorize(Policy = Policies.SuperAdminPolicy)]
+        [Authorize(Policy = Policies.AdminPolicy)]
         [HttpPut("users/{id}/role")]
-        public ActionResult UpdateUserRole(int id, [FromBody] string role)
+        public ActionResult UpdateUserRole(string id, [FromBody] string role)
         {
-            // TODO: Implement logic to update user's role by id
-            throw new NotImplementedException();
+            try {
+                _repository.UpdateUserRole(id, role, UserRoles.GetHighestUserRole(GetUserRoles()));
+                return Ok("User role has been updated");
+            } catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
         
     }
