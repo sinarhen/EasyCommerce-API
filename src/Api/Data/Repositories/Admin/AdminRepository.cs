@@ -59,9 +59,28 @@ public class AdminRepository: BaseRepository, IAdminRepository
         return highestRole ?? UserRoles.Customer;
     }
 
-    public Task<UserDto> GetUserById(int id)
+    public async Task<UserDto> GetUserById(string id)
     {
-        throw new NotImplementedException();
+        var user = await _db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new ArgumentException("User not found");
+
+        var roles = await GetUserRoles(user.Id);
+        var highestRole = GetHighestUserRole(roles);
+        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
+
+        var userDto = new UserDto
+        {
+            Id = user.Id,
+            Username = user.UserName,
+            Email = user.Email,
+            Role = highestRole,
+            IsBanned = isBanned,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt
+        };
+
+        return userDto;
     }
 
     public Task DeleteUser(string id)

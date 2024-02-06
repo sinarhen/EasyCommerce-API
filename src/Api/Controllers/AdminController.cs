@@ -37,16 +37,33 @@ namespace ECommerce.Controllers
         [HttpDelete("users/{id}")]
         public ActionResult DeleteUser(string id)
         {
-            // TODO: Implement logic to delete specific user by id
-            throw new NotImplementedException();
+            try {
+                _repository.DeleteUser(id);
+                return Ok("Successfully deleted user");
+            } catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
         // GET: api/admin/users/{id}
         [HttpGet("users/{id}")]
-        public ActionResult<User> GetUserById(string id)
+        public async Task<ActionResult<User>> GetUserById(string id)
         {
-            // TODO: Implement logic to get user by id
-            throw new NotImplementedException();
+            try {
+                var user = await _repository.GetUserById(id);
+
+                return Ok(user);
+            } catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
         // PUT: api/admin/users/{id}/ban

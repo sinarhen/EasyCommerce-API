@@ -6,8 +6,8 @@ namespace ECommerce.Data.Repositories.Admin;
 public interface IAdminRepository
 {
     Task<IEnumerable<UserDto>> GetAllUsers();
-    Task<UserDto> GetUserById(int id);
-    Task DeleteUser(int id);
-    Task BanUser(int id);
-    Task UpdateUserRole(int id, string role);
+    Task<UserDto> GetUserById(string id);
+    Task DeleteUser(string id);
+    Task BanUser(string id);
+    Task UpdateUserRole(string id, string role);
 }
