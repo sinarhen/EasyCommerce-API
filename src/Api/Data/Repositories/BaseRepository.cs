@@ -206,6 +206,14 @@ public class BaseRepository
                     })
                     .OrderBy(pc => pc.Order)
                     .ToArray(),
+                Images = p.Images
+                    .Select(i => new ProductImageDto
+                    {
+                        ColorId = i.ColorId,
+                        ImageUrls = i.ImageUrls
+                    })
+                    .ToList(),
+
                 Occasion = new IdNameDto
                 {
                     Id = p.Occasion.Id,
@@ -260,7 +268,6 @@ public class BaseRepository
                     Id = p.Collection.Id,
                     Name = p.Collection.Name
                 },
-
                 Categories = p.Categories
                     .Select(pc => new ProductCategoryDto
                     {
@@ -274,12 +281,18 @@ public class BaseRepository
                 {
                     Id = p.Occasion.Id,
                     Name = p.Occasion.Name
-                }
-                ,
+                },
+                Images = p.Images
+                    .Select(i => new ProductImageDto
+                    {
+                        ColorId = i.ColorId,
+                        ImageUrls = i.ImageUrls
+                    })
+                    .ToList(),
                 MainMaterial = new IdNameDto
                 {
-                    Id = p.Materials.MaxBy(m => m.Percentage).Material.Id,
-                    Name = p.Materials.MaxBy(m => m.Percentage).Material.Name
+                    Id = p.Materials.First().Material.Id,
+                    Name = p.Materials.First().Material.Name
                 },
                 Materials = p.Materials
                     .Select(pm => new MaterialDto
@@ -294,7 +307,9 @@ public class BaseRepository
                     {
                         Id = ps.Size.Id,
                         Name = ps.Size.Name,
-                        Quantity = ps.Stock
+                        Quantity = ps.Stock,
+                        Value = ps.Size.Value,
+                        IsAvailable = ps.Stock > 0
                     })
                     .ToList(),
                 Reviews = p.Reviews.Select(r => new ReviewDto {
