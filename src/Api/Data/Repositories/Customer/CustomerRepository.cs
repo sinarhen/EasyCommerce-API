@@ -22,6 +22,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     public async Task<UserReviewsDto> GetReviewsForUser(string userId)
     {
         var reviews = await _db.Reviews
+                .AsNoTracking()
                 .Where(r => r.CustomerId == userId)
                 .Select(r => new ReviewDto
                 {
@@ -44,7 +45,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         var user = await _userManager.FindByIdAsync(userId);
         var roles = await _userManager.GetRolesAsync(user);
 
-        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
+        var isBanned = await _db.BannedUsers.AsNoTracking().AnyAsync(b => b.UserId == user.Id);
         return new UserReviewsDto
         {
             User = new UserDto
