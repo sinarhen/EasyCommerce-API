@@ -1,23 +1,27 @@
 using AutoMapper;
+using Data.Repositories.Customer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/customer/{customerId}")]
+[Authorize]
 public class CustomerController : GenericController
 {
-    public CustomerController(IMapper mapper) : base(mapper)
+    private readonly ICustomerRepository _repository;
+    public CustomerController(IMapper mapper, ICustomerRepository repository) : base(mapper)
     {
+        _repository = repository;
     }
 
     [HttpGet("reviews")]
     public async Task<IActionResult> GetReviewsForUser()
     {
         try {
-            
-            
-            string res = null;
+            var res = await _repository.GetReviewsForUser(GetUserId());
+
             return Ok(res);
         } 
         catch (UnauthorizedAccessException e) {

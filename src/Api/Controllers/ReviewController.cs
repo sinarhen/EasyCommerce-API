@@ -1,9 +1,5 @@
-using System.Security.Claims;
 using AutoMapper;
 using Data.Repositories.Review;
-using ECommerce.Config;
-using ECommerce.Data.Repositories.Billboard;
-using ECommerce.Models.DTOs.Billboard;
 using ECommerce.Models.DTOs.Review;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

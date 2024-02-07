@@ -1,5 +1,6 @@
 using ECommerce.Data;
 using ECommerce.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories.Customer;
 
@@ -8,8 +9,11 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     public CustomerRepository(ProductDbContext context) : base(context)
     {
     }
-    Task<List<ECommerce.Models.Entities.Review>> ICustomerRepository.GetReviewsForUser(string userId)
+
+
+    public async Task<List<ECommerce.Models.Entities.Review>> GetReviewsForUser(string userId)
     {
-        throw new NotImplementedException();
+        // TODO: Return product name for each review
+        return await _db.Reviews.Where(r => r.CustomerId == userId).ToListAsync();
     }
 }
