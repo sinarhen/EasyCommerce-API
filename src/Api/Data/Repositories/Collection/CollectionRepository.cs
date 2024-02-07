@@ -1,8 +1,10 @@
 ﻿using ECommerce.Config;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Collection;
+using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Collection;

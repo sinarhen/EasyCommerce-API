@@ -12,6 +12,7 @@ namespace ECommerce.Data.Repositories;
 public class BaseRepository
 {
     protected readonly ProductDbContext _db;
+    
 
     protected BaseRepository(ProductDbContext db)
     {
