@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ECommerce.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
@@ -21,13 +22,4 @@ public class Order : BaseEntity
     public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     
-}
-
-public enum OrderStatus
-{
-    Pending,
-    Processing,
-    Shipped,
-    Delivered,
-    Cancelled
 }

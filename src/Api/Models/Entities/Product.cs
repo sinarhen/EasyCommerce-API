@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ECommerce.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
@@ -44,21 +45,4 @@ public class Product : BaseEntity
     
     // public ICollectiion<CartProduct> Carts { get; set; } = new List<CartProduct>();
     // Unnecessary because we don't need to know which carts a product is in and how many of them   
-}
-
-public enum Gender
-{
-    Male,
-    Female,
-    Unisex
-}
-
-public enum Season
-{
-    Winter,
-    Spring,
-    Summer,
-    Autumn,
-    All,
-    DemiSeason,
 }

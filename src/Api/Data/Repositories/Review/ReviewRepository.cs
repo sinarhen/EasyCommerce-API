@@ -1,5 +1,6 @@
 using ECommerce.Data;
 using ECommerce.Data.Repositories;
+using ECommerce.Models.DTOs.Review;
 
 namespace Data.Repositories.Review;
 public class ReviewRepository : BaseRepository, IReviewRepository
@@ -8,12 +9,12 @@ public class ReviewRepository : BaseRepository, IReviewRepository
     {
     }
 
-    public Task<ECommerce.Models.Entities.Review> CreateReviewForProduct(Guid productId)
+    public Task<ECommerce.Models.Entities.Review> CreateReviewForProduct(Guid productId, string userId, CreateReviewDto createReviewDto)
     {
         throw new NotImplementedException();
     }
 
-    public Task DeleteReviewForCollectionAsync(Guid reviewId)
+    public Task DeleteReviewForCollectionAsync(Guid reviewId, string userId)
     {
         throw new NotImplementedException();
     }
