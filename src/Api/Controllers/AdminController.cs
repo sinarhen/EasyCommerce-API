@@ -120,16 +120,21 @@ namespace ECommerce.Controllers
 
         [Authorize(Policy = Policies.AdminPolicy)]
         [HttpPut("users/{id}/role")]
-        public ActionResult UpdateUserRole(string id, [FromBody] ChangeUserRoleDto dto)
+        public async Task<ActionResult> UpdateUserRole(string id, [FromBody] ChangeUserRoleDto dto)
         {
             try {
-                _repository.UpdateUserRole(id, dto.Role, UserRoles.GetHighestUserRole(GetUserRoles()));
-                return Ok("User role has been updated");
+                await _repository.UpdateUserRole(id, dto.Role, UserRoles.GetHighestUserRole(GetUserRoles()));
+                return Ok(
+                    new {
+                        message = "User role has been updated"
+                    }
+                );
             } catch (ArgumentException e)
             {
                 return BadRequest(e.Message);
             } catch (Exception e)
             {
+                Console.WriteLine(e);
                 return StatusCode(500, e.Message);
             }
         }

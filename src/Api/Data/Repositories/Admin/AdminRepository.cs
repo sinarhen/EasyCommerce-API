@@ -38,7 +38,6 @@ public class AdminRepository: BaseRepository, IAdminRepository
         foreach (var user in users)
         {
             var roles = await GetUserRoles(user);
-            var highestRole = UserRoles.GetHighestUserRole(roles);
             var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
             var userDto = new UserDto
@@ -46,7 +45,11 @@ public class AdminRepository: BaseRepository, IAdminRepository
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                Role = highestRole,
+                Roles = roles.Select(r => new RoleDto
+                {
+                    Name = r,
+                    Level = UserRoles.RoleHierarchy[r]
+                }).ToList(),
                 IsBanned = isBanned,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
@@ -63,7 +66,6 @@ public class AdminRepository: BaseRepository, IAdminRepository
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
         var roles = await GetUserRoles(user);
-        var highestRole = UserRoles.GetHighestUserRole(roles);
         var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
         var userDto = new UserDto
@@ -71,7 +73,11 @@ public class AdminRepository: BaseRepository, IAdminRepository
             Id = user.Id,
             Username = user.UserName,
             Email = user.Email,
-            Role = highestRole,
+            Roles = roles.Select(r => new RoleDto
+                {
+                    Name = r,
+                    Level = UserRoles.RoleHierarchy[r]
+                }).ToList(),
             IsBanned = isBanned,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt
@@ -139,9 +145,16 @@ public class AdminRepository: BaseRepository, IAdminRepository
     {
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
+        Console.WriteLine("USER:", user);
         var userRoles = await GetUserRoles(user);
         
-        if (userRoles.Contains(role))
+        Console.WriteLine("USER ROLES:");
+        foreach (var r in userRoles)
+        {
+            Console.WriteLine(r);
+            
+        }
+        if (UserRoles.GetHighestUserRole(userRoles) == role)
         {
             throw new ArgumentException("User already in this role");
         }
@@ -150,22 +163,22 @@ public class AdminRepository: BaseRepository, IAdminRepository
         {
             throw new ArgumentException("You cannot assign a role higher than your own or equal to your role");
         }
+        var allRoles = UserRoles.GetAllRoles();
 
         var level = UserRoles.RoleHierarchy[role];
-        var rolesToRemove = userRoles.Where(r => UserRoles.RoleHierarchy[r] > level);
-        var result = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
-        if (!result.Succeeded)
+        var highestRole = UserRoles.GetHighestUserRole(userRoles);
+        if (UserRoles.RoleHierarchy[highestRole] > UserRoles.RoleHierarchy[role])
         {
-            throw new Exception("Failed to remove user from roles");
+            // remove all roles that are higher than the new role
+            var rolesToRemove = allRoles.Where(r => r != UserRoles.Customer && UserRoles.RoleHierarchy[r] > level && userRoles.Contains(r));
+            await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
         }
-        var rolesToAdd = userRoles.Where(r => UserRoles.RoleHierarchy[r] <= level);
-        result = await _userManager.AddToRolesAsync(user, rolesToAdd);
-        if (!result.Succeeded)
+        else if (UserRoles.RoleHierarchy[highestRole] < UserRoles.RoleHierarchy[role])
         {
-            throw new Exception("Failed to add user to roles");
+            // add all roles that are lower than the new role
+            var rolesToAdd = allRoles.Where(r => UserRoles.RoleHierarchy[r] <= level && !userRoles.Contains(r));
+            await _userManager.AddToRolesAsync(user, rolesToAdd);
         }
-
-
         await SaveChangesAsyncWithTransaction();
         return;
 

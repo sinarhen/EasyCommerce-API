@@ -21,5 +21,14 @@ public static class UserRoles
         return highestRole ?? Customer;
     }
 
-    
+    public static List<string> GetAllRoles()
+    {
+        return new List<string>
+        {
+            Customer,
+            Seller,
+            Admin,
+            SuperAdmin
+        };
+    }
 }
