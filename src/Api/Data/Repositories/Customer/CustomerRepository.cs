@@ -1,19 +1,25 @@
+using ECommerce.Config;
 using ECommerce.Data;
 using ECommerce.Data.Repositories;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
+using ECommerce.Models.DTOs.User;
+using ECommerce.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories.Customer;
 
 public class CustomerRepository : BaseRepository, ICustomerRepository
 {
-    public CustomerRepository(ProductDbContext context) : base(context)
+    private readonly UserManager<User> _userManager;
+    public CustomerRepository(ProductDbContext context, UserManager<User> userManager) : base(context)
     {
+        _userManager = userManager;
     }
 
 
-    public async Task<List<UserReviewsDto>> GetReviewsForUser(string userId)
+    public async Task<UserReviewsDto> GetReviewsForUser(string userId)
     {
         var reviews = await _db.Reviews
                 .Where(r => r.CustomerId == userId)
@@ -36,6 +42,24 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                 })
                 .ToListAsync();
 
-        var user = await 
+        var user = await _userManager.FindByIdAsync(userId);
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
+        return new UserReviewsDto
+        {
+            User = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Username = user.FirstName,
+                ImageUrl = user.ImageUrl,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt,
+                Role = UserRoles.GetHighestUserRole(roles),
+                IsBanned = isBanned
+            },
+            Reviews = reviews
+        }; 
     }
 }

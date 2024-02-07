@@ -45,11 +45,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                Roles = roles.Select(r => new RoleDto
-                {
-                    Name = r,
-                    Level = UserRoles.RoleHierarchy[r]
-                }).ToList(),
+                Role = UserRoles.GetHighestUserRole(roles),
                 IsBanned = isBanned,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
@@ -73,11 +69,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
             Id = user.Id,
             Username = user.UserName,
             Email = user.Email,
-            Roles = roles.Select(r => new RoleDto
-                {
-                    Name = r,
-                    Level = UserRoles.RoleHierarchy[r]
-                }).ToList(),
+            Role = UserRoles.GetHighestUserRole(roles),
             IsBanned = isBanned,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt

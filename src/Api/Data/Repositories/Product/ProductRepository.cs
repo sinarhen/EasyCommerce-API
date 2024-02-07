@@ -273,17 +273,7 @@ public class ProductRepository: BaseRepository, IProductRepository
                     })
                     .ToList(),
                 Reviews = p.Reviews.Select(r => new ReviewDto {
-                    Customer = new UserDto
-                    {
-                        Id = r.User.Id,
-                        Username = r.User.UserName,
-                        Email = r.User.Email,
-                        ImageUrl = r.User.ImageUrl,
-                        CreatedAt = r.User.CreatedAt,
-                        UpdatedAt = r.User.UpdatedAt,
-                        Role = UserRoles.GetHighestUserRole(_userManager.GetRolesAsync(r.User).Result),    
-
-                    },
+                    UserId = r.CustomerId,
                     Title = r.Title,
                     Content = r.Content,
                     Rating = r.Rating,
