@@ -63,4 +63,9 @@ public class ReviewRepository : BaseRepository, IReviewRepository
         _db.Reviews.Remove(review);
         await SaveChangesAsyncWithTransaction();
     }
+
+    public Task<List<ECommerce.Models.Entities.Review>> GetReviewsForUser(string userId)
+    {
+        throw new NotImplementedException();
+    }
 }
