@@ -13,25 +13,29 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     }
 
 
-    public async Task<List<ReviewDto>> GetReviewsForUser(string userId)
+    public async Task<List<UserReviewsDto>> GetReviewsForUser(string userId)
     {
-        return 
-            await _db.Reviews
+        var reviews = await _db.Reviews
                 .Where(r => r.CustomerId == userId)
                 .Select(r => new ReviewDto
                 {
                     Id = r.Id,
-                    Rating = r.Rating,
+                    UserId = r.CustomerId,
+                    Title = r.Title,
                     Content = r.Content,
-                    CustomerName = r.User.UserName,
+                    Rating = r.Rating,
+                    CreatedAt = r.CreatedAt,
                     Product = new ReviewProductDto
                     {
                         Id = r.Product.Id,
                         Name = r.Product.Name,
                         Description = r.Product.Description,
-                        ImageUrl = r.Product.Images.FirstOrDefault().ImageUrls.FirstOrDefault(),
+                        Price = r.Product.Stocks.MinBy(s => s.Price).Price,
+                        ImageUrl = r.Product.Images.FirstOrDefault().ImageUrls.FirstOrDefault()
                     }
                 })
                 .ToListAsync();
+
+        var user = await 
     }
 }

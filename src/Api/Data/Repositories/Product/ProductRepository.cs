@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using ECommerce.Config;
 using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Material;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Size;
+using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Product;
@@ -15,9 +18,11 @@ public class ProductRepository: BaseRepository, IProductRepository
 {
     
     private readonly IMapper _mapper;
-    public ProductRepository(ProductDbContext db, IMapper mapper) : base(db)
+    private readonly UserManager<User> _userManager;
+    public ProductRepository(ProductDbContext db, UserManager<User> userManager, IMapper mapper) : base(db)
     {
         _mapper = mapper;
+        _userManager = userManager;
     }
     
     
@@ -268,7 +273,17 @@ public class ProductRepository: BaseRepository, IProductRepository
                     })
                     .ToList(),
                 Reviews = p.Reviews.Select(r => new ReviewDto {
-                    CustomerName = r.User.UserName,
+                    Customer = new UserDto
+                    {
+                        Id = r.User.Id,
+                        Username = r.User.UserName,
+                        Email = r.User.Email,
+                        ImageUrl = r.User.ImageUrl,
+                        CreatedAt = r.User.CreatedAt,
+                        UpdatedAt = r.User.UpdatedAt,
+                        Role = UserRoles.GetHighestUserRole(_userManager.GetRolesAsync(r.User).Result),    
+
+                    },
                     Title = r.Title,
                     Content = r.Content,
                     Rating = r.Rating,

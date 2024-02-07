@@ -64,13 +64,4 @@ public class ReviewRepository : BaseRepository, IReviewRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public async Task<List<ECommerce.Models.Entities.Review>> GetReviewsForUser(string userId)
-    {
-        if (! await _db.Users.AnyAsync(u => u.Id == userId))
-        {
-            throw new ArgumentException("User not found");
-        }
-
-        return await _db.Reviews.Where(r => r.CustomerId == userId).ToListAsync();
-    }
 }
