@@ -2,8 +2,6 @@ using ECommerce.Data;
 using ECommerce.Data.Repositories;
 using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Review;
-using ECommerce.Models.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories.Review;
@@ -46,8 +44,23 @@ public class ReviewRepository : BaseRepository, IReviewRepository
         return review;
     }
 
-    public Task DeleteReviewForCollectionAsync(Guid reviewId, string userId)
+    public async Task DeleteReviewForCollectionAsync(Guid reviewId, string userId)
     {
-        throw new NotImplementedException();
+        
+        if (!await _db.Users.AnyAsync(u => u.Id == userId))
+        {
+            throw new ArgumentException("User not found");
+        }
+
+        var review = await _db.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId) 
+            ?? throw new ArgumentException("Review not found");
+
+        if (review.CustomerId != userId)
+        {
+            throw new UnauthorizedAccessException("You are not allowed to delete this review");
+        }
+
+        _db.Reviews.Remove(review);
+        await SaveChangesAsyncWithTransaction();
     }
 }
