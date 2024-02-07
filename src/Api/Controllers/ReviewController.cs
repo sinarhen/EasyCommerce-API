@@ -4,13 +4,14 @@ using Data.Repositories.Review;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Billboard;
 using ECommerce.Models.DTOs.Billboard;
+using ECommerce.Models.DTOs.Review;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers;
 
 [ApiController]
-[Route("api/reviews")]
+[Route("api/products/{productId}/reviews")]
 public class ReviewController : GenericController
 {
     private readonly IReviewRepository _repository;
@@ -41,13 +42,13 @@ public class ReviewController : GenericController
     //     }
     // }
 
-    [HttpPost("{productId}")]
+    [HttpPost]
     [Authorize(Policy = Policies.CustomerPolicy)]
-    public async Task<IActionResult> CreateReviewForProduct(Guid productId) // TODO: [FromBody] CreateReviewDto createReviewDto
+    public async Task<IActionResult> CreateReviewForProduct(Guid productId, CreateReviewDto createReviewDto)
     {
         try {
-            //TODO: Implement
-            throw new NotImplementedException();
+            var res = await _repository.CreateReviewForProduct(productId, GetUserId(), createReviewDto);
+            return Ok(res);
         } 
         catch (UnauthorizedAccessException e) {
             return Unauthorized(e.Message);

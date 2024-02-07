@@ -1,5 +1,6 @@
 using ECommerce.Data;
 using ECommerce.Data.Repositories;
+using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Review;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -24,12 +25,18 @@ public class ReviewRepository : BaseRepository, IReviewRepository
         {
             throw new ArgumentException("Product not found");
         }
+        if (Enum.IsDefined(typeof(Rating), createReviewDto.Rating) == false)
+        {
+            throw new ArgumentException("Invalid rating. Must be integer number between 1 and 5");
+        }
 
+        
         var review = new ECommerce.Models.Entities.Review
         {
             ProductId = productId,
             CustomerId = userId,
-            Rating = createReviewDto.Rating,
+            Title = createReviewDto.Title,
+            Rating = createReviewDto.Rating ,
             Content = createReviewDto.Content
         };
 
