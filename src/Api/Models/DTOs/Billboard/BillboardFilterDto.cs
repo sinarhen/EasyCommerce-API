@@ -1,3 +1,4 @@
+using ECommerce.Entities.Enum;
 using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.Billboard;

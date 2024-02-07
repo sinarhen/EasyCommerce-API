@@ -1,4 +1,5 @@
 ﻿using ECommerce.Config;
+using ECommerce.Entities.Enum;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

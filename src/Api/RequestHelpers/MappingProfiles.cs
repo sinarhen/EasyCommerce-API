@@ -112,17 +112,17 @@ public class MappingProfiles: Profile
 
         CreateMap<Product, ProductDetailsDto>()
             .IncludeBase<Product, ProductDto>()
-            .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews
-                .Select(r => new ReviewDto
-                {
-                    Title = r.Title,
-                    Content = r.Content,
-                    Rating = r.Rating,
-                    CreatedAt = r.CreatedAt
-                })
-            ))
-            .ForMember(dest => dest.Colors, opt => opt.Ignore())
-            .ForMember(dest => dest.Sizes, opt => opt.Ignore())
+            // .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews
+            //     .Select(r => new ReviewDto
+            //     {
+            //         Title = r.Title,
+            //         Content = r.Content,
+            //         Rating = r.Rating,
+            //         CreatedAt = r.CreatedAt
+            //     })
+            // ))
+            // .ForMember(dest => dest.Colors, opt => opt.Ignore())
+            // .ForMember(dest => dest.Sizes, opt => opt.Ignore())
             ;
     }
 }

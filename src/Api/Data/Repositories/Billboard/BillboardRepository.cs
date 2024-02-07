@@ -1,3 +1,4 @@
+using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Billboard;
 using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;

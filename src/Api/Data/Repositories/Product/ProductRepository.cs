@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;

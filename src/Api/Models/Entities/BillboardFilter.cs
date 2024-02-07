@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ECommerce.Entities.Enum;
 
 namespace ECommerce.Models.Entities;
 
