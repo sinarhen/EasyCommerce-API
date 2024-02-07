@@ -104,7 +104,6 @@ public class ReviewController : GenericController
             return StatusCode(500, e.Message);
 
         }
-    
     }
 
 }

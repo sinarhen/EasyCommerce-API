@@ -102,9 +102,10 @@ public class AuthController : GenericController
         });
     }
 
-    [HttpGet("validate/{token}")]
-    public ActionResult<SimplePrincipal> ValidateToken(string token)
+    [HttpGet("me")]
+    public ActionResult<SimplePrincipal> ValidateToken()
     {
+        var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
         var principal = _jwtService.ValidateToken(token);
         if (principal == null)
         {
@@ -190,5 +191,7 @@ public class AuthController : GenericController
             });
 
     }
+
+    
     
 }
