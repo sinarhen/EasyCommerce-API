@@ -90,8 +90,8 @@ public class ReviewController : GenericController
     public async Task<IActionResult> DeleteReview(Guid reviewId)
     {
         try {
-            //TODO: Implement
-            throw new NotImplementedException();
+            await _repository.DeleteReviewForCollectionAsync(reviewId, GetUserId());
+            return Ok();
         } 
         catch (UnauthorizedAccessException e) {
             return Unauthorized(e.Message);
