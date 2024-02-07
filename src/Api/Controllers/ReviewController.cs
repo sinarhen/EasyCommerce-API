@@ -43,7 +43,7 @@ public class ReviewController : GenericController
     // }
 
     [HttpPost]
-    [Authorize(Policy = Policies.CustomerPolicy)]
+    [Authorize]
     public async Task<IActionResult> CreateReviewForProduct(Guid productId, CreateReviewDto createReviewDto)
     {
         try {
@@ -86,7 +86,7 @@ public class ReviewController : GenericController
     // } Probably not needed
 
     [HttpDelete("{reviewId}")]
-    [Authorize(Policy = Policies.CustomerPolicy)]
+    [Authorize]
     public async Task<IActionResult> DeleteReview(Guid reviewId)
     {
         try {
