@@ -26,7 +26,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                 .Select(r => new ReviewDto
                 {
                     Id = r.Id,
-                    UserId = r.CustomerId,
                     Title = r.Title,
                     Content = r.Content,
                     Rating = r.Rating,

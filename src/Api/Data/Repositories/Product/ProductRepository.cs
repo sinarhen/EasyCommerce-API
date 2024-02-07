@@ -273,14 +273,19 @@ public class ProductRepository: BaseRepository, IProductRepository
                     })
                     .ToList(),
                 Reviews = p.Reviews.Select(r => new ReviewDto {
-                    UserId = r.CustomerId,
+                    User = new UserDto
+                    {
+                        Id = r.User.Id,
+                        Username = r.User.UserName,
+                        ImageUrl = r.User.ImageUrl
+                    },
                     Title = r.Title,
                     Content = r.Content,
                     Rating = r.Rating,
                     CreatedAt = r.CreatedAt,
 
                 }).ToList(),
-                
+            
                 SizeChartImageUrl = p.SizeChartImageUrl,
 
                 Name = p.Name,
