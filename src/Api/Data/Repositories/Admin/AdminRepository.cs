@@ -4,6 +4,7 @@ using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 
 namespace ECommerce.Data.Repositories.Admin;
 
@@ -176,14 +177,39 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
     }
 
-    public Task<IEnumerable<SellerUpgradeRequestDto>> GetSellerUpgradeRequests()
+    public async Task<IEnumerable<SellerUpgradeRequestDto>> GetSellerUpgradeRequests()
     {
-        throw new NotImplementedException();
+        return await _db.SellerUpgradeRequests
+            .AsNoTracking()
+            .Select(r => new SellerUpgradeRequestDto
+            {
+                Id = r.Id,
+                Status = r.Status.GetDisplayName(),
+                DecidedAt = r.DecidedAt,
+            })
+            .ToListAsync();
     }
 
-    public Task<SellerUpgradeRequestDetailsDto> GetSellerUpgradeRequestById(Guid id)
+    public async Task<SellerUpgradeRequestDetailsDto> GetSellerUpgradeRequestById(Guid id)
     {
-        throw new NotImplementedException();
+        return await _db.SellerUpgradeRequests
+            .AsNoTracking()
+            .Where(r => r.Id == id)
+            .Select(r => new SellerUpgradeRequestDetailsDto
+            {
+                Id = r.Id,
+                Status = r.Status.GetDisplayName(),
+                DecidedAt = r.DecidedAt,
+                Message = r.Message,
+                SellerInfo = new SellerInfoDto
+                {
+                    Name = r.SellerInfo.CompanyName,
+                    Description = r.SellerInfo.CompanyDescription,
+                    Email = r.SellerInfo.CompanyEmail,
+                    PhoneNumber = r.SellerInfo.CompanyPhone
+                }
+            })
+            .FirstOrDefaultAsync();
     }
 
     public Task ApproveSellerUpgradeRequest(Guid id, string message)
