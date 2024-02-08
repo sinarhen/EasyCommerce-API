@@ -89,7 +89,13 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         {
             throw new ArgumentException("Company phone number is required");
         }
+
+        var nameExists = await _db.SellerUpgradeRequests.Where(req => req.Status == SellerUpgradeRequestStatus.Approved &&  sellerInfo.Name == req.SellerInfo.CompanyName ).AnyAsync();
         
+        if (nameExists)
+        {
+            throw new ArgumentException("Company name already exists");
+        }
 
         await CheckIfUserIsSeller(userId);
         var seller = new SellerInfo
