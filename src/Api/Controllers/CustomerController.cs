@@ -1,5 +1,6 @@
 using AutoMapper;
 using Data.Repositories.Customer;
+using ECommerce.Models.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,21 +39,24 @@ public class CustomerController : GenericController
     }
 
     [HttpGet("upgrade")]
-    public async Task<IActionResult> UpgradeToSeller()
+    public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoDto sellerInfo = null)
     {
-        try {
-            var res = await _repository.UpgradeToSeller(GetUserId());
+        try
+        {
+            var res = await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
 
             return Ok(res);
-        } 
-        catch (UnauthorizedAccessException e) {
+        }
+        catch (UnauthorizedAccessException e)
+        {
             return Unauthorized(e.Message);
         }
         catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             return StatusCode(500, e.Message);
 
         }

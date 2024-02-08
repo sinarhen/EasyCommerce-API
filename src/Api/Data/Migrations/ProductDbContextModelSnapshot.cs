@@ -764,7 +764,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SellerInfos");
+                    b.ToTable("Sellers");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.SellerUpgradeRequests", b =>
@@ -964,8 +964,7 @@ namespace ECommerce.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("SellerInfoId")
-                        .IsUnique();
+                    b.HasIndex("SellerInfoId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -1427,8 +1426,8 @@ namespace ECommerce.Data.Migrations
                         .HasForeignKey("ECommerce.Models.Entities.User", "CartId");
 
                     b.HasOne("ECommerce.Models.Entities.SellerInfo", "SellerInfo")
-                        .WithOne("User")
-                        .HasForeignKey("ECommerce.Models.Entities.User", "SellerInfoId");
+                        .WithMany()
+                        .HasForeignKey("SellerInfoId");
 
                     b.Navigation("Cart");
 
@@ -1549,11 +1548,6 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Stocks");
-                });
-
-            modelBuilder.Entity("ECommerce.Models.Entities.SellerInfo", b =>
-                {
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Size", b =>

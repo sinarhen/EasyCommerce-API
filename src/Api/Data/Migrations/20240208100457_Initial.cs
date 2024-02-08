@@ -107,7 +107,7 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SellerInfos",
+                name: "Sellers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -155,7 +155,7 @@ namespace ECommerce.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SellerInfos", x => x.Id);
+                    table.PrimaryKey("PK_Sellers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -234,9 +234,9 @@ namespace ECommerce.Data.Migrations
                         principalTable: "Carts",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_SellerInfos_SellerInfoId",
+                        name: "FK_AspNetUsers_Sellers_SellerInfoId",
                         column: x => x.SellerInfoId,
-                        principalTable: "SellerInfos",
+                        principalTable: "Sellers",
                         principalColumn: "Id");
                 });
 
@@ -863,8 +863,7 @@ namespace ECommerce.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_SellerInfoId",
                 table: "AspNetUsers",
-                column: "SellerInfoId",
-                unique: true);
+                column: "SellerInfoId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -1118,7 +1117,7 @@ namespace ECommerce.Data.Migrations
                 name: "Carts");
 
             migrationBuilder.DropTable(
-                name: "SellerInfos");
+                name: "Sellers");
         }
     }
 }

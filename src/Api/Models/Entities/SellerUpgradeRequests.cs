@@ -10,8 +10,11 @@ public class SellerUpgradeRequests : BaseEntity
     public string Message { get; set; }
     public DateTime? DecidedAt { get; set; }
 
+    public Guid SellerInfoId { get; set; }
 
-
+    [ForeignKey("SellerInfoId")]
+    public SellerInfo SellerInfo { get; set; }
+    
     [ForeignKey("UserId")]
     public User User { get; set; }   
 }

@@ -63,7 +63,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         }; 
     }
 
-    public async Task<bool> UpgradeToSeller(string userId, SellerInfoDto sellerInfo)
+    public async Task<bool> RequestUpgradingToSeller(string userId, SellerInfoDto sellerInfo)
     {
         await CheckIfUserIsSeller(userId);
         var seller = new SellerInfo
@@ -74,6 +74,11 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             CompanyPhone = sellerInfo.PhoneNumber,
         };
         await _db.Sellers.AddAsync(seller);
+        await _db.SellerUpgradeRequests.AddAsync(new SellerUpgradeRequests
+        {
+            UserId = userId,
+            SellerInfoId = seller.Id
+        });
         await SaveChangesAsyncWithTransaction();
         return true;
     }
