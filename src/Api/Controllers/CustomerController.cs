@@ -22,7 +22,7 @@ public class CustomerController : GenericController
     {
         try {
             var res = await _repository.GetReviewsForUser(GetUserId());
-
+            
             return Ok(res);
         } 
         catch (UnauthorizedAccessException e) {
@@ -45,7 +45,7 @@ public class CustomerController : GenericController
         {
             var res = await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
 
-            return Ok(res);
+            return Ok(res ? "Successfully requested to upgrade to seller" : "Failed to request to upgrade to seller");
         }
         catch (UnauthorizedAccessException e)
         {
