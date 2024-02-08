@@ -6,5 +6,6 @@ public interface ICustomerRepository
 {
     Task<UserReviewsDto> GetReviewsForUser(string userId);
 
+    Task<bool> UpgradeToSeller(string userId);
 
 }

@@ -36,4 +36,25 @@ public class CustomerController : GenericController
 
         }
     }
+
+    [HttpGet("upgrade")]
+    public async Task<IActionResult> UpgradeToSeller()
+    {
+        try {
+            var res = await _repository.UpgradeToSeller(GetUserId());
+
+            return Ok(res);
+        } 
+        catch (UnauthorizedAccessException e) {
+            return Unauthorized(e.Message);
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e) {
+            return StatusCode(500, e.Message);
+
+        }
+    }
 }

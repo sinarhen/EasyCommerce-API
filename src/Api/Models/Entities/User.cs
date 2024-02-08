@@ -16,7 +16,11 @@ public class User : IdentityUser
     
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public Guid? SellerInfoId { get; set; }
     
+    [ForeignKey("SellerInfoId")]
+    public SellerInfo SellerInfo { get; set; }    
     // Navigation properties
     public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<Store> Stores { get; set; } = new List<Store>();

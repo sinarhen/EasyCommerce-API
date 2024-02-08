@@ -62,4 +62,9 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             Reviews = reviews
         }; 
     }
+
+    public Task<bool> UpgradeToSeller(string userId)
+    {
+        throw new NotImplementedException();
+    }
 }

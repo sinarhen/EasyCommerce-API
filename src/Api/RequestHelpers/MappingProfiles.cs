@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
-using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Auth;
 using ECommerce.Models.DTOs.Billboard;
 using ECommerce.Models.DTOs.Category;
 using ECommerce.Models.DTOs.Collection;
-using ECommerce.Models.DTOs.Color;
-using ECommerce.Models.DTOs.Material;
 using ECommerce.Models.DTOs.Product;
-using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.Store;
 using ECommerce.Models.Entities;
 
