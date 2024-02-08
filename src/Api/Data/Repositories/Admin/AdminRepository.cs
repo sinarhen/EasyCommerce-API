@@ -201,13 +201,14 @@ public class AdminRepository: BaseRepository, IAdminRepository
                 Status = r.Status.GetDisplayName(),
                 DecidedAt = r.DecidedAt,
                 Message = r.Message,
-                SellerInfo = new SellerInfoDto
+                SellerInfo = new SellerInfo
                 {
-                    Name = r.SellerInfo.CompanyName,
-                    Description = r.SellerInfo.CompanyDescription,
-                    Email = r.SellerInfo.CompanyEmail,
-                    PhoneNumber = r.SellerInfo.CompanyPhone
-                }
+                    CompanyName = r.SellerInfo.CompanyName,
+                    CompanyDescription = r.SellerInfo.CompanyDescription,
+                    CompanyEmail = r.SellerInfo.CompanyEmail,
+                    CompanyPhone = r.SellerInfo.CompanyPhone,
+                    
+                },
             })
             .FirstOrDefaultAsync();
     }

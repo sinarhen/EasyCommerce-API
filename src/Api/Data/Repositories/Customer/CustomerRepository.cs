@@ -63,7 +63,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         }; 
     }
 
-    public async Task<bool> RequestUpgradingToSeller(string userId, SellerInfoDto sellerInfo)
+    public async Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo)
     {
         if (string.IsNullOrWhiteSpace(userId))
         {

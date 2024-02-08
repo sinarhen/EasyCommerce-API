@@ -39,7 +39,7 @@ public class CustomerController : GenericController
     }
 
     [HttpPost("upgrade")]
-    public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoDto sellerInfo)
+    public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoCreateDto sellerInfo)
     {
         try
         {

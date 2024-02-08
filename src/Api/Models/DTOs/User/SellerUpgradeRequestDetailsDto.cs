@@ -1,9 +1,11 @@
+using ECommerce.Models.Entities;
+
 namespace ECommerce.Models.DTOs.User;
 
 public class SellerUpgradeRequestDetailsDto: SellerUpgradeRequestDto
 {
-    public SellerInfoDto SellerInfo { get; set; }
+    public SellerInfo SellerInfo { get; set; }
 
-    
+
     
 }
