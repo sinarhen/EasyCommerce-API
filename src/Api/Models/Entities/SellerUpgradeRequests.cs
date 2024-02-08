@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models.Entities;
 
-public class SellerUpgradeRequests : BaseEntity
+public class SellerUpgradeRequest : BaseEntity
 {
     public Guid Id { get; set; }
     public string UserId { get; set; }
@@ -14,7 +14,7 @@ public class SellerUpgradeRequests : BaseEntity
 
     [ForeignKey("SellerInfoId")]
     public SellerInfo SellerInfo { get; set; }
-    
+
     [ForeignKey("UserId")]
     public User User { get; set; }   
 }

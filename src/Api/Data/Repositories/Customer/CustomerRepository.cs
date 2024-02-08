@@ -74,7 +74,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             CompanyPhone = sellerInfo.PhoneNumber,
         };
         await _db.Sellers.AddAsync(seller);
-        await _db.SellerUpgradeRequests.AddAsync(new SellerUpgradeRequests
+        await _db.SellerUpgradeRequests.AddAsync(new SellerUpgradeRequest
         {
             UserId = userId,
             SellerInfoId = seller.Id

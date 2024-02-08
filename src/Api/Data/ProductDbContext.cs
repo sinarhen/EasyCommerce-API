@@ -17,7 +17,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<BillboardFilter> BillboardFilters { get; set; }
     public DbSet<BannedStore> BannedStores { get; set; }
     public DbSet<BannedUser> BannedUsers { get; set; }
-    public DbSet<SellerUpgradeRequests> SellerUpgradeRequests { get; set; }
+    public DbSet<SellerUpgradeRequest> SellerUpgradeRequests { get; set; }
     public DbSet<SellerInfo> Sellers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductStock> ProductStocks { get; set; }
