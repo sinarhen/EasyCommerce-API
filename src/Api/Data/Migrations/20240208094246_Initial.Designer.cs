@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240206110332_Updated")]
-    partial class Updated
+    [Migration("20240208094246_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -636,6 +636,171 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Reviews");
                 });
 
+            modelBuilder.Entity("ECommerce.Models.Entities.SellerInfo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CompanyAddress")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyApplepay")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyBanner")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyCashapp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyClubhouse")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyDescription")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyDiscord")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyEmail")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyFacebook")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyGooglepay")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyInstagram")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyLine")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyLinkedin")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyLogo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyPatreon")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyPaypal")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyPhone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyPinterest")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyReddit")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanySamsungpay")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanySignal")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanySkype")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanySnapchat")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyTelegram")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyTiktok")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyTumblr")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyTwitch")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyTwitter")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyVenmo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyViber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyVk")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyWebsite")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyWechat")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyWeibo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyWhatsapp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyYoutube")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CompanyZelle")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SellerInfos");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.SellerUpgradeRequests", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DecidedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SellerUpgradeRequests");
+                });
+
             modelBuilder.Entity("ECommerce.Models.Entities.Size", b =>
                 {
                     b.Property<Guid>("Id")
@@ -742,6 +907,9 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
@@ -774,6 +942,9 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("SellerInfoId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -795,6 +966,9 @@ namespace ECommerce.Data.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("SellerInfoId")
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -1231,6 +1405,15 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ECommerce.Models.Entities.SellerUpgradeRequests", b =>
+                {
+                    b.HasOne("ECommerce.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ECommerce.Models.Entities.Store", b =>
                 {
                     b.HasOne("ECommerce.Models.Entities.User", "Owner")
@@ -1246,7 +1429,13 @@ namespace ECommerce.Data.Migrations
                         .WithOne("Customer")
                         .HasForeignKey("ECommerce.Models.Entities.User", "CartId");
 
+                    b.HasOne("ECommerce.Models.Entities.SellerInfo", "SellerInfo")
+                        .WithOne("User")
+                        .HasForeignKey("ECommerce.Models.Entities.User", "SellerInfoId");
+
                     b.Navigation("Cart");
+
+                    b.Navigation("SellerInfo");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1363,6 +1552,11 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Stocks");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.SellerInfo", b =>
+                {
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Size", b =>

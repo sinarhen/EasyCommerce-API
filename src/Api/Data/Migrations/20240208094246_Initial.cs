@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Updated : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -107,6 +107,58 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SellerInfos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CompanyName = table.Column<string>(type: "text", nullable: true),
+                    CompanyDescription = table.Column<string>(type: "text", nullable: true),
+                    CompanyAddress = table.Column<string>(type: "text", nullable: true),
+                    CompanyPhone = table.Column<string>(type: "text", nullable: true),
+                    CompanyEmail = table.Column<string>(type: "text", nullable: true),
+                    CompanyWebsite = table.Column<string>(type: "text", nullable: true),
+                    CompanyLogo = table.Column<string>(type: "text", nullable: true),
+                    CompanyBanner = table.Column<string>(type: "text", nullable: true),
+                    CompanyFacebook = table.Column<string>(type: "text", nullable: true),
+                    CompanyTwitter = table.Column<string>(type: "text", nullable: true),
+                    CompanyInstagram = table.Column<string>(type: "text", nullable: true),
+                    CompanyLinkedin = table.Column<string>(type: "text", nullable: true),
+                    CompanyYoutube = table.Column<string>(type: "text", nullable: true),
+                    CompanyTiktok = table.Column<string>(type: "text", nullable: true),
+                    CompanySnapchat = table.Column<string>(type: "text", nullable: true),
+                    CompanyPinterest = table.Column<string>(type: "text", nullable: true),
+                    CompanyReddit = table.Column<string>(type: "text", nullable: true),
+                    CompanyTumblr = table.Column<string>(type: "text", nullable: true),
+                    CompanyWhatsapp = table.Column<string>(type: "text", nullable: true),
+                    CompanyTelegram = table.Column<string>(type: "text", nullable: true),
+                    CompanySignal = table.Column<string>(type: "text", nullable: true),
+                    CompanyViber = table.Column<string>(type: "text", nullable: true),
+                    CompanyWechat = table.Column<string>(type: "text", nullable: true),
+                    CompanyLine = table.Column<string>(type: "text", nullable: true),
+                    CompanyWeibo = table.Column<string>(type: "text", nullable: true),
+                    CompanyVk = table.Column<string>(type: "text", nullable: true),
+                    CompanySkype = table.Column<string>(type: "text", nullable: true),
+                    CompanyDiscord = table.Column<string>(type: "text", nullable: true),
+                    CompanyTwitch = table.Column<string>(type: "text", nullable: true),
+                    CompanyClubhouse = table.Column<string>(type: "text", nullable: true),
+                    CompanyPatreon = table.Column<string>(type: "text", nullable: true),
+                    CompanyCashapp = table.Column<string>(type: "text", nullable: true),
+                    CompanyPaypal = table.Column<string>(type: "text", nullable: true),
+                    CompanyVenmo = table.Column<string>(type: "text", nullable: true),
+                    CompanyZelle = table.Column<string>(type: "text", nullable: true),
+                    CompanyApplepay = table.Column<string>(type: "text", nullable: true),
+                    CompanyGooglepay = table.Column<string>(type: "text", nullable: true),
+                    CompanySamsungpay = table.Column<string>(type: "text", nullable: true),
+                    IsVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SellerInfos", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sizes",
                 columns: table => new
                 {
@@ -153,9 +205,11 @@ namespace ECommerce.Data.Migrations
                     City = table.Column<string>(type: "text", nullable: true),
                     Country = table.Column<string>(type: "text", nullable: true),
                     PostalCode = table.Column<string>(type: "text", nullable: true),
+                    ImageUrl = table.Column<string>(type: "text", nullable: true),
                     CartId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SellerInfoId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -178,6 +232,11 @@ namespace ECommerce.Data.Migrations
                         name: "FK_AspNetUsers_Carts_CartId",
                         column: x => x.CartId,
                         principalTable: "Carts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_SellerInfos_SellerInfoId",
+                        column: x => x.SellerInfoId,
+                        principalTable: "SellerInfos",
                         principalColumn: "Id");
                 });
 
@@ -368,6 +427,28 @@ namespace ECommerce.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Orders_AspNetUsers_CustomerId",
                         column: x => x.CustomerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SellerUpgradeRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: true),
+                    DecidedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SellerUpgradeRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SellerUpgradeRequests_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -780,6 +861,12 @@ namespace ECommerce.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_SellerInfoId",
+                table: "AspNetUsers",
+                column: "SellerInfoId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -927,6 +1014,11 @@ namespace ECommerce.Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SellerUpgradeRequests_UserId",
+                table: "SellerUpgradeRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stores_OwnerId",
                 table: "Stores",
                 column: "OwnerId");
@@ -984,6 +1076,9 @@ namespace ECommerce.Data.Migrations
                 name: "Reviews");
 
             migrationBuilder.DropTable(
+                name: "SellerUpgradeRequests");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -1021,6 +1116,9 @@ namespace ECommerce.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "SellerInfos");
         }
     }
 }

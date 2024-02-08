@@ -63,8 +63,31 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         }; 
     }
 
-    public Task<bool> UpgradeToSeller(string userId)
+    public async Task<bool> UpgradeToSeller(string userId, SellerInfoDto sellerInfo)
     {
-        throw new NotImplementedException();
+        await CheckIfUserIsSeller(userId);
+        var seller = new SellerInfo
+        {
+            CompanyName = sellerInfo.Name,
+            CompanyDescription = sellerInfo.Description,
+            CompanyEmail = sellerInfo.Email,
+            CompanyPhone = sellerInfo.PhoneNumber,
+        };
+        await _db.Sellers.AddAsync(seller);
+        await SaveChangesAsyncWithTransaction();
+        return true;
+    }
+    private async Task CheckIfUserIsSeller(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new ArgumentException("User not found");
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles.Contains(UserRoles.Seller))
+        {
+            throw new ArgumentException("User is already a seller");
+        }
+
+
+
     }
 }
+

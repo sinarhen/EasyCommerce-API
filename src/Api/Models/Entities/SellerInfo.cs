@@ -46,8 +46,6 @@ public class SellerInfo : BaseEntity
     
     // TODO: Add stripe and paypal account details
 
-    // Navigation properties
-    public User User { get; set; }
 
 
 }
