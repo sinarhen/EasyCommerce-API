@@ -13,4 +13,10 @@ public interface IAdminRepository
     Task UpdateUserRole(string id, string role, string adminRole);
     Task UnbanUser(string id);
     Task<IEnumerable<BannedUser>> GetBannedUsers();
+
+    Task<IEnumerable<SellerUpgradeRequestDto>> GetSellerUpgradeRequests();
+
+    Task<SellerUpgradeRequestDetailsDto> GetSellerUpgradeRequestById(Guid id);
+
+    Task ApproveSellerUpgradeRequest(Guid id, string message);
 }

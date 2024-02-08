@@ -175,4 +175,19 @@ public class AdminRepository: BaseRepository, IAdminRepository
         return;
 
     }
+
+    public Task<IEnumerable<SellerUpgradeRequestDto>> GetSellerUpgradeRequests()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SellerUpgradeRequestDetailsDto> GetSellerUpgradeRequestById(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task ApproveSellerUpgradeRequest(Guid id, string message)
+    {
+        throw new NotImplementedException();
+    }
 }

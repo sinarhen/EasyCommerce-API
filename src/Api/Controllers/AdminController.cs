@@ -138,6 +138,19 @@ namespace ECommerce.Controllers
                 return StatusCode(500, e.Message);
             }
         }
+
+        [HttpGet("upgrade-requests")]
+        public async Task<ActionResult<IEnumerable<SellerUpgradeRequestDto>>> GetUpgradeRequests()
+        {
+            try {
+                return Ok(await _repository.GetSellerUpgradeRequests());
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
         
     }
+
+
 }
