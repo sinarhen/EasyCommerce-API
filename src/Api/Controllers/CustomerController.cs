@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.Controllers;
 
 [ApiController]
-[Route("api/customer/{customerId}")]
+[Route("api/customer")]
 [Authorize]
 public class CustomerController : GenericController
 {
@@ -38,8 +38,8 @@ public class CustomerController : GenericController
         }
     }
 
-    [HttpGet("upgrade")]
-    public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoDto sellerInfo = null)
+    [HttpPost("upgrade")]
+    public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoDto sellerInfo)
     {
         try
         {

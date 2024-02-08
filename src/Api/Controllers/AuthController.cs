@@ -27,48 +27,54 @@ public class AuthController : GenericController
         _userManager = userManager;
         _jwtService = jwtService;
     }
-
-    [HttpPost("register")]
-    public async Task<ActionResult> Register([FromBody] RegisterDto dto)
+[HttpPost("register")]
+public async Task<ActionResult> Register([FromBody] RegisterDto dto)
+{
+    if (dto == null)
     {
-        if (await _userManager.Users.AnyAsync(x => x.Email == dto.Email))
-        {
-            return BadRequest("Email already in use");
-        }
-
-        if (dto == null)
-        {
-            return BadRequest("Empty data");
-        }
-
-        var user = _mapper.Map<User>(dto);
-        var result = await _userManager.CreateAsync(user, dto.Password);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        var roleResult = await _userManager.AddToRoleAsync(user, UserRoles.Customer);
-        if (!roleResult.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        var token = _jwtService.GenerateToken(user.Id, user.UserName, new List<string> { UserRoles.Customer });
-        var tokenAsString = _jwtService.WriteToken(token);
-
-        return CreatedAtAction(
-            nameof(Register),
-            new
-            {
-                id = user.Id,                
-                email = user.Email,
-                token = tokenAsString,
-                expiresTo = token.ValidTo,
-            }
-        );
-
+        return BadRequest("Empty data");
     }
+
+    // Check if a user with the same email exists
+    var userExistsTask = _userManager.Users.AnyAsync(x => x.Email == dto.Email);
+
+    // Map the DTO to a User object
+    var user = _mapper.Map<User>(dto);
+
+    // Wait for the userExistsTask to complete
+    if (await userExistsTask)
+    {
+        return BadRequest("Email already in use");
+    }
+
+    // Create the user and add to role in parallel
+    var createUserTask = _userManager.CreateAsync(user, dto.Password);
+    var addToRoleTask = createUserTask.ContinueWith(t => _userManager.AddToRoleAsync(user, UserRoles.Customer), TaskContinuationOptions.OnlyOnRanToCompletion);
+
+    // Wait for both tasks to complete
+    var result = await createUserTask;
+    var roleResult = await addToRoleTask;
+
+    if (!result.Succeeded || !roleResult.Result.Succeeded)
+    {
+        return BadRequest(result.Errors);
+    }
+
+    // Generate the JWT token
+    var token = _jwtService.GenerateToken(user.Id, user.UserName, new List<string> { UserRoles.Customer });
+    var tokenAsString = _jwtService.WriteToken(token);
+
+    return CreatedAtAction(
+        nameof(Register),
+        new
+        {
+            id = user.Id,                
+            email = user.Email,
+            token = tokenAsString,
+            expiresTo = token.ValidTo,
+        }
+    );
+}
 
     [HttpPost("login")]
     public async Task<ActionResult<JwtSecurityToken>> Login([FromBody] LoginDto dto)

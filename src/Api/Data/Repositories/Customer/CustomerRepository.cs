@@ -65,6 +65,32 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task<bool> RequestUpgradingToSeller(string userId, SellerInfoDto sellerInfo)
     {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new ArgumentException("User id is required");
+        }
+        if (sellerInfo == null)
+        {
+            throw new ArgumentException("Empty body");
+        }
+        if (sellerInfo.Name == null)
+        {
+            throw new ArgumentException("Company name is required");
+        }
+        if (sellerInfo.Description == null)
+        {
+            throw new ArgumentException("Company description is required");
+        }
+        if (sellerInfo.Email == null)
+        {
+            throw new ArgumentException("Company email is required");
+        }
+        if (sellerInfo.PhoneNumber == null)
+        {
+            throw new ArgumentException("Company phone number is required");
+        }
+        
+
         await CheckIfUserIsSeller(userId);
         var seller = new SellerInfo
         {
