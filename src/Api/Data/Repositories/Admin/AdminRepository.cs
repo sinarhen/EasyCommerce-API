@@ -181,11 +181,23 @@ public class AdminRepository: BaseRepository, IAdminRepository
     {
         return await _db.SellerUpgradeRequests
             .AsNoTracking()
+            .Where(r => _db.BannedUsers.All(b => b.UserId != r.UserId))
             .Select(r => new SellerUpgradeRequestDto
             {
                 Id = r.Id,
                 Status = r.Status.GetDisplayName(),
                 DecidedAt = r.DecidedAt,
+                Message = r.Message,
+                User = new UserDto 
+                {
+                    Id = r.UserId,
+                    Username = r.User.UserName,
+                    Email = r.User.Email,
+                    CreatedAt = r.User.CreatedAt,
+                    UpdatedAt = r.User.UpdatedAt,
+                    ImageUrl = r.User.ImageUrl
+
+                }
             })
             .ToListAsync();
     }

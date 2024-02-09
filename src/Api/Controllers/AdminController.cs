@@ -105,8 +105,8 @@ namespace ECommerce.Controllers
             }
         }
 
-        // GET: api/admin/banned-users
-        [HttpGet("banned-users")]
+        // GET: api/admin/users/banned
+        [HttpGet("users/banned")]
         public async Task<ActionResult<IEnumerable<BannedUser>>> GetBannedUsers()
         {
             try {
@@ -139,7 +139,7 @@ namespace ECommerce.Controllers
             }
         }
 
-        [HttpGet("upgrade-requests")]
+        [HttpGet("users/upgrade-requests")]
         public async Task<ActionResult<IEnumerable<SellerUpgradeRequestDto>>> GetUpgradeRequests()
         {
             try {

@@ -97,7 +97,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             throw new ArgumentException("Company name already exists");
         }
 
-        await CheckIfUserIsSeller(userId);
+        await CheckIfUserIsAuthorized(userId);
         var seller = new SellerInfo
         {
             CompanyName = sellerInfo.Name,
@@ -114,9 +114,14 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
         return true;
     }
-    private async Task CheckIfUserIsSeller(string userId)
+    private async Task CheckIfUserIsAuthorized(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId) ?? throw new ArgumentException("User not found");
+        if (await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id))
+        {
+            throw new UnauthorizedAccessException("User is banned");
+        }
+        
         var roles = await _userManager.GetRolesAsync(user);
         if (roles.Contains(UserRoles.Seller))
         {
