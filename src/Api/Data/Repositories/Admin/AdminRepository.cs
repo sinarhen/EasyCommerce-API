@@ -153,7 +153,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
         return await _db.SellerUpgradeRequests
             .AsNoTracking()
             .Where(r => _db.BannedUsers.All(b => b.UserId != r.UserId))
-            .OrderByDescending(r => r.DecidedAt)
+            .OrderByDescending(r => r.CreatedAt)
             .Select(r => new SellerUpgradeRequestDto
             {
                 Id = r.Id,
@@ -205,6 +205,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
     public async Task UpgradeSellerUpgradeRequestStatus(Guid id, string message, string status)
     {
         var request = await _db.SellerUpgradeRequests
+            .Include(r => r.User)
             .Where(r => _db.BannedUsers.All(b => b.UserId != r.UserId))
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ArgumentException("Request not found");
         
@@ -214,6 +215,12 @@ public class AdminRepository : BaseRepository, IAdminRepository
         request.Status = Enum.Parse<SellerUpgradeRequestStatus>(status);
         request.DecidedAt = DateTime.UtcNow;
         request.Message = message;
+        if (status == SellerUpgradeRequestStatus.Approved.GetDisplayName())
+        {
+            var user = request.User;
+            await _userManager.AddToRoleAsync(user, UserRoles.Seller);
+        }
+        
         await SaveChangesAsyncWithTransaction();
     }
 
