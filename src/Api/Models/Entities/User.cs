@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace ECommerce.Models.Entities;
@@ -19,12 +20,15 @@ public class User : IdentityUser
 
     public Guid? SellerInfoId { get; set; }
     
+    [Required]
     [ForeignKey("SellerInfoId")]
     public SellerInfo SellerInfo { get; set; }    
     // Navigation properties
+    [Required]
     public ICollection<Order> Orders { get; set; } = new List<Order>();
+    [Required]
     public ICollection<Store> Stores { get; set; } = new List<Store>();
-    
+    [Required]
     [ForeignKey("CartId")]
     public Cart Cart { get; set; }
 }
