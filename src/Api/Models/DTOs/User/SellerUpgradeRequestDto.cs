@@ -9,4 +9,5 @@ public class SellerUpgradeRequestDto
     public string Status { get; set; }
     public DateTime? DecidedAt { get; set; }
     public UserDto User { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

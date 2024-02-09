@@ -153,6 +153,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
         return await _db.SellerUpgradeRequests
             .AsNoTracking()
             .Where(r => _db.BannedUsers.All(b => b.UserId != r.UserId))
+            .OrderByDescending(r => r.DecidedAt)
             .Select(r => new SellerUpgradeRequestDto
             {
                 Id = r.Id,
@@ -168,7 +169,8 @@ public class AdminRepository : BaseRepository, IAdminRepository
                     CreatedAt = r.User.CreatedAt,
                     UpdatedAt = r.User.UpdatedAt,
                     ImageUrl = r.User.ImageUrl
-                }
+                },
+                CreatedAt = r.CreatedAt
             })
             .ToListAsync();
     }
