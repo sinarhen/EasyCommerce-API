@@ -6,6 +6,7 @@ using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
 
 namespace ECommerce.Controllers;
 
@@ -192,9 +193,9 @@ public class AdminController : GenericController
         {
             if (dto.Status == null) return BadRequest("Status is required");
 
-            if (dto.Status != SellerUpgradeRequestStatus.Approved && dto.Status != SellerUpgradeRequestStatus.Rejected)
+            if (SellerUpgradeRequestStatus.Approved.GetDisplayName() != dto.Status && SellerUpgradeRequestStatus.Rejected.GetDisplayName() != dto.Status)
                 return BadRequest("Invalid status. Valid statuses are `Approved` or `Rejected`");
-            await _repository.UpgradeSellerUpgradeRequestStatus(id, dto.Message, dto.Status.Value);
+            await _repository.UpgradeSellerUpgradeRequestStatus(id, dto.Message, dto.Status);
             return Ok(new
             {
                 message = "Seller upgrade request status has been updated"

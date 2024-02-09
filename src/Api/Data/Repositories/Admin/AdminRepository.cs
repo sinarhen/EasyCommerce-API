@@ -4,6 +4,7 @@ using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 
 namespace ECommerce.Data.Repositories.Admin;
 
@@ -155,7 +156,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
             .Select(r => new SellerUpgradeRequestDto
             {
                 Id = r.Id,
-                Status = r.Status,
+                Status = r.Status.GetDisplayName(),
                 DecidedAt = r.DecidedAt,
                 Message = r.Message,
                 User = new UserDto
@@ -163,6 +164,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
                     Id = r.UserId,
                     Username = r.User.UserName,
                     Email = r.User.Email,
+                    Role = r.Status == SellerUpgradeRequestStatus.Pending ? UserRoles.Customer : UserRoles.Seller, 
                     CreatedAt = r.User.CreatedAt,
                     UpdatedAt = r.User.UpdatedAt,
                     ImageUrl = r.User.ImageUrl
@@ -175,23 +177,18 @@ public class AdminRepository : BaseRepository, IAdminRepository
     {
         return await _db.SellerUpgradeRequests
             .AsNoTracking()
-            .Where(r => r.Id == id)
             .Select(r => new SellerUpgradeRequestDetailsDto
             {
                 Id = r.Id,
-                Status = r.Status,
+                Status = r.Status.GetDisplayName(),
                 DecidedAt = r.DecidedAt,
                 Message = r.Message,
-                SellerInfo = new SellerInfo
-                {
-                    CompanyName = r.SellerInfo.CompanyName,
-                    CompanyDescription = r.SellerInfo.CompanyDescription,
-                    CompanyEmail = r.SellerInfo.CompanyEmail,
-                    CompanyPhone = r.SellerInfo.CompanyPhone
-                },
+                SellerInfo = r.SellerInfo,
                 User = new UserDto
                 {
                     Id = r.UserId,
+                    // Made this to avoid additional query for roles and banned status, but it's maybe not the best solution
+                    Role = r.Status == SellerUpgradeRequestStatus.Pending ? UserRoles.Customer : UserRoles.Seller, 
                     Username = r.User.UserName,
                     Email = r.User.Email,
                     CreatedAt = r.User.CreatedAt,
@@ -199,17 +196,20 @@ public class AdminRepository : BaseRepository, IAdminRepository
                     ImageUrl = r.User.ImageUrl
                 }
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(r => r.Id == id) 
+               ?? throw new ArgumentException("Request not found");
     }
 
-    public async Task UpgradeSellerUpgradeRequestStatus(Guid id, string message, SellerUpgradeRequestStatus status)
+    public async Task UpgradeSellerUpgradeRequestStatus(Guid id, string message, string status)
     {
         var request = await _db.SellerUpgradeRequests
+            .Where(r => _db.BannedUsers.All(b => b.UserId != r.UserId))
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ArgumentException("Request not found");
-
+        
+        
         if (request.Status != SellerUpgradeRequestStatus.Pending)
             throw new ArgumentException("Upgrade already reviewed");
-        request.Status = status;
+        request.Status = Enum.Parse<SellerUpgradeRequestStatus>(status);
         request.DecidedAt = DateTime.UtcNow;
         request.Message = message;
         await SaveChangesAsyncWithTransaction();
