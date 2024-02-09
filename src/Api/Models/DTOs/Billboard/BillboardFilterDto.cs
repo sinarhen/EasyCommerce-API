@@ -1,7 +1,7 @@
 using ECommerce.Entities.Enum;
-using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.Billboard;
+
 public class BillboardFilterDto
 {
     public string Title { get; set; }
@@ -16,4 +16,3 @@ public class BillboardFilterDto
     public Guid? ColorId { get; set; }
     public Guid? SizeId { get; set; }
 }
-

@@ -6,8 +6,8 @@ namespace ECommerce.Models.Entities;
 
 public class BillboardFilter : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    [Key] public Guid Id { get; set; }
+
     public string Title { get; set; }
     public string Subtitle { get; set; }
 
@@ -18,31 +18,25 @@ public class BillboardFilter : BaseEntity
     public Season? Season { get; set; }
 
     public Guid? ColorId { get; set; }
-    
+
     public string OrderBy { get; set; }
-    
+
     public decimal? FromPrice { get; set; }
-    
+
     public decimal? ToPrice { get; set; }
-    
+
     public Guid? SizeId { get; set; }
-    
+
     public string Search { get; set; }
-    
+
     public Guid? BillboardId { get; set; }
-    
+
     // Navigation property
     public Billboard Billboard { get; set; }
-    
-    [ForeignKey("CategoryId")]
-    public Category Category { get; set; }
-    
-    [ForeignKey("ColorId")]
-    public Color Color { get; set; }
-    
-    [ForeignKey("SizeId")]
-    public Size Size { get; set; }
-    
-    
-    
+
+    [ForeignKey("CategoryId")] public Category Category { get; set; }
+
+    [ForeignKey("ColorId")] public Color Color { get; set; }
+
+    [ForeignKey("SizeId")] public Size Size { get; set; }
 }

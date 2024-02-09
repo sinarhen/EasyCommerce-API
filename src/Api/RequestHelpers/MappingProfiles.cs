@@ -9,13 +9,20 @@ using ECommerce.Models.Entities;
 
 namespace ECommerce.RequestHelpers;
 
-public class MappingProfiles: Profile
+public class MappingProfiles : Profile
 {
+    public MappingProfiles()
+    {
+        MapProductProfiles();
+        MapCategoryProfiles();
+        MapStoreProfiles();
+    }
 
     private void MapCategoryProfiles()
     {
         CreateMap<Category, CategoryDto>();
     }
+
     private void MapStoreProfiles()
     {
         CreateMap<Store, StoreDto>()
@@ -25,14 +32,8 @@ public class MappingProfiles: Profile
             .ForMember(dest => dest.Billboards, opt => opt.MapFrom(src => src.Billboards));
         CreateMap<Billboard, BillboardDto>();
         CreateMap<BillboardFilter, BillboardFilterDto>();
-    
     }
-    public MappingProfiles()
-    {
-        MapProductProfiles();
-        MapCategoryProfiles();
-        MapStoreProfiles();
-    }
+
     private void MapProductProfiles()
     {
         CreateMap<RegisterDto, User>();

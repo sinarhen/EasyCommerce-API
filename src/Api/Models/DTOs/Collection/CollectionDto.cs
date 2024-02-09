@@ -1,6 +1,7 @@
 using ECommerce.Models.DTOs.Billboard;
 
 namespace ECommerce.Models.DTOs.Collection;
+
 public class CollectionDto
 {
     public Guid Id { get; set; }

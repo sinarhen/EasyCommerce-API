@@ -8,9 +8,8 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
 {
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
-        
     }
-    
+
     public DbSet<Store> Stores { get; set; }
     public DbSet<Collection> Collections { get; set; }
     public DbSet<Billboard> Billboards { get; set; }
@@ -28,23 +27,21 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
 
     public DbSet<Category> Categories { get; set; }
     public DbSet<CategorySize> CategorySizes { get; set; }
-    
+
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartProduct> CartProducts { get; set; }
     public DbSet<Order> Orders { get; set; }
-    
+
     public DbSet<OrderDetail> OrderDetails { get; set; }
     public DbSet<Color> Colors { get; set; }
     public DbSet<Size> Sizes { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Occasion> Occasions { get; set; }
-    
-    
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        
     }
 
     public override int SaveChanges()
@@ -68,25 +65,17 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
                 || e.State == EntityState.Modified));
 
         foreach (var entityEntry in entries)
-        {
             if (entityEntry.Entity is BaseEntity baseEntity)
             {
                 baseEntity.UpdatedAt = DateTime.UtcNow;
 
-                if (entityEntry.State == EntityState.Added)
-                {
-                    baseEntity.CreatedAt = DateTime.UtcNow;
-                }
+                if (entityEntry.State == EntityState.Added) baseEntity.CreatedAt = DateTime.UtcNow;
             }
             else if (entityEntry.Entity is User user)
             {
                 user.UpdatedAt = DateTime.UtcNow;
 
-                if (entityEntry.State == EntityState.Added)
-                {
-                    user.CreatedAt = DateTime.UtcNow;
-                }
+                if (entityEntry.State == EntityState.Added) user.CreatedAt = DateTime.UtcNow;
             }
-        }
     }
 }

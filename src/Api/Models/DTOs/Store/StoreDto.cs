@@ -1,6 +1,8 @@
 ﻿using ECommerce.Models.Entities;
 
-namespace ECommerce.Models.DTOs.Store;public class StoreDto : BaseEntity
+namespace ECommerce.Models.DTOs.Store;
+
+public class StoreDto : BaseEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

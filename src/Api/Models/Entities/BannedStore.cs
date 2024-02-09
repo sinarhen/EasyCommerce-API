@@ -3,11 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Models.Entities;
 
-
 public class BannedStore : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    [Key] public Guid Id { get; set; }
 
     public Guid StoreId { get; set; }
 
@@ -18,6 +16,5 @@ public class BannedStore : BaseEntity
     public DateTime? BanEndDate { get; set; }
 
     // Navigation property
-    [ForeignKey("StoreId")]
-    public Store Store { get; set; }
+    [ForeignKey("StoreId")] public Store Store { get; set; }
 }

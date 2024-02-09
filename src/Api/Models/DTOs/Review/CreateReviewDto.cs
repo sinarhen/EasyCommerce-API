@@ -2,7 +2,6 @@ using ECommerce.Entities.Enum;
 
 namespace ECommerce.Models.DTOs.Review;
 
-
 public class CreateReviewDto
 {
     public string Title { get; set; }

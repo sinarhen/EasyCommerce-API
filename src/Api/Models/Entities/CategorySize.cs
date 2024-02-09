@@ -7,12 +7,11 @@ namespace ECommerce.Models.Entities;
 public class CategorySize : BaseEntity
 {
     public Guid CategoryId { get; set; }
-    
+
     public Guid SizeId { get; set; }
-    
+
     // Navigation properties
-    [ForeignKey("CategoryId")]
-    public Category Category { get; set; }
-    [ForeignKey("SizeId")]
-    public Size Size { get; set; }
+    [ForeignKey("CategoryId")] public Category Category { get; set; }
+
+    [ForeignKey("SizeId")] public Size Size { get; set; }
 }

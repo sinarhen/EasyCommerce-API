@@ -7,5 +7,5 @@ public enum Season
     Summer,
     Autumn,
     All,
-    DemiSeason,
+    DemiSeason
 }

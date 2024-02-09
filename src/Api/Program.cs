@@ -1,15 +1,7 @@
 using System.Security.Claims;
 using System.Text;
-using Data.Repositories.Customer;
-using Data.Repositories.Review;
 using ECommerce.Config;
 using ECommerce.Data;
-using ECommerce.Data.Repositories.Admin;
-using ECommerce.Data.Repositories.Billboard;
-using ECommerce.Data.Repositories.Category;
-using ECommerce.Data.Repositories.Collection;
-using ECommerce.Data.Repositories.Product;
-using ECommerce.Data.Repositories.Store;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;
@@ -17,9 +9,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +35,6 @@ builder.Services.AddIdentity<User, UserRole>(options =>
         options.Password.RequireUppercase = true;
         options.Password.RequireLowercase = false;
         options.User.RequireUniqueEmail = true;
-        
     })
     .AddRoles<UserRole>()
     .AddEntityFrameworkStores<ProductDbContext>()
@@ -73,7 +61,7 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = Secrets.JwtIssuer,
             ValidAudience = Secrets.JwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secrets.JwtKey))
-        };       
+        };
     });
 
 builder.Services.AddAuthorizationWithPolicies();

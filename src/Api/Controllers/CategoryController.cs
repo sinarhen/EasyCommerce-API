@@ -22,19 +22,20 @@ public class CategoryController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
-        try {
+        try
+        {
             var categories = await _repository.GetCategoriesAsync();
             return Ok(
-                new 
+                new
                 {
-                    Categories = _mapper.Map<List<CategoryDto>>(categories)   
+                    Categories = _mapper.Map<List<CategoryDto>>(categories)
                 }
             );
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-        
     }
 
     [HttpGet("{id}")]
@@ -42,23 +43,17 @@ public class CategoryController : GenericController
     {
         try
         {
-            if (id == Guid.Empty)
-            {
-                return BadRequest();
-            }
+            if (id == Guid.Empty) return BadRequest();
             var category = await _repository.GetCategoryAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
+            if (category == null) return NotFound();
             return Ok(_mapper.Map<CategoryDto>(category));
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-        
     }
-    
+
     [Authorize(Policy = Policies.AdminPolicy)]
     [HttpPost]
     public async Task<ActionResult> CreateCategory(WriteCategoryDto categoryDto)
@@ -66,15 +61,15 @@ public class CategoryController : GenericController
         try
         {
             await _repository.CreateCategoryAsync(categoryDto);
-            
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-        
+
         return Ok();
     }
-    
+
     [Authorize(Policy = Policies.AdminPolicy)]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCategory(Guid id, WriteCategoryDto categoryDto)
@@ -84,12 +79,12 @@ public class CategoryController : GenericController
         try
         {
             await _repository.UpdateCategoryAsync(id, categoryDto);
-            
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-        
+
         return Ok();
     }
 
@@ -100,11 +95,12 @@ public class CategoryController : GenericController
         try
         {
             await _repository.DeleteCategoryAsync(id);
-            
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             return BadRequest(e.Message);
         }
-        return Ok();        
+
+        return Ok();
     }
 }

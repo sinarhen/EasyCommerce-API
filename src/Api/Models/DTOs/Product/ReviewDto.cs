@@ -3,6 +3,7 @@ using ECommerce.Models.DTOs.Review;
 using ECommerce.Models.DTOs.User;
 
 namespace ECommerce.Models.DTOs.Product;
+
 public class ReviewDto
 {
     public Guid Id { get; set; }
@@ -12,11 +13,11 @@ public class ReviewDto
     public Rating Rating { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public ReviewProductDto Product { get; set; } = new ReviewProductDto();
+    public ReviewProductDto Product { get; set; } = new();
 }
 
 public class UserReviewsDto
 {
-    public UserDto User { get; set; } = new UserDto();
-    public List<ReviewDto> Reviews { get; set; } = new List<ReviewDto>();
+    public UserDto User { get; set; } = new();
+    public List<ReviewDto> Reviews { get; set; } = new();
 }

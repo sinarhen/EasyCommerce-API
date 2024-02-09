@@ -6,8 +6,7 @@ namespace ECommerce.Models.Entities;
 [PrimaryKey("Id")]
 public class Color : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    [Key] public Guid Id { get; set; }
 
     public string HexCode { get; set; }
 
@@ -16,6 +15,4 @@ public class Color : BaseEntity
     // Navigation properties
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
     public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
-
-
 }

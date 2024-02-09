@@ -39,22 +39,15 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddAuthorizationWithPolicies(this IServiceCollection services)
     {
-        services.AddAuthorization(options => 
+        services.AddAuthorization(options =>
         {
-            options.AddPolicy(Policies.AdminPolicy, policy => 
-            {
-                policy.RequireRole(UserRoles.Admin, UserRoles.SuperAdmin);
-            });
+            options.AddPolicy(Policies.AdminPolicy,
+                policy => { policy.RequireRole(UserRoles.Admin, UserRoles.SuperAdmin); });
 
-            options.AddPolicy(Policies.SellerPolicy, policy => 
-            {
-                policy.RequireRole(UserRoles.Seller, UserRoles.Admin, UserRoles.SuperAdmin);
-        });
+            options.AddPolicy(Policies.SellerPolicy,
+                policy => { policy.RequireRole(UserRoles.Seller, UserRoles.Admin, UserRoles.SuperAdmin); });
 
-            options.AddPolicy(Policies.SuperAdminPolicy, policy => 
-            {
-                policy.RequireRole(UserRoles.SuperAdmin);
-            });
+            options.AddPolicy(Policies.SuperAdminPolicy, policy => { policy.RequireRole(UserRoles.SuperAdmin); });
         });
         return services;
     }

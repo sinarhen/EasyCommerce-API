@@ -1,7 +1,6 @@
-namespace ECommerce.Models.DTOs.Admin
+namespace ECommerce.Models.DTOs.Admin;
+
+public class ChangeUserRoleDto
 {
-    public class ChangeUserRoleDto
-    {
-        public string Role { get; set; }
-    }
+    public string Role { get; set; }
 }

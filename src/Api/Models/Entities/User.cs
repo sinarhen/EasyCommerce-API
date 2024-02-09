@@ -14,21 +14,19 @@ public class User : IdentityUser
     public string PostalCode { get; set; }
     public string ImageUrl { get; set; }
     public Guid? CartId { get; set; }
-    
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
     public Guid? SellerInfoId { get; set; }
-    
-    [Required]
+
     [ForeignKey("SellerInfoId")]
-    public SellerInfo SellerInfo { get; set; }    
+    public SellerInfo SellerInfo { get; set; }
+
     // Navigation properties
-    [Required]
     public ICollection<Order> Orders { get; set; } = new List<Order>();
-    [Required]
+
     public ICollection<Store> Stores { get; set; } = new List<Store>();
-    [Required]
-    [ForeignKey("CartId")]
-    public Cart Cart { get; set; }
+
+    [ForeignKey("CartId")] public Cart Cart { get; set; }
 }

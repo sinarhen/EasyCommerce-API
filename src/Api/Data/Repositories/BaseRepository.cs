@@ -5,12 +5,13 @@ namespace ECommerce.Data.Repositories;
 public class BaseRepository
 {
     protected readonly ProductDbContext _db;
-    
+
 
     protected BaseRepository(ProductDbContext db)
     {
         _db = db;
     }
+
     protected async Task SaveChangesAsyncWithTransaction()
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
@@ -25,24 +26,26 @@ public class BaseRepository
             throw;
         }
     }
-    
-    protected int CalculateDepth(ECommerce.Models.Entities.Category category)
+
+    protected int CalculateDepth(Models.Entities.Category category)
     {
-        int depth = 1;
+        var depth = 1;
         while (category.ParentCategory != null)
         {
             depth++;
             category = category.ParentCategory;
         }
+
         return depth;
     }
-    
+
     protected static bool ValidateOwner(string userId, string ownerId, bool? isAdmin = false)
     {
-        bool isAdminValue = isAdmin.HasValue && isAdmin.Value;
-        return (ownerId == userId || isAdminValue);
+        var isAdminValue = isAdmin.HasValue && isAdmin.Value;
+        return ownerId == userId || isAdminValue;
     }
-    protected void AddToCategories(ECommerce.Models.Entities.Category category, ECommerce.Models.Entities.Product product, int order)
+
+    protected void AddToCategories(Models.Entities.Category category, Models.Entities.Product product, int order)
     {
         var currentCategory = category;
         while (currentCategory != null)
@@ -58,6 +61,4 @@ public class BaseRepository
             currentCategory = currentCategory.ParentCategory;
         }
     }
-    
-    
 }

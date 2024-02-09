@@ -6,8 +6,4 @@ public class CreateCollectionDto
     public string Description { get; set; }
 
     public Guid StoreId { get; set; }
-
-
 }
-
-

@@ -6,8 +6,8 @@ namespace ECommerce.Models.Entities;
 [PrimaryKey("Id")]
 public class Material : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    [Key] public Guid Id { get; set; }
+
     public string Name { get; set; }
 
     // Navigation properties

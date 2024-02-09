@@ -8,5 +8,4 @@ public interface ICustomerRepository
     Task<UserReviewsDto> GetReviewsForUser(string userId);
 
     Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
-
 }

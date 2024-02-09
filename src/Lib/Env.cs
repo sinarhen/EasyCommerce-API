@@ -18,8 +18,13 @@ public static class Env
     }
 
     public static string GetRequired(string key)
-        => Environment.GetEnvironmentVariable(key)
-           ?? throw new KeyNotFoundException($"Environment variable: {key} wasn't found!");
+    {
+        return Environment.GetEnvironmentVariable(key)
+               ?? throw new KeyNotFoundException($"Environment variable: {key} wasn't found!");
+    }
 
-    public static string? GetOptional(string key) => Environment.GetEnvironmentVariable(key);
+    public static string? GetOptional(string key)
+    {
+        return Environment.GetEnvironmentVariable(key);
+    }
 }

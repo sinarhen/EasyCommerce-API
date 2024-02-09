@@ -10,8 +10,7 @@ public class BannedUser
     public string Reason { get; set; }
     public DateTime BanStartTime { get; set; }
     public DateTime BanEndTime { get; set; }
-    
+
     // Navigation properties
-    [ForeignKey("UserId")]
-    public User User { get; set; }
+    [ForeignKey("UserId")] public User User { get; set; }
 }

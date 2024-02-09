@@ -7,24 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Admin;
 
-public class AdminRepository: BaseRepository, IAdminRepository
+public class AdminRepository : BaseRepository, IAdminRepository
 {
     private readonly UserManager<User> _userManager;
+
     public AdminRepository(ProductDbContext db, UserManager<User> userManager) : base(db)
     {
         _userManager = userManager;
-    }
-    private async Task<IEnumerable<string>> GetUserRoles(User user)
-    {
-        var roles = await _userManager.GetRolesAsync(user);
-        return roles;
-        
-    }
-
-    private async Task<User> FindUser(string id)
-    {
-        var user = await _userManager.FindByIdAsync(id);
-        return user;
     }
 
     public async Task<IEnumerable<UserDto>> GetAllUsers()
@@ -87,16 +76,10 @@ public class AdminRepository: BaseRepository, IAdminRepository
     {
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
-        if (user == null)
-        {
-            throw new ArgumentException("User not found");
-        }
+        if (user == null) throw new ArgumentException("User not found");
 
         var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == id);
-        if (isBanned)
-        {
-            throw new ArgumentException("User is already banned");
-        }
+        if (isBanned) throw new ArgumentException("User is already banned");
 
         var bannedUser = new BannedUser
         {
@@ -118,11 +101,9 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         var bannedUser = await _db.BannedUsers
             .FirstOrDefaultAsync(b => b.UserId == id) ?? throw new ArgumentException("User is not banned");
-        
+
         _db.BannedUsers.Remove(bannedUser);
         await SaveChangesAsyncWithTransaction();
-
-        return;
     }
 
     public async Task<IEnumerable<BannedUser>> GetBannedUsers()
@@ -133,26 +114,18 @@ public class AdminRepository: BaseRepository, IAdminRepository
 
         return bannedUsers;
     }
+
     public async Task UpdateUserRole(string id, string role, string adminRole)
     {
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
         var userRoles = await GetUserRoles(user);
-        
-        foreach (var r in userRoles)
-        {
-            Console.WriteLine(r);
-            
-        }
-        if (UserRoles.GetHighestUserRole(userRoles) == role)
-        {
-            throw new ArgumentException("User already in this role");
-        }
+
+        foreach (var r in userRoles) Console.WriteLine(r);
+        if (UserRoles.GetHighestUserRole(userRoles) == role) throw new ArgumentException("User already in this role");
 
         if (UserRoles.RoleHierarchy[role] >= UserRoles.RoleHierarchy[adminRole])
-        {
             throw new ArgumentException("You cannot assign a role higher than your own or equal to your role");
-        }
         var allRoles = UserRoles.GetAllRoles();
 
         var level = UserRoles.RoleHierarchy[role];
@@ -160,7 +133,8 @@ public class AdminRepository: BaseRepository, IAdminRepository
         if (UserRoles.RoleHierarchy[highestRole] > UserRoles.RoleHierarchy[role])
         {
             // remove all roles that are higher than the new role
-            var rolesToRemove = allRoles.Where(r => r != UserRoles.Customer && UserRoles.RoleHierarchy[r] > level && userRoles.Contains(r));
+            var rolesToRemove = allRoles.Where(r =>
+                r != UserRoles.Customer && UserRoles.RoleHierarchy[r] > level && userRoles.Contains(r));
             await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
         }
         else if (UserRoles.RoleHierarchy[highestRole] < UserRoles.RoleHierarchy[role])
@@ -169,6 +143,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
             var rolesToAdd = allRoles.Where(r => UserRoles.RoleHierarchy[r] <= level && !userRoles.Contains(r));
             await _userManager.AddToRolesAsync(user, rolesToAdd);
         }
+
         await SaveChangesAsyncWithTransaction();
     }
 
@@ -183,7 +158,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
                 Status = r.Status,
                 DecidedAt = r.DecidedAt,
                 Message = r.Message,
-                User = new UserDto 
+                User = new UserDto
                 {
                     Id = r.UserId,
                     Username = r.User.UserName,
@@ -191,7 +166,6 @@ public class AdminRepository: BaseRepository, IAdminRepository
                     CreatedAt = r.User.CreatedAt,
                     UpdatedAt = r.User.UpdatedAt,
                     ImageUrl = r.User.ImageUrl
-
                 }
             })
             .ToListAsync();
@@ -213,10 +187,9 @@ public class AdminRepository: BaseRepository, IAdminRepository
                     CompanyName = r.SellerInfo.CompanyName,
                     CompanyDescription = r.SellerInfo.CompanyDescription,
                     CompanyEmail = r.SellerInfo.CompanyEmail,
-                    CompanyPhone = r.SellerInfo.CompanyPhone,
-                    
+                    CompanyPhone = r.SellerInfo.CompanyPhone
                 },
-                User = new UserDto 
+                User = new UserDto
                 {
                     Id = r.UserId,
                     Username = r.User.UserName,
@@ -224,7 +197,6 @@ public class AdminRepository: BaseRepository, IAdminRepository
                     CreatedAt = r.User.CreatedAt,
                     UpdatedAt = r.User.UpdatedAt,
                     ImageUrl = r.User.ImageUrl
-
                 }
             })
             .FirstOrDefaultAsync();
@@ -236,12 +208,22 @@ public class AdminRepository: BaseRepository, IAdminRepository
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ArgumentException("Request not found");
 
         if (request.Status != SellerUpgradeRequestStatus.Pending)
-        {
             throw new ArgumentException("Upgrade already reviewed");
-        }
         request.Status = status;
         request.DecidedAt = DateTime.UtcNow;
         request.Message = message;
         await SaveChangesAsyncWithTransaction();
+    }
+
+    private async Task<IEnumerable<string>> GetUserRoles(User user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        return roles;
+    }
+
+    private async Task<User> FindUser(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        return user;
     }
 }

@@ -15,8 +15,8 @@ namespace ECommerce.Controllers;
 //TODO: Extract the db logic to a repository
 public class AuthController : GenericController
 {
-    private readonly UserManager<User> _userManager;
     private readonly JwtService _jwtService;
+    private readonly UserManager<User> _userManager;
 
     public AuthController(
         IMapper mapper,
@@ -27,75 +27,59 @@ public class AuthController : GenericController
         _userManager = userManager;
         _jwtService = jwtService;
     }
-[HttpPost("register")]
-public async Task<ActionResult> Register([FromBody] RegisterDto dto)
-{
-    if (dto == null)
+
+    [HttpPost("register")]
+    public async Task<ActionResult> Register([FromBody] RegisterDto dto)
     {
-        return BadRequest("Empty data");
+        if (dto == null) return BadRequest("Empty data");
+
+        // Check if a user with the same email exists
+        var userExistsTask = _userManager.Users.AnyAsync(x => x.Email == dto.Email);
+
+        // Map the DTO to a User object
+        var user = _mapper.Map<User>(dto);
+
+        // Wait for the userExistsTask to complete
+        if (await userExistsTask) return BadRequest("Email already in use");
+
+        // Create the user and add to role in parallel
+        var createUserTask = _userManager.CreateAsync(user, dto.Password);
+        var addToRoleTask = createUserTask.ContinueWith(t => _userManager.AddToRoleAsync(user, UserRoles.Customer),
+            TaskContinuationOptions.OnlyOnRanToCompletion);
+
+        // Wait for both tasks to complete
+        var result = await createUserTask;
+        var roleResult = await addToRoleTask;
+
+        if (!result.Succeeded || !roleResult.Result.Succeeded) return BadRequest(result.Errors);
+
+        // Generate the JWT token
+        var token = _jwtService.GenerateToken(user.Id, user.UserName, new List<string> { UserRoles.Customer });
+        var tokenAsString = _jwtService.WriteToken(token);
+
+        return CreatedAtAction(
+            nameof(Register),
+            new
+            {
+                id = user.Id,
+                email = user.Email,
+                token = tokenAsString,
+                expiresTo = token.ValidTo
+            }
+        );
     }
-
-    // Check if a user with the same email exists
-    var userExistsTask = _userManager.Users.AnyAsync(x => x.Email == dto.Email);
-
-    // Map the DTO to a User object
-    var user = _mapper.Map<User>(dto);
-
-    // Wait for the userExistsTask to complete
-    if (await userExistsTask)
-    {
-        return BadRequest("Email already in use");
-    }
-
-    // Create the user and add to role in parallel
-    var createUserTask = _userManager.CreateAsync(user, dto.Password);
-    var addToRoleTask = createUserTask.ContinueWith(t => _userManager.AddToRoleAsync(user, UserRoles.Customer), TaskContinuationOptions.OnlyOnRanToCompletion);
-
-    // Wait for both tasks to complete
-    var result = await createUserTask;
-    var roleResult = await addToRoleTask;
-
-    if (!result.Succeeded || !roleResult.Result.Succeeded)
-    {
-        return BadRequest(result.Errors);
-    }
-
-    // Generate the JWT token
-    var token = _jwtService.GenerateToken(user.Id, user.UserName, new List<string> { UserRoles.Customer });
-    var tokenAsString = _jwtService.WriteToken(token);
-
-    return CreatedAtAction(
-        nameof(Register),
-        new
-        {
-            id = user.Id,                
-            email = user.Email,
-            token = tokenAsString,
-            expiresTo = token.ValidTo,
-        }
-    );
-}
 
     [HttpPost("login")]
     public async Task<ActionResult<JwtSecurityToken>> Login([FromBody] LoginDto dto)
     {
-        if (dto == null)
-        {
-            return BadRequest("Empty data");
-        }
+        if (dto == null) return BadRequest("Empty data");
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
-        if (user == null)
-        {
-            return Unauthorized();
-        }
+        if (user == null) return Unauthorized();
 
         var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
-        if (!passwordIsCorrect)
-        {
-            return Unauthorized("Password is incorrect");
-        }
+        if (!passwordIsCorrect) return Unauthorized("Password is incorrect");
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -104,7 +88,7 @@ public async Task<ActionResult> Register([FromBody] RegisterDto dto)
         return Ok(new
         {
             token = tokenAsString,
-            expiration = token.ValidTo,
+            expiration = token.ValidTo
         });
     }
 
@@ -113,91 +97,59 @@ public async Task<ActionResult> Register([FromBody] RegisterDto dto)
     {
         var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
         var principal = _jwtService.ValidateToken(token);
-        if (principal == null)
-        {
-            return BadRequest();
-        }
+        if (principal == null) return BadRequest();
 
         return Ok(principal);
     }
-    
+
     [HttpPost("change-password")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
-        if (dto == null)
-        {
-            return BadRequest("Empty data");
-        }
+        if (dto == null) return BadRequest("Empty data");
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null)
-        {
-            return BadRequest("User with such email does not exist");
-        }
+        if (user == null) return BadRequest("User with such email does not exist");
 
         var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.OldPassword);
-        if (!passwordIsCorrect)
-        {
-            return Unauthorized("Password is incorrect");
-        }
+        if (!passwordIsCorrect) return Unauthorized("Password is incorrect");
 
         var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
+        if (!result.Succeeded) return BadRequest(result.Errors);
 
-        
-        var token = _jwtService.GenerateToken(userId: user.Id, username: user.UserName, roles: await _userManager.GetRolesAsync(user));
-        
+
+        var token = _jwtService.GenerateToken(user.Id, user.UserName, await _userManager.GetRolesAsync(user));
+
         Console.WriteLine("token: " + _jwtService.WriteToken(token));
-        return CreatedAtAction(nameof(ChangePassword),
-        new
-        {
-            token = _jwtService.WriteToken(token),
-            expiration = token.ValidTo,
-        });
-        
-    } 
-    
-    [HttpPost("change-email")]
-    public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
-    {
-        if (dto == null)
-        {
-            return BadRequest("Empty data");
-        }
-
-        var user = await _userManager.FindByEmailAsync(dto.OldEmail);
-        if (user == null)
-        {
-            return BadRequest("User with such email does not exist");
-        }
-
-        var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
-        if (!passwordIsCorrect)
-        {
-            return Unauthorized("Password is incorrect");
-        }
-
-        var result = await _userManager.SetEmailAsync(user, dto.NewEmail);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        
-        var token = _jwtService.GenerateToken(userId: user.Id, username: user.UserName, roles: await _userManager.GetRolesAsync(user));
-        
         return CreatedAtAction(nameof(ChangePassword),
             new
             {
                 token = _jwtService.WriteToken(token),
-                expiration = token.ValidTo,
+                expiration = token.ValidTo
             });
-
     }
 
-    
-    
+    [HttpPost("change-email")]
+    public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
+    {
+        if (dto == null) return BadRequest("Empty data");
+
+        var user = await _userManager.FindByEmailAsync(dto.OldEmail);
+        if (user == null) return BadRequest("User with such email does not exist");
+
+        var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
+        if (!passwordIsCorrect) return Unauthorized("Password is incorrect");
+
+        var result = await _userManager.SetEmailAsync(user, dto.NewEmail);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+
+        var token = _jwtService.GenerateToken(user.Id, user.UserName, await _userManager.GetRolesAsync(user));
+
+        return CreatedAtAction(nameof(ChangePassword),
+            new
+            {
+                token = _jwtService.WriteToken(token),
+                expiration = token.ValidTo
+            });
+    }
 }

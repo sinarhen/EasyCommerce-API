@@ -11,7 +11,7 @@ public class Secrets
     public static readonly string AdminEmail;
     public static readonly string AdminPassword;
     public static readonly string AdminUsername;
-    
+
     static Secrets()
     {
         JwtIssuer = Env.GetRequired("JWT_ISSUER");

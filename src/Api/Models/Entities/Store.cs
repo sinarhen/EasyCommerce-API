@@ -13,18 +13,14 @@ public class Store : BaseEntity
     public string Address { get; set; }
     public string Contacts { get; set; }
     public string Email { get; set; }
-    
-    public string OwnerId { get; set; }
-    
-    public bool IsVerified { get; set; }
-    
-    
-    // Navigation properties
-    [ForeignKey("OwnerId")]
-    public User Owner { get; set; }
 
-    [Required]
-    public List<Collection> Collections { get; set; }
-    
-    
+    public string OwnerId { get; set; }
+
+    public bool IsVerified { get; set; }
+
+
+    // Navigation properties
+    [ForeignKey("OwnerId")] public User Owner { get; set; }
+
+    [Required] public List<Collection> Collections { get; set; }
 }

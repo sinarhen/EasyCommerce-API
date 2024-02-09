@@ -1,6 +1,7 @@
 using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.User;
+
 public class SellerUpgradeRequestDto
 {
     public Guid Id { get; set; }

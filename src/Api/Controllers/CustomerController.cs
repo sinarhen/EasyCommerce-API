@@ -12,6 +12,7 @@ namespace ECommerce.Controllers;
 public class CustomerController : GenericController
 {
     private readonly ICustomerRepository _repository;
+
     public CustomerController(IMapper mapper, ICustomerRepository repository) : base(mapper)
     {
         _repository = repository;
@@ -20,21 +21,23 @@ public class CustomerController : GenericController
     [HttpGet("reviews")]
     public async Task<IActionResult> GetReviewsForUser()
     {
-        try {
+        try
+        {
             var res = await _repository.GetReviewsForUser(GetUserId());
-            
+
             return Ok(res);
-        } 
-        catch (UnauthorizedAccessException e) {
+        }
+        catch (UnauthorizedAccessException e)
+        {
             return Unauthorized(e.Message);
         }
         catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             return StatusCode(500, e.Message);
-
         }
     }
 
@@ -58,7 +61,6 @@ public class CustomerController : GenericController
         catch (Exception e)
         {
             return StatusCode(500, e.Message);
-
         }
     }
 }

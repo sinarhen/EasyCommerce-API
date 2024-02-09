@@ -7,17 +7,14 @@ namespace ECommerce.Models.Entities;
 [PrimaryKey("ProductId", "CategoryId")]
 public class ProductCategory : BaseEntity
 {
-    [Key]
-    public Guid ProductId { get; set; }
-    [Key]
-    public Guid CategoryId { get; set; }
-    
+    [Key] public Guid ProductId { get; set; }
+
+    [Key] public Guid CategoryId { get; set; }
+
     public int Order { get; set; }
-    
+
     // Navigation properties
-    [ForeignKey("ProductId")]
-    public Product Product { get; set; }
-    
-    [ForeignKey("CategoryId")]
-    public Category Category { get; set; }
+    [ForeignKey("ProductId")] public Product Product { get; set; }
+
+    [ForeignKey("CategoryId")] public Category Category { get; set; }
 }

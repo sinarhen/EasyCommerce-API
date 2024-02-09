@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Billboard;
@@ -23,43 +22,48 @@ public class BillboardController : GenericController
     [HttpGet]
     public async Task<IActionResult> GetBillboardsForCollection(Guid collectionId)
     {
-        try {
+        try
+        {
             var billboards = await _repository.GetBillboardsForCollectionAsync(collectionId);
             return Ok(_mapper.Map<List<BillboardDto>>(billboards));
-        } 
-        catch (UnauthorizedAccessException e) {
+        }
+        catch (UnauthorizedAccessException e)
+        {
             return Unauthorized(e.Message);
         }
         catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             return StatusCode(500, e.Message);
-
         }
     }
 
     [HttpPost]
     [Authorize(Policy = Policies.SellerPolicy)]
-    public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId, [FromBody] CreateBillboardDto createBillboardDto)
+    public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId,
+        [FromBody] CreateBillboardDto createBillboardDto)
     {
-        try {
-     
-            var billboard = await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto, IsAdmin());
+        try
+        {
+            var billboard =
+                await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto,
+                    IsAdmin());
             return Ok(_mapper.Map<BillboardDto>(billboard));
-    
-        } 
-        catch (UnauthorizedAccessException e) {
+        }
+        catch (UnauthorizedAccessException e)
+        {
             return Unauthorized(e.Message);
         }
         catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             return StatusCode(500, e.Message);
-
         }
     }
 
@@ -67,19 +71,22 @@ public class BillboardController : GenericController
     [Authorize(Policy = Policies.SellerPolicy)]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)
     {
-        try {
-            var billboard = await _repository.UpdateBillboardAsync(billboardId, updateBillboardDto, GetUserId(), IsAdmin());
+        try
+        {
+            var billboard =
+                await _repository.UpdateBillboardAsync(billboardId, updateBillboardDto, GetUserId(), IsAdmin());
             return Ok(_mapper.Map<BillboardDto>(billboard));
-    
-        } 
-        catch (UnauthorizedAccessException e) {
+        }
+        catch (UnauthorizedAccessException e)
+        {
             return Unauthorized(e.Message);
         }
         catch (ArgumentException e)
         {
             return BadRequest(e.Message);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             return StatusCode(500, e.Message);
         }
     }
@@ -91,5 +98,4 @@ public class BillboardController : GenericController
         await _repository.DeleteBillboardAsync(collectionId, billboardId, GetUserId(), IsAdmin());
         return Ok();
     }
-
 }

@@ -43,9 +43,6 @@ public class SellerInfo : BaseEntity
     public string CompanySamsungpay { get; set; }
 
     public bool IsVerified { get; set; }
-    
+
     // TODO: Add stripe and paypal account details
-
-
-
 }

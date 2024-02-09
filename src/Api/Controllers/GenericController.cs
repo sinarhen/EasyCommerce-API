@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
 using ECommerce.Config;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers;
@@ -9,6 +8,7 @@ namespace ECommerce.Controllers;
 public class GenericController : ControllerBase
 {
     protected readonly IMapper _mapper;
+
     public GenericController(IMapper mapper)
     {
         _mapper = mapper;
@@ -33,6 +33,5 @@ public class GenericController : ControllerBase
     protected List<string> GetUserRoles()
     {
         return User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-            
     }
 }

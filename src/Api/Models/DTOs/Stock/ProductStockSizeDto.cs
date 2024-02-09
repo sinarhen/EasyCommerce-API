@@ -1,4 +1,5 @@
 ﻿namespace ECommerce.Models.DTOs.Stock;
+
 public class ProductStockSizeDto
 {
     public Guid SizeId { get; set; }

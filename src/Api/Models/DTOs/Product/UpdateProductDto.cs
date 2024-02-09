@@ -1,8 +1,8 @@
 ﻿using ECommerce.Models.DTOs.Material;
 using ECommerce.Models.DTOs.Stock;
-using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.Product;
+
 public class UpdateProductDto
 {
     public string Name { get; set; }
@@ -15,7 +15,7 @@ public class UpdateProductDto
     public string Season { get; set; }
     public Guid MainMaterialId { get; set; }
     public Guid? CollectionId { get; set; }
-    public List<MaterialDto> Materials { get; set; } = new List<MaterialDto>(); 
-    
-    public List<ProductStockDto> Stocks { get; set; } = new List<ProductStockDto>();
+    public List<MaterialDto> Materials { get; set; } = new();
+
+    public List<ProductStockDto> Stocks { get; set; } = new();
 }

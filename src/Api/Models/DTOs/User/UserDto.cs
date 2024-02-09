@@ -10,13 +10,11 @@ public class UserDto
     public bool IsBanned { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    
 }
 
-public class RoleDto 
+public class RoleDto
 {
     public string Name { get; set; }
 
     public int Level { get; set; }
-
 }

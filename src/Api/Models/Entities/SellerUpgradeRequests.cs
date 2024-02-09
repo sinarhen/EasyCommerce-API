@@ -12,11 +12,9 @@ public class SellerUpgradeRequest : BaseEntity
 
     public Guid SellerInfoId { get; set; }
 
-    [ForeignKey("SellerInfoId")]
-    public SellerInfo SellerInfo { get; set; }
+    [ForeignKey("SellerInfoId")] public SellerInfo SellerInfo { get; set; }
 
-    [ForeignKey("UserId")]
-    public User User { get; set; }   
+    [ForeignKey("UserId")] public User User { get; set; }
 }
 
 public enum SellerUpgradeRequestStatus

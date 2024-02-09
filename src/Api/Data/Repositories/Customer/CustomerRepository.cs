@@ -13,6 +13,7 @@ namespace Data.Repositories.Customer;
 public class CustomerRepository : BaseRepository, ICustomerRepository
 {
     private readonly UserManager<User> _userManager;
+
     public CustomerRepository(ProductDbContext context, UserManager<User> userManager) : base(context)
     {
         _userManager = userManager;
@@ -22,25 +23,25 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     public async Task<UserReviewsDto> GetReviewsForUser(string userId)
     {
         var reviews = await _db.Reviews
-                .AsNoTracking()
-                .Where(r => r.CustomerId == userId)
-                .Select(r => new ReviewDto
+            .AsNoTracking()
+            .Where(r => r.CustomerId == userId)
+            .Select(r => new ReviewDto
+            {
+                Id = r.Id,
+                Title = r.Title,
+                Content = r.Content,
+                Rating = r.Rating,
+                CreatedAt = r.CreatedAt,
+                Product = new ReviewProductDto
                 {
-                    Id = r.Id,
-                    Title = r.Title,
-                    Content = r.Content,
-                    Rating = r.Rating,
-                    CreatedAt = r.CreatedAt,
-                    Product = new ReviewProductDto
-                    {
-                        Id = r.Product.Id,
-                        Name = r.Product.Name,
-                        Description = r.Product.Description,
-                        Price = r.Product.Stocks.MinBy(s => s.Price).Price,
-                        ImageUrl = r.Product.Images.FirstOrDefault().ImageUrls.FirstOrDefault()
-                    }
-                })
-                .ToListAsync();
+                    Id = r.Product.Id,
+                    Name = r.Product.Name,
+                    Description = r.Product.Description,
+                    Price = r.Product.Stocks.MinBy(s => s.Price).Price,
+                    ImageUrl = r.Product.Images.FirstOrDefault().ImageUrls.FirstOrDefault()
+                }
+            })
+            .ToListAsync();
 
         var user = await _userManager.FindByIdAsync(userId);
         var roles = await _userManager.GetRolesAsync(user);
@@ -60,42 +61,23 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                 IsBanned = isBanned
             },
             Reviews = reviews
-        }; 
+        };
     }
 
     public async Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo)
     {
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            throw new ArgumentException("User id is required");
-        }
-        if (sellerInfo == null)
-        {
-            throw new ArgumentException("Empty body");
-        }
-        if (sellerInfo.Name == null)
-        {
-            throw new ArgumentException("Company name is required");
-        }
-        if (sellerInfo.Description == null)
-        {
-            throw new ArgumentException("Company description is required");
-        }
-        if (sellerInfo.Email == null)
-        {
-            throw new ArgumentException("Company email is required");
-        }
-        if (sellerInfo.PhoneNumber == null)
-        {
-            throw new ArgumentException("Company phone number is required");
-        }
+        if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("User id is required");
+        if (sellerInfo == null) throw new ArgumentException("Empty body");
+        if (sellerInfo.Name == null) throw new ArgumentException("Company name is required");
+        if (sellerInfo.Description == null) throw new ArgumentException("Company description is required");
+        if (sellerInfo.Email == null) throw new ArgumentException("Company email is required");
+        if (sellerInfo.PhoneNumber == null) throw new ArgumentException("Company phone number is required");
 
-        var nameExists = await _db.SellerUpgradeRequests.Where(req => req.Status == SellerUpgradeRequestStatus.Approved &&  sellerInfo.Name == req.SellerInfo.CompanyName ).AnyAsync();
-        
-        if (nameExists)
-        {
-            throw new ArgumentException("Company name already exists");
-        }
+        var nameExists = await _db.SellerUpgradeRequests.Where(req =>
+                req.Status == SellerUpgradeRequestStatus.Approved && sellerInfo.Name == req.SellerInfo.CompanyName)
+            .AnyAsync();
+
+        if (nameExists) throw new ArgumentException("Company name already exists");
 
         await CheckIfUserIsAuthorized(userId);
         var seller = new SellerInfo
@@ -103,7 +85,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             CompanyName = sellerInfo.Name,
             CompanyDescription = sellerInfo.Description,
             CompanyEmail = sellerInfo.Email,
-            CompanyPhone = sellerInfo.PhoneNumber,
+            CompanyPhone = sellerInfo.PhoneNumber
         };
         await _db.Sellers.AddAsync(seller);
         await _db.SellerUpgradeRequests.AddAsync(new SellerUpgradeRequest
@@ -114,22 +96,14 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
         return true;
     }
+
     private async Task CheckIfUserIsAuthorized(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId) ?? throw new ArgumentException("User not found");
         if (await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id))
-        {
             throw new UnauthorizedAccessException("User is banned");
-        }
-        
+
         var roles = await _userManager.GetRolesAsync(user);
-        if (roles.Contains(UserRoles.Seller))
-        {
-            throw new ArgumentException("User is already a seller");
-        }
-
-
-
+        if (roles.Contains(UserRoles.Seller)) throw new ArgumentException("User is already a seller");
     }
 }
-

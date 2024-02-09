@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Collection;
 using ECommerce.Models.DTOs.Collection;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers.Collection;
-
 
 [ApiController]
 [Route("api/collections")]
@@ -57,7 +55,7 @@ public class CollectionController : GenericController
         try
         {
             var ownerId = GetUserId();
-            var ownerRoles = GetUserRoles();            
+            var ownerRoles = GetUserRoles();
             await _repository.UpdateCollectionAsync(id, collectionDto, ownerId, ownerRoles);
             return NoContent();
         }
@@ -73,7 +71,7 @@ public class CollectionController : GenericController
         try
         {
             var ownerId = GetUserId();
-            var ownerRoles = GetUserRoles();            
+            var ownerRoles = GetUserRoles();
             await _repository.DeleteCollectionAsync(id, ownerId, ownerRoles);
             return NoContent();
         }
@@ -90,7 +88,8 @@ public class CollectionController : GenericController
         try
         {
             var ownerId = GetUserId();
-            var ownerRoles = GetUserRoles();            var collection = await _repository.CreateCollectionAsync(collectionDto, ownerId, ownerRoles);
+            var ownerRoles = GetUserRoles();
+            var collection = await _repository.CreateCollectionAsync(collectionDto, ownerId, ownerRoles);
             return CreatedAtAction(nameof(CreateCollection), new { id = collection.Id }, collection);
         }
         catch (Exception ex)
@@ -98,5 +97,4 @@ public class CollectionController : GenericController
             return BadRequest(ex.Message);
         }
     }
-
 }

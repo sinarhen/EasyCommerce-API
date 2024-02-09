@@ -1,16 +1,12 @@
-﻿
-using ECommerce.Models.DTOs.Color;
-using ECommerce.Models.DTOs.Material;
-using ECommerce.Models.DTOs.Size;
+﻿using ECommerce.Models.DTOs.Color;
 
 namespace ECommerce.Models.DTOs.Product;
 
-public class ProductDto 
+public class ProductDto
 {
-    
     public Guid Id { get; set; }
     public ProductCategoryDto[] Categories { get; set; }
-    
+
     public string Name { get; set; }
     public string Description { get; set; }
     public double? Discount { get; set; }
@@ -27,7 +23,7 @@ public class ProductDto
     public decimal DiscountPrice { get; set; }
     public bool IsNew { get; set; }
     public bool IsOnSale { get; set; }
-    
+
     public bool IsAvailable { get; set; }
     public bool IsBestseller { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -41,7 +37,6 @@ public class ProductCategoryDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    
+
     public int Order { get; set; }
 }
-
