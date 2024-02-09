@@ -150,6 +150,42 @@ namespace ECommerce.Controllers
             }
         }
         
+        [HttpGet("users/upgrade-requests/{id:guid}")]
+        public async Task<ActionResult<SellerUpgradeRequestDetailsDto>> GetUpgradeRequestById(Guid id)
+        {
+            try {
+                return Ok(await _repository.GetSellerUpgradeRequestById(id));
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpPut("users/upgrade-requests/{id:guid}")]
+        public async Task<ActionResult> UpdateUpgradeRequestStatus(Guid id, [FromBody] SellerUpgradeRequestDto dto)
+        {
+            try {
+                if (dto.Status == null)
+                {
+                    return BadRequest("Status is required");
+                }
+
+                if (dto.Status != SellerUpgradeRequestStatus.Approved && dto.Status != SellerUpgradeRequestStatus.Rejected)
+                {
+                    return BadRequest("Invalid status. Valid statuses are `Approved` or `Rejected`");
+                }
+                await _repository.UpgradeSellerUpgradeRequestStatus(id, dto.Message, dto.Status.Value);
+                return Ok(new {
+                    message = "Seller upgrade request status has been updated"
+                });
+            } catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            } catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
     }
 
 

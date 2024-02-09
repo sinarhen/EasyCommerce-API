@@ -18,5 +18,7 @@ public interface IAdminRepository
 
     Task<SellerUpgradeRequestDetailsDto> GetSellerUpgradeRequestById(Guid id);
 
-    Task ApproveSellerUpgradeRequest(Guid id, string message);
+    Task UpgradeSellerUpgradeRequestStatus(Guid id, string message, SellerUpgradeRequestStatus status);
+
+
 }

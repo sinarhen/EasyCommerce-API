@@ -4,7 +4,6 @@ using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Extensions;
 
 namespace ECommerce.Data.Repositories.Admin;
 
@@ -138,10 +137,8 @@ public class AdminRepository: BaseRepository, IAdminRepository
     {
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
-        Console.WriteLine("USER:", user);
         var userRoles = await GetUserRoles(user);
         
-        Console.WriteLine("USER ROLES:");
         foreach (var r in userRoles)
         {
             Console.WriteLine(r);
@@ -173,8 +170,6 @@ public class AdminRepository: BaseRepository, IAdminRepository
             await _userManager.AddToRolesAsync(user, rolesToAdd);
         }
         await SaveChangesAsyncWithTransaction();
-        return;
-
     }
 
     public async Task<IEnumerable<SellerUpgradeRequestDto>> GetSellerUpgradeRequests()
@@ -185,7 +180,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
             .Select(r => new SellerUpgradeRequestDto
             {
                 Id = r.Id,
-                Status = r.Status.GetDisplayName(),
+                Status = r.Status,
                 DecidedAt = r.DecidedAt,
                 Message = r.Message,
                 User = new UserDto 
@@ -210,7 +205,7 @@ public class AdminRepository: BaseRepository, IAdminRepository
             .Select(r => new SellerUpgradeRequestDetailsDto
             {
                 Id = r.Id,
-                Status = r.Status.GetDisplayName(),
+                Status = r.Status,
                 DecidedAt = r.DecidedAt,
                 Message = r.Message,
                 SellerInfo = new SellerInfo
@@ -221,12 +216,32 @@ public class AdminRepository: BaseRepository, IAdminRepository
                     CompanyPhone = r.SellerInfo.CompanyPhone,
                     
                 },
+                User = new UserDto 
+                {
+                    Id = r.UserId,
+                    Username = r.User.UserName,
+                    Email = r.User.Email,
+                    CreatedAt = r.User.CreatedAt,
+                    UpdatedAt = r.User.UpdatedAt,
+                    ImageUrl = r.User.ImageUrl
+
+                }
             })
             .FirstOrDefaultAsync();
     }
 
-    public Task ApproveSellerUpgradeRequest(Guid id, string message)
+    public async Task UpgradeSellerUpgradeRequestStatus(Guid id, string message, SellerUpgradeRequestStatus status)
     {
-        throw new NotImplementedException();
+        var request = await _db.SellerUpgradeRequests
+            .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ArgumentException("Request not found");
+
+        if (request.Status != SellerUpgradeRequestStatus.Pending)
+        {
+            throw new ArgumentException("Upgrade already reviewed");
+        }
+        request.Status = status;
+        request.DecidedAt = DateTime.UtcNow;
+        request.Message = message;
+        await SaveChangesAsyncWithTransaction();
     }
 }
