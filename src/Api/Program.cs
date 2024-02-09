@@ -27,12 +27,8 @@ var envFile = builder.Environment.IsDevelopment() ? ".env.dev" : ".env";
 Env.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), envFile));
 
 
-builder.Services.AddControllers().AddJsonOptions(
-    x => {
-        // x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve
+builder.Services.AddControllers();
 
-    }
-);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -80,36 +76,10 @@ builder.Services.AddAuthentication(options =>
         };       
     });
 
-builder.Services.AddAuthorization(options => 
-{
-    options.AddPolicy(Policies.AdminPolicy, policy => 
-    {
-        policy.RequireRole(UserRoles.Admin, UserRoles.SuperAdmin);
-    });
-
-    options.AddPolicy(Policies.SellerPolicy, policy => 
-    {
-        policy.RequireRole(UserRoles.Seller, UserRoles.Admin, UserRoles.SuperAdmin);
-});
-
-    options.AddPolicy(Policies.SuperAdminPolicy, policy => 
-    {
-        policy.RequireRole(UserRoles.SuperAdmin);
-    });
-});
-
+builder.Services.AddAuthorizationWithPolicies();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 builder.Services.AddJwtService();
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IStoreRepository, StoreRepository>();
-builder.Services.AddScoped<ICollectionRepository, CollectionRepository>();
-builder.Services.AddScoped<IBillboardRepository, BillboardRepository>();
-builder.Services.AddScoped<IAdminRepository, AdminRepository>();
-builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddRepositories();
 
 var app = builder.Build();
 
