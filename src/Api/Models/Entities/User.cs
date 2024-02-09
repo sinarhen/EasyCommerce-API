@@ -18,7 +18,7 @@ public class User : IdentityUser
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public Guid? SellerInfoId { get; set; }
+    public virtual Guid? SellerInfoId { get; set; }
 
     [ForeignKey("SellerInfoId")]
     public SellerInfo SellerInfo { get; set; }

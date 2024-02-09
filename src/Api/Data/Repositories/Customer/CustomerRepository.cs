@@ -1,6 +1,5 @@
+using Data.Repositories.Customer;
 using ECommerce.Config;
-using ECommerce.Data;
-using ECommerce.Data.Repositories;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
 using ECommerce.Models.DTOs.User;
@@ -8,7 +7,7 @@ using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Repositories.Customer;
+namespace ECommerce.Data.Repositories.Customer;
 
 public class CustomerRepository : BaseRepository, ICustomerRepository
 {

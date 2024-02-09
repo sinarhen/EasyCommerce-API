@@ -218,7 +218,10 @@ public class AdminRepository : BaseRepository, IAdminRepository
         if (status == SellerUpgradeRequestStatus.Approved.GetDisplayName())
         {
             var user = request.User;
-            await _userManager.AddToRoleAsync(user, UserRoles.Seller);
+            await _userManager.AddToRoleAsync(user, UserRoles.Seller); 
+            
+            user.SellerInfoId = request.SellerInfoId;
+            
         }
         
         await SaveChangesAsyncWithTransaction();

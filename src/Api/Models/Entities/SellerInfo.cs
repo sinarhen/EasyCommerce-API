@@ -42,7 +42,10 @@ public class SellerInfo : BaseEntity
     public string CompanyGooglepay { get; set; }
     public string CompanySamsungpay { get; set; }
 
+    public string UserId { get; set; }
     public bool IsVerified { get; set; }
+
+    public virtual User User { get; set; }
 
     // TODO: Add stripe and paypal account details
 }
