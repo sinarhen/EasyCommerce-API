@@ -2,7 +2,6 @@
 
 ## Controllers
 - [x] AdminController
-
 	- [x] `GetAllUsers`: Retrieves all users in the system.
 	- [x] `DeleteUser`: Deletes a user from the system based on the provided user ID.
 	- [x] `GetUserById`: Retrieves a specific user based on the provided user ID.
@@ -14,15 +13,46 @@
 	- [x] `GetUpgradeRequestById`: Retrieves a specific seller upgrade request based on the provided request ID.
 	- [x] `UpdateUpgradeRequestStatus`: Updates the status of a specific seller upgrade request based on the provided request ID and status.
 - [x] AuthController
+	- [x] `Register`: Registers a new user in the system.
+	- [x] `Login`: Logs in a user. Finds the user by email, checks if the password is correct, generates a JWT token for the user and returns it.
+	- [x] `ValidateToken`: Validates a JWT token. Retrieves the token from the Authorization header, validates it and returns the principal.
+	- [x] `ChangePassword`: Changes the password of a user.
+	- [x] `ChangeEmail`: Changes the email of a user.
 - [x] BillboardController
+	- [x] `GetBillboardsForCollection: Retrieves all billboards for a specific collection.
+	- [x] `CreateBillboardForCollection`: Creates a new billboard for a specific collection. 
+	- [x] `UpdateBillboard` :  Updates a specific billboard.
+	- [x] `DeleteBillboard`: Deletes a specific billboard from a specific collection. 
 - [x] CategoryController
-- [x] CollectionController
-- [x] CustomerController
+	- [x] `GetCategories`: Retrieves all categories. 
+	- [x] `GetCategory`: Retrieves a specific category based on the provided ID. 
+	- [x] `CreateCategory`: Creates a new category.
+	- [x] `UpdateCategory` - Updates a specific category based on the provided ID and DTO.
+	- [x] `DeleteCategory`- Deletes a specific category based on the provided ID.
+- [x] CollectionRepository
+	- [x] `CreateCollectionAsync`: Creates a new collection.
+	- [x] `DeleteCollectionAsync`: Deletes a specific collection based on the provided ID. 
+	- [x] `GetCollectionByIdAsync`: Retrieves a specific collection based on the provided ID. 
+	- [x] `GetRandomCollectionsAsync`: Retrieves a random set of collections. It returns the collections as a list.
+	- [x] `UpdateCollectionAsync`: Updates a specific collection based on the provided ID and DTO. 
+	- [x] `GetCollectionsAsync`: Retrieves collections based on the provided search parameters.
+- [x] `CustomerController`
+	- [x] `GetReviewsForUser`: Retrieves all reviews for the currently authenticated user.
+	- [x] `UpgradeToSeller`: Allows the currently authenticated user to request an upgrade to a seller.
+	- [ ] GetOrdersForUser - Retrieves all orders made by user.
+	- [ ] GetCartForUser - Retrieves cart for user.
 - [x] GenericController
-- [x] ProductController
-- [x] ReviewController
-- [x] SellerController
+- [x] `ProductController`
+	- [x] `GetProducts`: Retrieves a list of products based on the provided search parameters.
+	- [x] `GetProduct`: Retrieves a specific product by its ID.
+	- [x] `CreateProduct`: Creates a new product. This action is only allowed for users with the Seller role.
+	- [x] `UpdateProduct`: Updates a specific product by its ID. This action is only allowed for users with the Seller role.
+	- [x] `DeleteProduct`: Deletes a specific product by its ID. This action is only allowed for users with the Seller role.
+- [x] `ReviewController`
+	- [x] `CreateReviewForProduct`: Creates a new review for a specific product. This action is only allowed for authenticated users.
+	- [x] `DeleteReview`: Deletes a specific review. This action is only allowed for authenticated users.
 - [x] StoreController
+- [ ] SellerController
 - [ ] OrderController
 - [ ] CartController 
 
@@ -37,11 +67,8 @@
 
 ## Models
 ### DTOs
-- [ ] Complete DTOs folder
-### Entities 
-- [ ] Complete Entities folder
+### Entities  
 ### Enum
-- [ ] Complete Enum folder
 
 ## Services
 - [x] JWT Service
