@@ -20,10 +20,11 @@ public class User : IdentityUser
 
     public virtual Guid? SellerInfoId { get; set; }
 
-    [ForeignKey("SellerInfoId")]
-    public SellerInfo SellerInfo { get; set; }
-
     // Navigation properties
+    [ForeignKey("SellerInfoId")]
+    public virtual SellerInfo SellerInfo { get; set; }    
+    public ICollection<SellerUpgradeRequest> Requests { get; set; } = new List<SellerUpgradeRequest>();
+    
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public ICollection<Store> Stores { get; set; } = new List<Store>();
