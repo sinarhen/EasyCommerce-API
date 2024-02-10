@@ -44,7 +44,7 @@ public class SellerInfo : BaseEntity
     public string CompanyGooglepay { get; set; }
     public string CompanySamsungpay { get; set; }
 
-    public string RequestId { get; set; }
+    public Guid RequestId { get; set; }
     public bool IsVerified { get; set; }
 
     // Navigation properties
