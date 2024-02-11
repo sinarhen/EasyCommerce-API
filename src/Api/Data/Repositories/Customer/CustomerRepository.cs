@@ -67,24 +67,24 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     {
         if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("User id is required");
         if (sellerInfo == null) throw new ArgumentException("Empty body");
-        if (sellerInfo.Name == null) throw new ArgumentException("Company name is required");
-        if (sellerInfo.Description == null) throw new ArgumentException("Company description is required");
-        if (sellerInfo.Email == null) throw new ArgumentException("Company email is required");
-        if (sellerInfo.PhoneNumber == null) throw new ArgumentException("Company phone number is required");
+        if (sellerInfo.Name == null) throw new ArgumentException(" name is required");
+        if (sellerInfo.Description == null) throw new ArgumentException(" description is required");
+        if (sellerInfo.Email == null) throw new ArgumentException(" email is required");
+        if (sellerInfo.PhoneNumber == null) throw new ArgumentException(" phone number is required");
 
         var nameExists = await _db.SellerUpgradeRequests.Where(req =>
-                req.Status == SellerUpgradeRequestStatus.Approved && sellerInfo.Name == req.SellerInfo.CompanyName)
+                req.Status == SellerUpgradeRequestStatus.Approved && sellerInfo.Name == req.SellerInfo.Name)
             .AnyAsync();
 
-        if (nameExists) throw new ArgumentException("Company name already exists");
+        if (nameExists) throw new ArgumentException(" name already exists");
 
         await CheckIfUserIsAuthorized(userId);
         var seller = new SellerInfo
         {
-            CompanyName = sellerInfo.Name,
-            CompanyDescription = sellerInfo.Description,
-            CompanyEmail = sellerInfo.Email,
-            CompanyPhone = sellerInfo.PhoneNumber
+            Name = sellerInfo.Name,
+            Description = sellerInfo.Description,
+            Email = sellerInfo.Email,
+            Phone = sellerInfo.PhoneNumber
         };
         await _db.Sellers.AddAsync(seller);
         await _db.SellerUpgradeRequests.AddAsync(new SellerUpgradeRequest
