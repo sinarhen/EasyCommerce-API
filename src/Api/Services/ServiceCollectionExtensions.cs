@@ -7,6 +7,7 @@ using ECommerce.Data.Repositories.Category;
 using ECommerce.Data.Repositories.Collection;
 using ECommerce.Data.Repositories.Customer;
 using ECommerce.Data.Repositories.Product;
+using ECommerce.Data.Repositories.Seller;
 using ECommerce.Data.Repositories.Store;
 
 namespace ECommerce.Services;
@@ -35,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IStoreRepository, StoreRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<ISellerRepository, SellerRepository>();
         return services;
     }
 
