@@ -123,7 +123,6 @@ public class AuthController : GenericController
         if (user == null) return BadRequest("User not found");
 
         var roles = await _userManager.GetRolesAsync(user);
-        if (roles == null) return BadRequest("Roles not found");
 
         // rest of your code
         var newToken = _jwtService.GenerateToken(user.Id, user.UserName, roles);
