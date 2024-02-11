@@ -107,6 +107,35 @@ public class AuthController : GenericController
         return Ok(principal);
     }
     
+    [HttpGet("refresh-token")]
+    public async Task<ActionResult<JwtSecurityToken>> RefreshToken()
+    {
+        var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        if (token == null) return BadRequest("Authorization header is required");
+
+        var principal = _jwtService.ValidateToken(token);
+        if (principal == null) return BadRequest("Invalid token");
+
+        var id = GetUserId();
+        if (id == null) return BadRequest("User ID is required");
+
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return BadRequest("User not found");
+
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles == null) return BadRequest("Roles not found");
+
+        // rest of your code
+        var newToken = _jwtService.GenerateToken(user.Id, user.UserName, roles);
+        var tokenAsString = _jwtService.WriteToken(newToken);
+        return Ok(new
+        {
+            token = tokenAsString,
+            expiration = newToken.ValidTo
+        });
+    }
+    
+    
     [HttpGet("me")]
     public async Task<ActionResult<UserDto>> GetMe()
     {
@@ -146,7 +175,6 @@ public class AuthController : GenericController
 
         var token = _jwtService.GenerateToken(user.Id, user.UserName, await _userManager.GetRolesAsync(user));
 
-        Console.WriteLine("token: " + _jwtService.WriteToken(token));
         return CreatedAtAction(nameof(ChangePassword),
             new
             {
