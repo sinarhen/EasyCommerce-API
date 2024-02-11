@@ -82,7 +82,7 @@ public async Task<SellerInfoDto> GetSellerInfo(string id)
 
     if (user == null)
     {
-        throw new ArgumentException("User not found");
+        throw new ArgumentException("User not found or not a seller");
     }
 
     return user;

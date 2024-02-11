@@ -1,7 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using ECommerce.Config;
+using ECommerce.Data;
 using ECommerce.Models.DTOs.Auth;
+using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Identity;
@@ -17,15 +19,18 @@ public class AuthController : GenericController
 {
     private readonly JwtService _jwtService;
     private readonly UserManager<User> _userManager;
-
+    private readonly ProductDbContext _db;
+    
     public AuthController(
         IMapper mapper,
         UserManager<User> userManager,
+        ProductDbContext db,
         JwtService jwtService
     ) : base(mapper)
     {
         _userManager = userManager;
         _jwtService = jwtService;
+        _db = db;
     }
 
     [HttpPost("register")]
@@ -92,16 +97,38 @@ public class AuthController : GenericController
         });
     }
 
-    [HttpGet("me")]
+    [HttpGet("validate-token")]
     public ActionResult<SimplePrincipal> ValidateToken()
     {
         var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
         var principal = _jwtService.ValidateToken(token);
-        if (principal == null) return BadRequest();
+        if (principal == null) return BadRequest("Invalid token");
 
         return Ok(principal);
     }
-
+    
+    [HttpGet("me")]
+    public async Task<ActionResult<UserDto>> GetMe()
+    {
+        var id = GetUserId();
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return NotFound();
+        var roles = await _userManager.GetRolesAsync(user);
+        
+        return Ok(new UserDto
+        {
+            Id = user.Id,
+            Username = user.UserName,
+            Email = user.Email,
+            ImageUrl = user.ImageUrl,
+            Role = roles.FirstOrDefault(),
+            Roles = roles.ToList(),
+            IsBanned = await _db.BannedUsers.AnyAsync(x => x.UserId == user.Id),
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt
+        });
+    }
+    
     [HttpPost("change-password")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {

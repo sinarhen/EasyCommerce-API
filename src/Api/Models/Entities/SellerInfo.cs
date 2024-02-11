@@ -47,7 +47,7 @@ public class SellerInfo : BaseEntity
     public bool IsVerified { get; set; }
 
     // Navigation properties
-    public ICollection<SellerUpgradeRequest> Request { get; set; }
+    public ICollection<SellerUpgradeRequest> Requests { get; set; }
 
     // TODO: Add stripe and paypal account details
 }
