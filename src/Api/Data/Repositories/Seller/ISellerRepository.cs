@@ -7,8 +7,7 @@ public interface ISellerRepository
     // Task<SellerInfoDto> GetSellerInfo(string id);
     
     Task UpdateSellerInfo(string id, SellerInfo sellerInfo);
-    
-    
-    
-    
+    Task<SellerInfo> GetSellerInfo(string id);
+
+
 }

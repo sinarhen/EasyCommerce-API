@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
+using ECommerce.Data.Repositories.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,10 @@ namespace ECommerce.Controllers;
 [Authorize(Policy = Policies.SellerPolicy)]
 public class SellerController: GenericController
 {
-    public SellerController(IMapper mapper) : base(mapper)
+    private readonly ISellerRepository _repository;
+    public SellerController(IMapper mapper, ISellerRepository sellerRepository) : base(mapper)
     {
-        
+        _repository = sellerRepository;
     }
 
     [HttpGet]
@@ -21,9 +23,10 @@ public class SellerController: GenericController
         try
         {
             var id = GetUserId();
+
+            var info = await _repository.GetSellerInfo(id);
             
-            // TODO: Implement the repository method to get seller info
-            return Ok();
+            return Ok(info);
 
         } 
         catch (Exception e)

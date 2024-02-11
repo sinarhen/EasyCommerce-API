@@ -65,14 +65,8 @@
 - [x] `SimplePrincipal.cs` - Dto with list of claims
 - [x] `UserRoles.cs` - consistent role names.
 
-## Models
-### DTOs
-### Entities  
-### Enum
-
 ## Services
 - [x] JWT Service
-- [ ] Other services (based on your application requirements)
 
 ## Data
 - [x] Database context and migrations

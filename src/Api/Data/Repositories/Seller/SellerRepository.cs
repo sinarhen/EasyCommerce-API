@@ -20,4 +20,11 @@ public class SellerRepository: BaseRepository, ISellerRepository
         await SaveChangesAsyncWithTransaction();
         
     }
+    
+    public async Task<SellerInfo> GetSellerInfo(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id) ?? throw new ArgumentException("User not found");
+        var sellerInfo = user.SellerInfo;
+        return sellerInfo;
+    }
 }
