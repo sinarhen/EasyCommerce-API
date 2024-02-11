@@ -44,12 +44,10 @@ public class SellerInfo : BaseEntity
     public string Googlepay { get; set; }
     public string Samsungpay { get; set; }
 
-    public Guid RequestId { get; set; }
     public bool IsVerified { get; set; }
 
     // Navigation properties
-    [ForeignKey("RequestId")]
-    public SellerUpgradeRequest Request { get; set; }
+    public ICollection<SellerUpgradeRequest> Request { get; set; }
 
     // TODO: Add stripe and paypal account details
 }

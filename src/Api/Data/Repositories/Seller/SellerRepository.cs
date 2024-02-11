@@ -8,7 +8,7 @@ namespace ECommerce.Data.Repositories.Seller;
 public class SellerRepository: BaseRepository, ISellerRepository
 {
     private readonly UserManager<User> _userManager;
-    protected SellerRepository(ProductDbContext db, UserManager<User> userManager) : base(db)
+    public SellerRepository(ProductDbContext db, UserManager<User> userManager) : base(db)
     {
         _userManager = userManager;
     }
