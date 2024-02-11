@@ -25,6 +25,7 @@ public class User : IdentityUser
     public virtual SellerInfo SellerInfo { get; set; }    
     public ICollection<SellerUpgradeRequest> Requests { get; set; } = new List<SellerUpgradeRequest>();
     
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public ICollection<Store> Stores { get; set; } = new List<Store>();

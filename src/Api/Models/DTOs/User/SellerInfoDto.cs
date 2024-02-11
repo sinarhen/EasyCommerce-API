@@ -46,7 +46,7 @@ public class SellerInfoDto
     public int ProductCount { get; set; }
     public int CollectionCount { get; set; }
     public int ReviewCount { get; set; }
-    public int Rating { get; set; }
+    public double Rating { get; set; }
     public bool IsVerified { get; set; }
     
     public DateTime CreatedAt { get; set; }
