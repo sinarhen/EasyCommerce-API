@@ -16,12 +16,10 @@ namespace ECommerce.Data.Repositories.Product;
 public class ProductRepository : BaseRepository, IProductRepository
 {
     private readonly IMapper _mapper;
-    private readonly UserManager<User> _userManager;
 
-    public ProductRepository(ProductDbContext db, UserManager<User> userManager, IMapper mapper) : base(db)
+    public ProductRepository(ProductDbContext db, IMapper mapper) : base(db)
     {
         _mapper = mapper;
-        _userManager = userManager;
     }
 
     public async Task<IEnumerable<ProductDto>> GetProductsAsync(ProductSearchParams searchParams)
@@ -38,36 +36,44 @@ public class ProductRepository : BaseRepository, IProductRepository
     public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string userId,
         bool isAdmin)
     {
-        var existingCollection =
-            await _db.Collections.Include(collection => collection.Store)
-                .FirstOrDefaultAsync(collection => collection.Id == productDto.CollectionId) ??
-            throw new ArgumentException($"CollectionId with ID {productDto.CollectionId} does not exist");
-        var isOwner = ValidateOwner(userId, existingCollection.Store.OwnerId, isAdmin);
+        var ownerId = await _db.Collections
+            .AsNoTracking()
+            .Where(c => c.Id == productDto.CollectionId)
+            .Select(c => c.Store.OwnerId)
+            .FirstOrDefaultAsync();
+        
+        var isOwner = ValidateOwner(userId, ownerId, isAdmin);
         if (!isOwner) throw new UnauthorizedAccessException("You are not the owner of this store");
+        
         ValidateCreateProductDtoOnModelLevel(productDto);
 
-        var nonExistingMaterialIds = productDto.Materials
-            .Where(m => !_db.Materials.Any(material => material.Id == m.Id))
-            .Select(m => m.Id)
-            .ToList();
 
-        var nonExistingColors = productDto.Stocks
-            .Where(s => !_db.Colors.Any(color => color.Id == s.ColorId))
-            .Select(color => color.ColorId)
-            .ToList();
+        var nonExistingColors = await _db.Colors
+            .AsNoTracking()
+            .Where(c => productDto.Stocks.All(stock => stock.ColorId != c.Id))
+            .Select(c => c.Id)
+            .ToListAsync();
+
 
         if (nonExistingColors.Any())
             throw new ArgumentException(
                 $"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
 
-        var nonExistingSizes = productDto.Stocks
-            .Select(size => _db.Sizes.FirstOrDefault(s => s.Id == size.SizeId))
-            .Where(size => size == null)
-            .ToList();
+        var nonExistingSizes = await _db.Sizes
+            .AsNoTracking()
+            .Where(s => productDto.Stocks.All(stock => stock.SizeId != s.Id))
+            .Select(s => s.Id)
+            .ToListAsync();
 
         if (nonExistingSizes.Any())
             throw new ArgumentException(
-                $"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
+                $"Sizes with the following IDs do not exist: ${string.Join(", ", nonExistingSizes)}");
+
+        var nonExistingMaterialIds = await _db.Materials
+            .AsNoTracking()
+            .Where(m => productDto.Materials.All(material => material.Id != m.Id))
+            .Select(m => m.Id)
+            .ToListAsync();
 
 
         if (nonExistingMaterialIds.Any())
@@ -85,10 +91,11 @@ public class ProductRepository : BaseRepository, IProductRepository
 
         var product = _mapper.Map<Models.Entities.Product>(productDto);
 
+        await _db.Products.AddAsync(product);
 
         product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
         {
-            Product = product,
+            ProductId = product.Id,
             ColorId = stockDto.ColorId,
             SizeId = stockDto.SizeId,
             Stock = stockDto.Stock,
@@ -97,22 +104,21 @@ public class ProductRepository : BaseRepository, IProductRepository
 
         product.Materials = productDto.Materials.Select(material => new ProductMaterial
         {
-            Product = product,
-            Material = _db.Materials.FirstOrDefault(m => m.Id == material.Id),
+            ProductId = product.Id,
+            MaterialId = material.Id,
             Percentage = material.Percentage
         }).ToList();
 
         product.Images = productDto.Images.Select(imageDto => new ProductImage
         {
-            Product = product,
-            Color = _db.Colors.FirstOrDefault(c => c.Id == imageDto.ColorId),
+            ProductId = product.Id,
+            ColorId = imageDto.ColorId,
             ImageUrls = imageDto.ImageUrls
         }).ToList();
 
         var initialOrder = CalculateDepth(category);
         AddToCategories(category, product, initialOrder);
 
-        await _db.Products.AddAsync(product);
         await SaveChangesAsyncWithTransaction();
 
         return product;
@@ -126,7 +132,7 @@ public class ProductRepository : BaseRepository, IProductRepository
             .Include(product => product.Categories).ThenInclude(c => c.Category).ThenInclude(c => c.ParentCategory)
             .Include(product => product.Materials)
             .Include(product => product.Collection).ThenInclude(collection => collection.Store)
-            .ThenInclude(store => store.Owner)
+            .ThenInclude(store => store.Owner) 
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null) throw new ArgumentException($"Product with ID {id} does not exist");
@@ -257,14 +263,10 @@ public class ProductRepository : BaseRepository, IProductRepository
     public async Task DeleteProductAsync(Guid id, string userId, bool isAdmin)
     {
         var product = await _db.Products
-            .Include(product => product.Stocks)
-            .Include(product => product.Categories)
-            .Include(product => product.Materials)
-            .Include(product => product.Collection)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null) throw new ArgumentException($"Product with ID {id} does not exist");
-        var ownerId = product.Collection.Store.OwnerId;
+        var ownerId = product.SellerId;
         ValidateOwner(userId, ownerId, isAdmin);
 
         ClearProductCategories(product);

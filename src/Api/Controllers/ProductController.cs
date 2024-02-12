@@ -52,7 +52,10 @@ public class ProductController : GenericController
         try
         {
             var product = await _repository.GetProductAsync(id);
-
+            if (product == null)
+            {
+                return NotFound();
+            }
             return Ok(product);
         }
         catch (ArgumentException e)
