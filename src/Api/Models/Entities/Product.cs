@@ -23,7 +23,7 @@ public class Product : BaseEntity
 
     public Season? Season { get; set; }
 
-    public Guid? SellerId { get; set; }
+    public string SellerId { get; set; }
     
     public Guid? CollectionId { get; set; }
 
