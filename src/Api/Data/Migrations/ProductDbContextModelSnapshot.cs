@@ -470,6 +470,9 @@ namespace ECommerce.Data.Migrations
                     b.Property<int?>("Season")
                         .HasColumnType("integer");
 
+                    b.Property<string>("SellerId")
+                        .HasColumnType("text");
+
                     b.Property<string>("SizeChartImageUrl")
                         .HasColumnType("text");
 
@@ -484,6 +487,8 @@ namespace ECommerce.Data.Migrations
                     b.HasIndex("CollectionId");
 
                     b.HasIndex("OccasionId");
+
+                    b.HasIndex("SellerId");
 
                     b.HasIndex("SizeId");
 
@@ -1296,6 +1301,10 @@ namespace ECommerce.Data.Migrations
                         .WithMany("Products")
                         .HasForeignKey("OccasionId");
 
+                    b.HasOne("ECommerce.Models.Entities.User", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId");
+
                     b.HasOne("ECommerce.Models.Entities.Size", null)
                         .WithMany("Stocks")
                         .HasForeignKey("SizeId");
@@ -1303,6 +1312,8 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Collection");
 
                     b.Navigation("Occasion");
+
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.ProductCategory", b =>
