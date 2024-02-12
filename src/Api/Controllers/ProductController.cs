@@ -49,9 +49,20 @@ public class ProductController : GenericController
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
     {
-        var product = await _repository.GetProductAsync(id);
+        try
+        {
+            var product = await _repository.GetProductAsync(id);
 
-        return Ok(product);
+            return Ok(product);
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 
     [Authorize(Policy = Policies.SellerPolicy)]
