@@ -20,7 +20,7 @@ public class BaseRepository
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
         }
-        catch
+        catch (Exception e)
         {
             await transaction.RollbackAsync();
             throw;

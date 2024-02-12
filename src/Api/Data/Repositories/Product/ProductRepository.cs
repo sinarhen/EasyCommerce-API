@@ -45,37 +45,40 @@ public class ProductRepository : BaseRepository, IProductRepository
         var isOwner = ValidateOwner(userId, ownerId, isAdmin);
         if (!isOwner) throw new UnauthorizedAccessException("You are not the owner of this store");
         
+        
         ValidateCreateProductDtoOnModelLevel(productDto);
-
-
-        var nonExistingColors = await _db.Colors
+        
+        var colorIds = productDto.Stocks.Select(s => s.ColorId).ToList();
+        var existingColorIds = await _db.Colors
             .AsNoTracking()
-            .Where(c => productDto.Stocks.All(stock => stock.ColorId != c.Id))
+            .Where(c => colorIds.Contains(c.Id))
             .Select(c => c.Id)
             .ToListAsync();
-
-
+        var nonExistingColors = colorIds.Except(existingColorIds).ToList();
+        
         if (nonExistingColors.Any())
             throw new ArgumentException(
                 $"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
-
-        var nonExistingSizes = await _db.Sizes
+        
+        var sizeIds = productDto.Stocks.Select(s => s.SizeId).ToList();
+        var existingSizes = await _db.Sizes
             .AsNoTracking()
-            .Where(s => productDto.Stocks.All(stock => stock.SizeId != s.Id))
+            .Where(s => sizeIds.Contains(s.Id))
             .Select(s => s.Id)
             .ToListAsync();
-
+        var nonExistingSizes = sizeIds.Except(existingSizes).ToList();
         if (nonExistingSizes.Any())
             throw new ArgumentException(
                 $"Sizes with the following IDs do not exist: ${string.Join(", ", nonExistingSizes)}");
-
-        var nonExistingMaterialIds = await _db.Materials
+    
+        
+        var materialIds = productDto.Materials.Select(m => m.Id).ToList();
+        var existingMaterialIds = await _db.Materials
             .AsNoTracking()
-            .Where(m => productDto.Materials.All(material => material.Id != m.Id))
+            .Where(m => materialIds.Contains(m.Id))
             .Select(m => m.Id)
             .ToListAsync();
-
-
+        var nonExistingMaterialIds = materialIds.Except(existingMaterialIds).ToList();
         if (nonExistingMaterialIds.Any())
             throw new ArgumentException(
                 $"Materials with the following IDs do not exist: {string.Join(", ", nonExistingMaterialIds)}");
@@ -85,40 +88,54 @@ public class ProductRepository : BaseRepository, IProductRepository
         if (nonExistingSizes.Any())
             throw new ArgumentException(
                 $"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
-        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
-        if (productDto.CategoryId == Guid.Empty || category == null)
-            throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
-
+        
+        var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId) 
+                       ?? throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
+        
         var product = _mapper.Map<Models.Entities.Product>(productDto);
+        if (product == null) throw new ArgumentException("Product mapping from dto is null");
 
+        // Denormalization to avoid joins and improve performance
+        product.SellerId = userId;
+        
         await _db.Products.AddAsync(product);
 
-        product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+        if (productDto.Stocks != null)
         {
-            ProductId = product.Id,
-            ColorId = stockDto.ColorId,
-            SizeId = stockDto.SizeId,
-            Stock = stockDto.Stock,
-            Price = stockDto.Price
-        }).ToList();
-
-        product.Materials = productDto.Materials.Select(material => new ProductMaterial
+            product.Stocks = productDto.Stocks.Select(stockDto => new ProductStock
+            {
+                ProductId = product.Id,
+                ColorId = stockDto.ColorId,
+                SizeId = stockDto.SizeId,
+                Stock = stockDto.Stock,
+                Price = stockDto.Price
+            }).ToList();
+    
+        }
+        
+        if (productDto.Materials != null)
         {
-            ProductId = product.Id,
-            MaterialId = material.Id,
-            Percentage = material.Percentage
-        }).ToList();
-
-        product.Images = productDto.Images.Select(imageDto => new ProductImage
+            product.Materials = productDto.Materials.Select(material => new ProductMaterial
+            {
+                ProductId = product.Id,
+                MaterialId = material.Id,
+                Percentage = material.Percentage
+            }).ToList();
+        }
+        
+        if (productDto.Images != null)
         {
-            ProductId = product.Id,
-            ColorId = imageDto.ColorId,
-            ImageUrls = imageDto.ImageUrls
-        }).ToList();
-
+            product.Images = productDto.Images.Select(imageDto => new ProductImage
+            {
+                ProductId = product.Id,
+                ColorId = imageDto.ColorId,
+                ImageUrls = imageDto.ImageUrls
+            }).ToList();
+        }
+            
         var initialOrder = CalculateDepth(category);
         AddToCategories(category, product, initialOrder);
-
+        
         await SaveChangesAsyncWithTransaction();
 
         return product;
@@ -127,18 +144,18 @@ public class ProductRepository : BaseRepository, IProductRepository
     public async Task<Models.Entities.Product> UpdateProductAsync(Guid id, UpdateProductDto productDto, string userId,
         bool isAdmin)
     {
+        
+        // TODO: Optimize this method
         var product = await _db.Products
             .Include(product => product.Stocks)
             .Include(product => product.Categories).ThenInclude(c => c.Category).ThenInclude(c => c.ParentCategory)
             .Include(product => product.Materials)
-            .Include(product => product.Collection).ThenInclude(collection => collection.Store)
-            .ThenInclude(store => store.Owner) 
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null) throw new ArgumentException($"Product with ID {id} does not exist");
 
 
-        var ownerId = product.Collection.Store.OwnerId;
+        var ownerId = product.SellerId;
 
         if (!ValidateOwner(userId, ownerId, isAdmin))
             throw new UnauthorizedAccessException("You have no permission to update this product");
@@ -150,7 +167,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         if (productDto.CategoryId != Guid.Empty && productDto.CategoryId != product.Categories.First().CategoryId)
         {
             // checking if category with given id exists
-            var category = await _db.Categories.FirstOrDefaultAsync(c => c.Id == productDto.CategoryId);
+            var category = await _db.Categories.FindAsync(productDto.CategoryId);
             if (category == null)
                 throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
 
@@ -203,7 +220,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         {
             var materials = await _db.Materials.AsNoTracking().ToListAsync();
             var nonExistingMaterialIds = productDto.Materials
-                .Where(m => !materials.Any(material => material.Id == m.Id))
+                .Where(m => materials.All(material => material.Id != m.Id))
                 .Select(m => m.Id)
                 .ToList();
 
@@ -595,7 +612,8 @@ public class ProductRepository : BaseRepository, IProductRepository
     private static void ValidateCreateProductDtoOnModelLevel(CreateProductDto productDto)
     {
         if (productDto == null) throw new ArgumentException("Request body is empty");
-
+        
+        if (productDto.CategoryId == Guid.Empty) throw new ArgumentException("Product must have valid category id");
         if (productDto.Stocks.Any(
                 s => s.SizeId == Guid.Empty || s.ColorId == Guid.Empty || s.Stock <= 0 || s.Price <= 0))
             throw new ArgumentException("Product stock must have valid size, color, stock and price");

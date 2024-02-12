@@ -41,27 +41,15 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public override int SaveChanges()
     {
         UpdateTimestamps();
-        UpdateSellerId();
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         UpdateTimestamps();
-        UpdateSellerId();
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    private void UpdateSellerId()
-    {
-        var productEntries = ChangeTracker.Entries<Product>()
-            .Where(e => e.State == EntityState.Added);
-
-        foreach (var entry in productEntries)
-        {
-                entry.Entity.SellerId = entry.Entity.Collection.Store.OwnerId;
-        }
-    }
 
 
     private void UpdateTimestamps()

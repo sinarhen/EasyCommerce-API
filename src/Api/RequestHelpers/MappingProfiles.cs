@@ -105,8 +105,9 @@ public class MappingProfiles : Profile
             .ForMember(dest => dest.Categories, opt => opt.Ignore())
             .ForMember(dest => dest.Materials, opt => opt.Ignore())
             .ForMember(dest => dest.Stocks, opt => opt.Ignore())
-            .ForMember(dest => dest.Images, opt => opt.Ignore());
-
+            .ForMember(dest => dest.Images, opt => opt.Ignore())
+            .ForMember(dest => dest.SellerId, opt => opt.Ignore());
+            
         CreateMap<Product, ProductDetailsDto>()
             .IncludeBase<Product, ProductDto>()
             // .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews
