@@ -1,5 +1,4 @@
-﻿using Data.Repositories.Customer;
-using Data.Repositories.Review;
+﻿using Data.Repositories.Review;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Admin;
 using ECommerce.Data.Repositories.Billboard;

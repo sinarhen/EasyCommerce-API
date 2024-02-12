@@ -1,4 +1,3 @@
-using Data.Repositories.Customer;
 using ECommerce.Config;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
@@ -94,6 +93,36 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         });
         await SaveChangesAsyncWithTransaction();
         return true;
+    }
+
+    public Task<Cart> GetCartForUser(string userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> AddProductToCart(string userId, CartProduct cartProduct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> RemoveProductFromCart(string userId, Guid cartProductId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> UpdateProductInCart(string userId, CartProduct cartProduct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> ClearCart(string userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> Checkout(string userId)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task CheckIfUserIsAuthorized(string userId)

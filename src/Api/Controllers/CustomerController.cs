@@ -1,5 +1,5 @@
 using AutoMapper;
-using Data.Repositories.Customer;
+using ECommerce.Data.Repositories.Customer;
 using ECommerce.Models.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
