@@ -41,6 +41,9 @@
 	- [x] `UpgradeToSeller`: Allows the currently authenticated user to request an upgrade to a seller.
 	- [ ] GetOrdersForUser - Retrieves all orders made by user.
 	- [ ] GetCartForUser - Retrieves cart for user.
+    - [ ] AddToCart - Adds product to cart.
+    - [ ] RemoveFromCart - Removes product from cart.
+    - [ ] UpdateProductCart - Updates cart.
 - [x] GenericController
 - [x] `ProductController`
 	- [x] `GetProducts`: Retrieves a list of products based on the provided search parameters.
@@ -53,6 +56,9 @@
 	- [x] `DeleteReview`: Deletes a specific review. This action is only allowed for authenticated users.
 - [x] StoreController
 - [ ] SellerController
+	- [X] GetSellerInfo - Retrieves all products for a specific seller.
+    - [ ] GetOrdersForSeller - Retrieves all orders made by user.
+    - [ ] GetSellsInfoForSeller - Retrieves all sells info for seller.
 - [ ] OrderController
 - [ ] CartController 
 

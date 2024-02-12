@@ -23,7 +23,8 @@ public class Product : BaseEntity
 
     public Season? Season { get; set; }
 
-
+    public Guid? SellerId { get; set; }
+    
     public Guid? CollectionId { get; set; }
 
     // Navigation properties
@@ -32,6 +33,9 @@ public class Product : BaseEntity
 
     [ForeignKey("CollectionId")] public Collection Collection { get; set; }
 
+    // Using denormalization to avoid joins and improve performance.
+    [ForeignKey("SellerId")] public User Seller { get; set; }
+    
     public ICollection<ProductMaterial> Materials { get; set; } = new List<ProductMaterial>();
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
