@@ -1,4 +1,5 @@
 using ECommerce.Config;
+using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
 using ECommerce.Models.DTOs.User;
@@ -95,7 +96,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         return true;
     }
 
-    public Task<Cart> GetCartForUser(string userId)
+    public Task<CartDto> GetCartForUser(string userId)
     {
         throw new NotImplementedException();
     }

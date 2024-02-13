@@ -1,3 +1,4 @@
+using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
@@ -10,7 +11,7 @@ public interface ICustomerRepository
 
     Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
     
-    Task<Cart> GetCartForUser(string userId);
+    Task<CartDto> GetCartForUser(string userId);
     
     Task<bool> AddProductToCart(string userId, CartProduct cartProduct); // TODO: CreateCartProductDto
     
