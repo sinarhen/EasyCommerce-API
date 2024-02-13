@@ -1,7 +1,9 @@
 using ECommerce.Config;
 using ECommerce.Models.DTOs.Cart;
+using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
+using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -97,10 +99,56 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task<CartDto> GetCartForUser(string userId)
     { 
-        var user = await GetAuthorizedUserAsync(userId);
+        var cart = await _db.Users
+            .AsNoTracking()
+            .Where(u => u.Id == userId)
+            .Select(u => new CartDto
+            {
+                Id = u.Cart.Id,
+                Customer = new UserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    Username = u.FirstName,
+                    ImageUrl = u.ImageUrl,
+                    CreatedAt = u.CreatedAt,
+                    UpdatedAt = u.UpdatedAt
+                },
+                Products = u.Cart.Products.Select(i => new CartItemDto
+                {
+                    Id = i.Id,
+                    Product = new CartItemProductDto
+                    {
+                        Id = i.Product.Id,
+                        Name = i.Product.Name,
+                        Description = i.Product.Description,
+                        Price = i.Product.Stocks.MinBy(s => s.Price).Price,
+                        Color = new ColorDto
+                        {
+                            Id = i.ColorId,
+                            HexCode = i.Color.HexCode,
+                            Name = i.Color.Name
+                        },
+                        Size = new SizeDto
+                        {
+                            Id = i.SizeId,
+                            Name = i.Size.Name,
+                            Value = i.Size.Value,
+                        },
+                        ImageUrl = i.Product.Images.FirstOrDefault(productImage => productImage.ColorId == i.ColorId)
+                            .ImageUrls.FirstOrDefault(),
+                        SellerId = i.Product.SellerId,
+                        SellerName = i.Product.Seller.FirstName,
+                        
+                    },
+                    Quantity = i.Quantity
+                }).ToList()
+            
+            })
+            .FirstOrDefaultAsync();
         
-        
-        
+        if (cart == null) throw new ArgumentException("User not found");
+
         throw new NotImplementedException();
     }
 
