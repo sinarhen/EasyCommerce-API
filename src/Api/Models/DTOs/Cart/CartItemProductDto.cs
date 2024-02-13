@@ -1,8 +1,7 @@
 ﻿using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Size;
-using ECommerce.Models.DTOs.User;
 
-namespace ECommerce.Models.DTOs;
+namespace ECommerce.Models.DTOs.Cart;
 
 public class CartItemProductDto
 {

@@ -1,5 +1,6 @@
 using ECommerce.Config;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
 using ECommerce.Models.DTOs.User;

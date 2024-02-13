@@ -1,4 +1,5 @@
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;

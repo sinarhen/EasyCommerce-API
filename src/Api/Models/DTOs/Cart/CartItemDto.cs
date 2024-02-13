@@ -1,4 +1,4 @@
-﻿namespace ECommerce.Models.DTOs;
+﻿namespace ECommerce.Models.DTOs.Cart;
 
 public class CartItemDto
 {
