@@ -1,5 +1,6 @@
 ﻿using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Size;
+using ECommerce.Models.DTOs.User;
 
 namespace ECommerce.Models.DTOs;
 
@@ -12,5 +13,6 @@ public class CartItemProductDto
     public string ImageUrl { get; set; }
     public ColorDto Color { get; set; }
     public SizeDto Size { get; set; }
-    public string CustomerId { get; set; }
+    public string SellerName { get; set; }
+    public string SellerId { get; set; }
 }
