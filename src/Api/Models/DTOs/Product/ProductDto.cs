@@ -1,8 +1,9 @@
 ﻿using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.Product;
 
-public class ProductDto
+public class ProductDto: BaseEntity
 {
     public Guid Id { get; set; }
     public ProductCategoryDto[] Categories { get; set; }
@@ -26,8 +27,6 @@ public class ProductDto
 
     public bool IsAvailable { get; set; }
     public bool IsBestseller { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
     public List<ColorDto> Colors { get; set; }
 
     public List<ProductImageDto> Images { get; set; }

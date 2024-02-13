@@ -13,11 +13,11 @@ public interface ICustomerRepository
     
     Task<CartDto> GetCartForUser(string userId);
     
-    Task<bool> AddProductToCart(string userId, CartProduct cartProduct); // TODO: CreateCartProductDto
+    Task<bool> AddProductToCart(string userId, CartProductDto cartProduct); // TODO: CreateCartProductDto
     
     Task<bool> RemoveProductFromCart(string userId, Guid cartProductId);
     
-    Task<bool> UpdateProductInCart(string userId, CartProduct cartProduct); // TODO: CreateCartProductDto
+    Task<bool> UpdateProductInCart(string userId, CartProductDto cartProduct); // TODO: CreateCartProductDto
     
     Task<bool> ClearCart(string userId);
     
