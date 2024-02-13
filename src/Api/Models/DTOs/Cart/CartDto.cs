@@ -1,4 +1,6 @@
-﻿namespace ECommerce.Models.DTOs.Cart;
+﻿using ECommerce.Models.DTOs.User;
+
+namespace ECommerce.Models.DTOs.Cart;
 
 public class CartDto
 {
@@ -6,5 +8,5 @@ public class CartDto
     public ICollection<CartItemDto> Products { get; set; } = new List<CartItemDto>();
     public decimal TotalPrice { get; set; }
     public int TotalQuantity { get; set; }
-    public string CustomerId { get; set; }
+    public UserDto Customer { get; set; }
 }
