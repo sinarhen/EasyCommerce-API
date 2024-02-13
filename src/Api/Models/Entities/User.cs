@@ -23,6 +23,9 @@ public class User : IdentityUser
     // Navigation properties
     [ForeignKey("SellerInfoId")]
     public virtual SellerInfo SellerInfo { get; set; }    
+    
+    public virtual BannedUser BannedUser { get; set; }
+    
     public ICollection<SellerUpgradeRequest> Requests { get; set; } = new List<SellerUpgradeRequest>();
     
     public ICollection<Review> Reviews { get; set; } = new List<Review>();

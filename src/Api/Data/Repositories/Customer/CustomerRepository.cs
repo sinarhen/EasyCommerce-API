@@ -1,5 +1,4 @@
 using ECommerce.Config;
-using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
@@ -43,7 +42,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             })
             .ToListAsync();
 
-        var user = await CheckIfUserIsAuthorized(userId);
+        var user = await GetAuthorizedUserAsync(userId);
         return new UserReviewsDto
         {
             User = new UserDto
@@ -76,7 +75,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
         if (nameExists) throw new ArgumentException(" name already exists");
 
-        var user = await CheckIfUserIsAuthorized(userId);
+        var user = await GetAuthorizedUserAsync(userId);
         await CheckIfUserIsSeller(user);
         
         var seller = new SellerInfo
@@ -97,8 +96,10 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     }
 
     public async Task<CartDto> GetCartForUser(string userId)
-    {
-        await CheckIfUserIsAuthorized(userId);
+    { 
+        var user = await GetAuthorizedUserAsync(userId);
+        
+        
         
         throw new NotImplementedException();
     }
@@ -128,14 +129,21 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         throw new NotImplementedException();
     }
 
-    private async Task<User> CheckIfUserIsAuthorized(string userId)
+    private async Task<User> GetAuthorizedUserAsync(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId) ?? throw new ArgumentException("User not found");
-        if (await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id))
+        var user = await _db.Users
+            .Include(u => u.BannedUser)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+            throw new ArgumentException("User not found");
+
+        if (user.BannedUser != null && user.BannedUser.BanEndTime > DateTime.Now)
             throw new UnauthorizedAccessException("User is banned");
+
         return user;
     }
-    
+
     private async Task CheckIfUserIsSeller(User user)
     {
         var roles = await _userManager.GetRolesAsync(user);
