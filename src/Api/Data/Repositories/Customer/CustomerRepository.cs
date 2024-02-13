@@ -79,7 +79,9 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
         if (nameExists) throw new ArgumentException(" name already exists");
 
-        await CheckIfUserIsAuthorized(userId);
+        var user = await CheckIfUserIsAuthorized(userId);
+        await CheckIfUserIsSeller(user);
+        
         var seller = new SellerInfo
         {
             Name = sellerInfo.Name,
@@ -97,8 +99,10 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         return true;
     }
 
-    public Task<CartDto> GetCartForUser(string userId)
+    public async Task<CartDto> GetCartForUser(string userId)
     {
+        await CheckIfUserIsAuthorized(userId);
+        
         throw new NotImplementedException();
     }
 
@@ -127,13 +131,17 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         throw new NotImplementedException();
     }
 
-    private async Task CheckIfUserIsAuthorized(string userId)
+    private async Task<User> CheckIfUserIsAuthorized(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId) ?? throw new ArgumentException("User not found");
         if (await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id))
             throw new UnauthorizedAccessException("User is banned");
-
+        return user;
+    }
+    
+    private async Task CheckIfUserIsSeller(User user)
+    {
         var roles = await _userManager.GetRolesAsync(user);
-        if (roles.Contains(UserRoles.Seller)) throw new ArgumentException("User is already a seller");
+        if (!roles.Contains(UserRoles.Seller)) throw new UnauthorizedAccessException("User is not a seller");
     }
 }
