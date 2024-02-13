@@ -102,7 +102,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> AddProductToCart(string userId, CartItemDto cartProduct)
+    public Task<bool> AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
         throw new NotImplementedException();
     }
@@ -112,7 +112,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> UpdateProductInCart(string userId, CartItemDto cartProduct)
+    public Task<bool> UpdateProductInCart(string userId, CreateCartItemDto cartProduct)
     {
         throw new NotImplementedException();
     }

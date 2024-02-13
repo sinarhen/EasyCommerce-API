@@ -1,6 +1,6 @@
 ﻿namespace ECommerce.Models.DTOs.Cart;
 
-public class CreateCartProductDto
+public class CreateCartItemDto
 {
     public Guid ProductId { get; set; }
     public int Quantity { get; set; }
