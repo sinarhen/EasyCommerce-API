@@ -1,4 +1,6 @@
-﻿namespace ECommerce.Config;
+﻿using ECommerce.Models.Entities;
+
+namespace ECommerce.Config;
 
 public static class UserRoles
 {
@@ -7,7 +9,7 @@ public static class UserRoles
     public const string Customer = "Customer";
     public const string SuperAdmin = "SuperAdmin";
 
-    public static Dictionary<string, int> RoleHierarchy = new()
+    public static readonly Dictionary<string, int> RoleHierarchy = new()
     {
         { SuperAdmin, 4 },
         { Admin, 3 },
@@ -31,4 +33,5 @@ public static class UserRoles
             SuperAdmin
         };
     }
+    
 }
