@@ -8,7 +8,7 @@ namespace ECommerce.Data.Repositories.Customer;
 
 public interface ICustomerRepository
 {
-    Task<UserReviewsDto> GetReviewsForUser(string userId);
+    Task<UserReviewsDto> GetReviewsForUser(string userId, IReadOnlyList<string> roles);
 
     Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
     

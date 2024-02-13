@@ -20,7 +20,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     }
 
 
-    public async Task<UserReviewsDto> GetReviewsForUser(string userId)
+    public async Task<UserReviewsDto> GetReviewsForUser(string userId, IReadOnlyList<string> roles)
     {
         var reviews = await _db.Reviews
             .AsNoTracking()
@@ -43,10 +43,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             })
             .ToListAsync();
 
-        var user = await _userManager.FindByIdAsync(userId);
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var isBanned = await _db.BannedUsers.AsNoTracking().AnyAsync(b => b.UserId == user.Id);
+        var user = await CheckIfUserIsAuthorized(userId);
         return new UserReviewsDto
         {
             User = new UserDto
@@ -58,7 +55,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
                 Role = UserRoles.GetHighestUserRole(roles),
-                IsBanned = isBanned
+                IsBanned = false
             },
             Reviews = reviews
         };
