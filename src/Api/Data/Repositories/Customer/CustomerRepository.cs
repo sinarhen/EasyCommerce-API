@@ -170,11 +170,12 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             .ThenInclude(c => c.Products)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        var product = await _db.Products
+        var productExists = await _db.Products
+            .AsNoTracking()
             .Include(p => p.Stocks)
-            .FirstOrDefaultAsync(p => p.Stocks.Any(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId));
+            .AnyAsync(p => p.Stocks.Any(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId));
 
-        if (product == null) throw new ArgumentException("Product not found");
+        if (!productExists) throw new ArgumentException("Product not found");
 
         user.Cart ??= new Cart
         {
