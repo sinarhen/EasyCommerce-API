@@ -20,14 +20,14 @@ public class BaseRepository
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
         }
-        catch (Exception e)
+        catch
         {
             await transaction.RollbackAsync();
             throw;
         }
     }
 
-    protected int CalculateDepth(Models.Entities.Category category)
+    protected static int CalculateDepth(Models.Entities.Category category)
     {
         var depth = 1;
         while (category.ParentCategory != null)
@@ -45,7 +45,7 @@ public class BaseRepository
         return ownerId == userId || isAdminValue;
     }
 
-    protected void AddToCategories(Models.Entities.Category category, Models.Entities.Product product, int order)
+    protected static void AddToCategories(Models.Entities.Category category, Models.Entities.Product product, int order)
     {
         var currentCategory = category;
         while (currentCategory != null)
