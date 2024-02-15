@@ -9,7 +9,6 @@ using ECommerce.Models.DTOs.Stock;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Product;
@@ -29,7 +28,7 @@ public class ProductRepository : BaseRepository, IProductRepository
     }
 
 
-    public async Task<ProductDto> GetProductAsync(Guid id)
+    public async Task<ProductDetailsDto> GetProductAsync(Guid id)
     {
         return await GetProductDtoById(id);
     }
@@ -416,6 +415,7 @@ public class ProductRepository : BaseRepository, IProductRepository
     private async Task<ProductDetailsDto> GetProductDtoById(Guid id)
 {
     var product = await _db.Products
+        .AsNoTracking()
         .Include(p => p.Stocks)
         .ThenInclude(s => s.Color)
         .Include(p => p.Stocks)
@@ -432,6 +432,7 @@ public class ProductRepository : BaseRepository, IProductRepository
     {
         throw new ArgumentException($"Product with ID {id} does not exist");
     }
+
 
     var productDto = new ProductDetailsDto
     {
@@ -491,9 +492,9 @@ public class ProductRepository : BaseRepository, IProductRepository
             Rating = r.Rating,
             CreatedAt = r.CreatedAt
         }).ToList(),
-
+    
         SizeChartImageUrl = product.SizeChartImageUrl,
-
+    
         Name = product.Name,
         Description = product.Description,
         Gender = product.Gender.ToString(),
@@ -523,9 +524,9 @@ public class ProductRepository : BaseRepository, IProductRepository
         }).ToList(),
         IsAvailable = product.Stocks.Any(ps => ps.Stock > 0),
         MinPrice = product.Stocks.Any() ? product.Stocks.Min(s => s.Price) : 0,
-
+    
     };
-
+    
     return productDto;
 }
 
@@ -601,11 +602,9 @@ public class ProductRepository : BaseRepository, IProductRepository
                     Name = ps.Color.Name,
                     HexCode = ps.Color.HexCode,
                     // ImageUrls = ps.Product.Images
-                    // .Where(i => i.ColorId == ps.ColorId)
-                    // .SelectMany(i => i.ImageUrls)
-                    // .ToList(),
-                    IsAvailable = p.Stocks.Any(stock => stock.Stock > 0),
-                    Quantity = ps.Stock
+                    //     .Where(i => i.ColorId == ps.ColorId)
+                    //     .SelectMany(i => i.ImageUrls)
+                    //     .ToList(),
                 })
                 .ToList(),
             IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
