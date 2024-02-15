@@ -63,7 +63,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         };
     }
 
-    public async Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo)
+    public async Task RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo)
     {
         if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("User id is required");
         if (sellerInfo == null) throw new ArgumentException("Empty body");
@@ -95,7 +95,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             SellerInfoId = seller.Id
         });
         await SaveChangesAsyncWithTransaction();
-        return true;
     }
     public async Task<CartDto> GetCartForUser(string userId)
     {
@@ -164,27 +163,64 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
         return cart;
     }
-    public Task<bool> AddProductToCart(string userId, CreateCartItemDto cartProduct)
+    public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
+    {
+        var user = await _db.Users
+            .Include(u => u.Cart)
+            .ThenInclude(c => c.Products)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        var product = await _db.Products
+            .Include(p => p.Stocks)
+            .FirstOrDefaultAsync(p => p.Stocks.Any(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId));
+
+        if (product == null) throw new ArgumentException("Product not found");
+
+        user.Cart ??= new Cart
+        {
+            CustomerId = userId
+        };
+
+        var existingProduct = user.Cart.Products
+            .FirstOrDefault(p => p.ProductId == cartProduct.ProductId
+                                 && p.ColorId == cartProduct.ColorId
+                                 && p.SizeId == cartProduct.SizeId);
+
+        if (existingProduct != null)
+        {
+            existingProduct.Quantity += cartProduct.Quantity;
+        }
+        else
+        {
+            await _db.CartProducts.AddAsync(new CartProduct
+            {
+                CartId = user.Cart.Id,
+                ProductId = cartProduct.ProductId,
+                ColorId = cartProduct.ColorId,
+                SizeId = cartProduct.SizeId,
+                Quantity = cartProduct.Quantity,
+            });
+        }
+
+        await SaveChangesAsyncWithTransaction();
+    }
+
+    public Task RemoveProductFromCart(string userId, Guid cartProductId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> RemoveProductFromCart(string userId, Guid cartProductId)
+    public Task UpdateProductInCart(string userId, CreateCartItemDto cartProduct)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> UpdateProductInCart(string userId, CreateCartItemDto cartProduct)
+    public Task ClearCart(string userId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> ClearCart(string userId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> Checkout(string userId)
+    public Task Checkout(string userId)
     {
         throw new NotImplementedException();
     }

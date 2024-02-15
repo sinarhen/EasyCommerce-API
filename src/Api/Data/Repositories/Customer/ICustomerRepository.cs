@@ -10,17 +10,17 @@ public interface ICustomerRepository
 {
     Task<UserReviewsDto> GetReviewsForUser(string userId, IReadOnlyList<string> roles);
 
-    Task<bool> RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
+    Task RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
     
     Task<CartDto> GetCartForUser(string userId);
 
-    Task<bool> AddProductToCart(string userId, CreateCartItemDto cartProduct);
+    Task AddProductToCart(string userId, CreateCartItemDto cartProduct);
     
-    Task<bool> RemoveProductFromCart(string userId, Guid cartProductId);
+    Task RemoveProductFromCart(string userId, Guid cartProductId);
     
-    Task<bool> UpdateProductInCart(string userId, CreateCartItemDto cartProduct);
+    Task UpdateProductInCart(string userId, CreateCartItemDto cartProduct);
     
-    Task<bool> ClearCart(string userId);
+    Task ClearCart(string userId);
     
-    Task<bool> Checkout(string userId); 
+    Task Checkout(string userId); 
 }

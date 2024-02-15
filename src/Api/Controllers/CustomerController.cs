@@ -69,9 +69,9 @@ public class CustomerController : GenericController
     {
         try
         {
-            var res = await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
+            await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
 
-            return Ok(res ? "Successfully requested to upgrade to seller" : "Failed to request to upgrade to seller");
+            return Ok("Successfully requested to upgrade to seller");
         }
         catch (UnauthorizedAccessException e)
         {
