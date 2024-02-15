@@ -8,6 +8,7 @@ using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using CartDto = ECommerce.Models.DTOs.Cart.CartDto;
 
 namespace ECommerce.Data.Repositories.Customer;
 
@@ -96,12 +97,20 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
         return true;
     }
-
     public async Task<CartDto> GetCartForUser(string userId)
-    { 
-        var cart = await _db.Users
+    {
+        var userQuery = _db.Users
             .AsNoTracking()
-            .Where(u => u.Id == userId)
+            .Where(u => u.Id == userId);
+
+        var cartQuery = userQuery
+            .Select(u => u.Cart);
+
+        var productsQuery = cartQuery
+            .SelectMany(c => c.Products)
+            .Where(i => i.Product != null && i.Color != null && i.Size != null);
+
+        var cartDtoQuery = userQuery
             .Select(u => new CartDto
             {
                 Id = u.Cart.Id,
@@ -114,7 +123,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                     CreatedAt = u.CreatedAt,
                     UpdatedAt = u.UpdatedAt
                 },
-                Products = u.Cart.Products.Select(i => new CartItemDto
+                Products = productsQuery.Select(i => new CartItemDto
                 {
                     Id = i.Id,
                     Product = new CartItemProductDto
@@ -122,7 +131,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                         Id = i.Product.Id,
                         Name = i.Product.Name,
                         Description = i.Product.Description,
-                        Price = i.Product.Stocks.MinBy(s => s.Price).Price,
+                        Price = i.Product.Stocks.OrderBy(s => s.Price).First().Price,
                         Color = new ColorDto
                         {
                             Id = i.ColorId,
@@ -135,23 +144,26 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                             Name = i.Size.Name,
                             Value = i.Size.Value,
                         },
-                        ImageUrl = i.Product.Images.FirstOrDefault(productImage => productImage.ColorId == i.ColorId)
-                            .ImageUrls.FirstOrDefault(),
+                        ImageUrl = i.Product.Images.FirstOrDefault(productImage => productImage.ColorId == i.ColorId).ImageUrls.FirstOrDefault(),
                         SellerId = i.Product.SellerId,
                         SellerName = i.Product.Seller.FirstName,
-                        
                     },
                     Quantity = i.Quantity
                 }).ToList()
-            
-            })
-            .FirstOrDefaultAsync();
-        
-        if (cart == null) throw new ArgumentException("User not found");
+            });
 
-        throw new NotImplementedException();
+        var cart = await cartDtoQuery.FirstOrDefaultAsync() ?? new CartDto
+        {
+            Customer = new UserDto
+            {
+                Id = userId,
+                
+            },
+            Products = new List<CartItemDto>()
+        };
+
+        return cart;
     }
-
     public Task<bool> AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
         throw new NotImplementedException();
