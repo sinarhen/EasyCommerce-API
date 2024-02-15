@@ -463,9 +463,7 @@ public class ProductRepository : BaseRepository, IProductRepository
                     {
                         Id = ps.Size.Id,
                         Name = ps.Size.Name,
-                        Quantity = ps.Stock,
                         Value = ps.Size.Value,
-                        IsAvailable = ps.Stock > 0
                     })
                     .ToList(),
                 Reviews = p.Reviews.Select(r => new ReviewDto
@@ -506,10 +504,9 @@ public class ProductRepository : BaseRepository, IProductRepository
                         // .Where(i => i.ColorId == ps.ColorId)
                         // .SelectMany(i => i.ImageUrls)
                         // .ToList(),
-                        IsAvailable = p.Stocks.Any(stock => stock.Stock > 0),
-                        Quantity = ps.Stock
                     })
                     .ToList(),
+                // Stocks = TODO:
                 IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
                 MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0,
                 DiscountPrice = p.Stocks.Any()
