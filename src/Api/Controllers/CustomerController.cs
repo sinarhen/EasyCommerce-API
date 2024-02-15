@@ -23,8 +23,31 @@ public class CustomerController : GenericController
     {
         try
         {
-            var res = await _repository.GetReviewsForUser(GetUserId());
+            var res = await _repository.GetReviewsForUser(GetUserId(), GetUserRoles());
 
+            return Ok(res);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(e.Message);
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [HttpGet("cart")]
+    public async Task<IActionResult> GetCart()
+    {
+        try
+        {
+            var res = await _repository.GetCartForUser(GetUserId());
+            
             return Ok(res);
         }
         catch (UnauthorizedAccessException e)
