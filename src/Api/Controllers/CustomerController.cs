@@ -1,5 +1,6 @@
 using AutoMapper;
 using ECommerce.Data.Repositories.Customer;
+using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,15 +41,38 @@ public class CustomerController : GenericController
             return StatusCode(500, e.Message);
         }
     }
-    
+
     [HttpGet("cart")]
     public async Task<IActionResult> GetCart()
     {
         try
         {
             var res = await _repository.GetCartForUser(GetUserId());
-            
+
             return Ok(res);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(e.Message);
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [HttpPost("cart")]
+    public async Task<IActionResult> AddToCart([FromBody] CreateCartItemDto cartItem)
+    {
+        try
+        {
+            await _repository.AddProductToCart(GetUserId(), cartItem);
+
+            return Ok("Successfully added to cart");
         }
         catch (UnauthorizedAccessException e)
         {

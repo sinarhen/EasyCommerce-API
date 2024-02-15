@@ -165,22 +165,48 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     }
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
+        if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("User id is required");
+        if (cartProduct == null) throw new ArgumentException("Empty body");
+        if (cartProduct.ProductId == Guid.Empty) throw new ArgumentException("Product id is required");
+        if (cartProduct.ColorId == Guid.Empty) throw new ArgumentException("Color id is required");
+        if (cartProduct.SizeId == Guid.Empty) throw new ArgumentException("Size id is required");
+        if (cartProduct.Quantity < 1) throw new ArgumentException("Quantity must be greater than 0");
+
         var user = await _db.Users
             .Include(u => u.Cart)
             .ThenInclude(c => c.Products)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        var productExists = await _db.Products
+        if (user == null) throw new ArgumentException("User not found");
+        
+        var product = await _db.Products
             .AsNoTracking()
             .Include(p => p.Stocks)
-            .AnyAsync(p => p.Stocks.Any(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId));
-
-        if (!productExists) throw new ArgumentException("Product not found");
-
-        user.Cart ??= new Cart
+            .FirstOrDefaultAsync(p => p.Id == cartProduct.ProductId);
+        if (product == null) throw new ArgumentException("Product not found");
+        
+        var stock = product
+            .Stocks
+            .FirstOrDefault(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId);
+   
+        if (stock == null) throw new ArgumentException("Stock not found");
+        if (stock.Stock < cartProduct.Quantity) throw new ArgumentException("Not enough stock for this product");
+        
+        var color = await _db.Colors.FindAsync(cartProduct.ColorId);
+        if (color == null) throw new ArgumentException("Color not found");
+        
+        var size = await _db.Sizes.FindAsync(cartProduct.SizeId);
+        if (size == null) throw new ArgumentException("Size not found");
+        
+        if (user.Cart == null)
         {
-            CustomerId = userId
-        };
+            user.Cart = new Cart
+            {
+                Id = new Guid(),
+                CustomerId = userId
+            };
+            _db.Carts.Add(user.Cart);
+        }
 
         var existingProduct = user.Cart.Products
             .FirstOrDefault(p => p.ProductId == cartProduct.ProductId
@@ -205,7 +231,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
         await SaveChangesAsyncWithTransaction();
     }
-
     public Task RemoveProductFromCart(string userId, Guid cartProductId)
     {
         throw new NotImplementedException();
