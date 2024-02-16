@@ -35,7 +35,7 @@ public class StoreController : GenericController
         );
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<StoreDto>> GetStore(Guid id)
     {
         try
@@ -100,7 +100,7 @@ public class StoreController : GenericController
 
 
     [Authorize(Policy = Policies.SellerPolicy)]
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
@@ -125,7 +125,7 @@ public class StoreController : GenericController
 
 
     [Authorize(Policy = Policies.SellerPolicy)]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> DeleteStore(Guid id)
     {
