@@ -27,10 +27,6 @@ public class StoreRepository : BaseRepository, IStoreRepository
 
     public async Task<Models.Entities.Store> CreateStoreAsync(StoreDto storeDto, string ownerId)
     {
-        if (storeDto == null) throw new ArgumentNullException(nameof(storeDto));
-        if (string.IsNullOrEmpty(storeDto.Name)) throw new ArgumentException("Store name cannot be empty");
-        if (string.IsNullOrEmpty(storeDto.Email)) throw new ArgumentException("Email cannot be empty");
-
         if (string.IsNullOrEmpty(ownerId)) throw new Exception("User id not provided. Internal Error");
 
         var store = new Models.Entities.Store
