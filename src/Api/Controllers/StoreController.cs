@@ -132,10 +132,7 @@ public class StoreController : GenericController
         try
         {
             var store = await _repository.GetStoreAsync(id);
-
-
-            if (GetUserId() != store.OwnerId) return Unauthorized();
-
+            
 
             await _repository.DeleteStoreAsync(id, GetUserId(), IsAdmin());
             return Ok();
