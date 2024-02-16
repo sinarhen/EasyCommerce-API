@@ -8,6 +8,7 @@ using ECommerce.Data.Repositories.Product;
 using ECommerce.Data.Repositories.Review;
 using ECommerce.Data.Repositories.Seller;
 using ECommerce.Data.Repositories.Store;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Services;
 
@@ -25,6 +26,14 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection EnableModelStateInvalidFilterSuppression(this IServiceCollection services)
+    {
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        });
+        return services;
+    }
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IAdminRepository, AdminRepository>();

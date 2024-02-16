@@ -69,6 +69,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddJwtService();
 builder.Services.AddRepositories();
 builder.Services.AddScoped<ValidationService>();
+builder.Services.EnableModelStateInvalidFilterSuppression();
 
 var app = builder.Build();
 
