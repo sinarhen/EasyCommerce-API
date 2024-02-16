@@ -65,13 +65,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo)
     {
-        if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("User id is required");
-        if (sellerInfo == null) throw new ArgumentException("Empty body");
-        if (sellerInfo.Name == null) throw new ArgumentException(" name is required");
-        if (sellerInfo.Description == null) throw new ArgumentException(" description is required");
-        if (sellerInfo.Email == null) throw new ArgumentException(" email is required");
-        if (sellerInfo.Phone == null) throw new ArgumentException(" phone number is required");
-
         var nameExists = await _db.SellerUpgradeRequests.Where(req =>
                 req.Status == SellerUpgradeRequestStatus.Approved && sellerInfo.Name == req.SellerInfo.Name)
             .AnyAsync();
@@ -165,13 +158,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     }
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
-        if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("User id is required");
-        if (cartProduct == null) throw new ArgumentException("Empty body");
-        if (cartProduct.ProductId == Guid.Empty) throw new ArgumentException("Product id is required");
-        if (cartProduct.ColorId == Guid.Empty) throw new ArgumentException("Color id is required");
-        if (cartProduct.SizeId == Guid.Empty) throw new ArgumentException("Size id is required");
-        if (cartProduct.Quantity < 1) throw new ArgumentException("Quantity must be greater than 0");
-
         var user = await _db.Users
             .Include(u => u.Cart)
             .ThenInclude(c => c.Products)
