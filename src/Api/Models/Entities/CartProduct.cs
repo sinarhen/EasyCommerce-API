@@ -2,6 +2,8 @@
 
 namespace ECommerce.Models.Entities;
 
+// Could make composite key with CartId, ProductId, SizeId, and ColorId
+// but it would be bad for performance
 public class CartProduct : BaseEntity
 {
     public Guid Id { get; set; }

@@ -40,8 +40,8 @@
 	- [x] `GetReviewsForUser`: Retrieves all reviews for the currently authenticated user.
 	- [x] `UpgradeToSeller`: Allows the currently authenticated user to request an upgrade to a seller.
 	- [ ] GetOrdersForUser - Retrieves all orders made by user.
-	- [ ] GetCartForUser - Retrieves cart for user.
-    - [ ] AddToCart - Adds product to cart.
+	- [X] GetCartForUser - Retrieves cart for user.
+    - [X] AddToCart - Adds product to cart.
     - [ ] RemoveFromCart - Removes product from cart.
     - [ ] UpdateProductCart - Updates cart.
 - [x] GenericController
