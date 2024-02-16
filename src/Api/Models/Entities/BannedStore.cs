@@ -9,6 +9,8 @@ public class BannedStore : BaseEntity
 
     public Guid StoreId { get; set; }
 
+    [Required]
+    [StringLength(3000, MinimumLength = 10, ErrorMessage = "Reason message should be between 10 and 3000 characters.")]
     public string Reason { get; set; }
 
     public DateTime BanStartDate { get; set; }
