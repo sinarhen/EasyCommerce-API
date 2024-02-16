@@ -25,6 +25,7 @@ public class User : IdentityUser
     public string PostalCode { get; set; }
     
     [StringLength(2000)]
+    [Url(ErrorMessage = "Invalid URL")]
     public string ImageUrl { get; set; }
     public Guid? CartId { get; set; }
 

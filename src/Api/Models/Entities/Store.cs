@@ -17,6 +17,7 @@ public class Store : BaseEntity
     public string BannerUrl { get; set; }
     
     [StringLength(2000, ErrorMessage = "Logo URL is too long")]
+    [Url]
     public string LogoUrl { get; set; }
     
     [StringLength(100, ErrorMessage = "Address is too long")]
