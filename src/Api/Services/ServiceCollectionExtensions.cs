@@ -1,11 +1,11 @@
-﻿using Data.Repositories.Review;
-using ECommerce.Config;
+﻿using ECommerce.Config;
 using ECommerce.Data.Repositories.Admin;
 using ECommerce.Data.Repositories.Billboard;
 using ECommerce.Data.Repositories.Category;
 using ECommerce.Data.Repositories.Collection;
 using ECommerce.Data.Repositories.Customer;
 using ECommerce.Data.Repositories.Product;
+using ECommerce.Data.Repositories.Review;
 using ECommerce.Data.Repositories.Seller;
 using ECommerce.Data.Repositories.Store;
 
