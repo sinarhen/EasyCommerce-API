@@ -1,4 +1,4 @@
-namespace ECommerce.Entities.Enum;
+namespace ECommerce.Models.Enum;
 
 public enum Gender
 {
