@@ -3,6 +3,7 @@ using ECommerce.Config;
 using ECommerce.Data.Repositories.Product;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.RequestHelpers;
+using ECommerce.RequestHelpers.SearchParams;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

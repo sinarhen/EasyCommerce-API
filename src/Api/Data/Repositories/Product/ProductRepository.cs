@@ -8,7 +8,9 @@ using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.Stock;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
+using ECommerce.Models.Enum;
 using ECommerce.RequestHelpers;
+using ECommerce.RequestHelpers.SearchParams;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Product;
@@ -393,14 +395,14 @@ public class ProductRepository : BaseRepository, IProductRepository
     {
         return searchParams.OrderBy switch
         {
-            "price" => query.OrderBy(p => p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : decimal.MaxValue),
-            "price_desc" => query.OrderByDescending(p =>
+            ProductsOrderBy.Price => query.OrderBy(p => p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : decimal.MaxValue),
+            ProductsOrderBy.PriceDesc => query.OrderByDescending(p =>
                 p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : decimal.MaxValue),
-            "name" => query.OrderBy(p => p.Name),
-            "name_desc" => query.OrderByDescending(p => p.Name),
-            "newest" => query.OrderByDescending(p => p.CreatedAt),
-            "oldest" => query.OrderBy(p => p.CreatedAt),
-            "bestseller" => query.OrderBy(p => p.Orders.Count),
+            ProductsOrderBy.Name => query.OrderBy(p => p.Name),
+            ProductsOrderBy.NameDesc => query.OrderByDescending(p => p.Name),
+            ProductsOrderBy.Newest => query.OrderByDescending(p => p.CreatedAt),
+            ProductsOrderBy.Oldest => query.OrderBy(p => p.CreatedAt),
+            ProductsOrderBy.Bestseller => query.OrderBy(p => p.Orders.Count),
             _ => query.OrderBy(p => p.Name)
         };
     }

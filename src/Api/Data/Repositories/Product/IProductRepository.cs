@@ -1,5 +1,5 @@
 ﻿using ECommerce.Models.DTOs.Product;
-using ECommerce.RequestHelpers;
+using ECommerce.RequestHelpers.SearchParams;
 
 namespace ECommerce.Data.Repositories.Product;
 

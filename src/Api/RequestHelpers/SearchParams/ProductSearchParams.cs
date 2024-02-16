@@ -1,9 +1,11 @@
-﻿namespace ECommerce.RequestHelpers;
+﻿using ECommerce.Models.Enum;
+
+namespace ECommerce.RequestHelpers.SearchParams;
 
 public class ProductSearchParams
 {
     public Guid? ProductId { get; set; }
-    public string OrderBy { get; set; }
+    public ProductsOrderBy OrderBy { get; set; }
 
     public string FilterBy { get; set; }
 

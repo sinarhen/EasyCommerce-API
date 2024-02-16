@@ -1,5 +1,6 @@
 using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Billboard;
+using ECommerce.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Billboard;
@@ -55,8 +56,12 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
                            ?? throw new ArgumentException("Size for billboard filter not found");
             }
 
-            if (!string.IsNullOrEmpty(createBillboardDto.BillboardFilter.OrderBy))
-                billboard.BillboardFilter.OrderBy = createBillboardDto.BillboardFilter.OrderBy;
+            if (Enum.TryParse<ProductsOrderBy>(createBillboardDto.BillboardFilter.OrderBy, true, out var orderBy))
+                billboard.BillboardFilter.OrderBy = orderBy;
+            else
+            {
+                
+            }
             if (!string.IsNullOrEmpty(createBillboardDto.BillboardFilter.Search))
                 billboard.BillboardFilter.Search = createBillboardDto.BillboardFilter.Search;
             billboard.BillboardFilter.FromPrice = createBillboardDto.BillboardFilter.FromPrice;
@@ -126,7 +131,12 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         var filterDto = updateBillboardDto.BillboardFilter;
         if (filterDto != null)
         {
-            if (!string.IsNullOrEmpty(filterDto.OrderBy)) billboard.BillboardFilter.OrderBy = filterDto.OrderBy;
+            if (Enum.TryParse<ProductsOrderBy>(filterDto.OrderBy, true, out var orderBy))
+                billboard.BillboardFilter.OrderBy = orderBy;
+            else
+            {
+                throw new ArgumentException($"Invalid OrderBy, valid values are: {string.Join(", ", Enum.GetNames(typeof(ProductsOrderBy)))}");
+            }
 
             if (!string.IsNullOrEmpty(filterDto.Search)) billboard.BillboardFilter.Search = filterDto.Search;
 
