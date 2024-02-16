@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Material;
@@ -9,7 +8,6 @@ using ECommerce.Models.DTOs.Stock;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using ECommerce.Models.Enum;
-using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,8 +45,8 @@ public class ProductRepository : BaseRepository, IProductRepository
         var isOwner = ValidateOwner(userId, ownerId, isAdmin);
         if (!isOwner) throw new UnauthorizedAccessException("You are not the owner of this store");
         
-        
-        ValidateCreateProductDtoOnModelLevel(productDto);
+        // Will be made in controller body with ModelState.IsValid
+        // ValidateCreateProductDtoOnModelLevel(productDto);
         
         var colorIds = productDto.Stocks.Select(s => s.ColorId).ToList();
         var existingColorIds = await _db.Colors
@@ -162,12 +160,13 @@ public class ProductRepository : BaseRepository, IProductRepository
         if (!ValidateOwner(userId, ownerId, isAdmin))
             throw new UnauthorizedAccessException("You have no permission to update this product");
 
+        // Will be made in controller body with ModelState.IsValid
+        // if (!string.IsNullOrEmpty(productDto.Name)) product.Name = productDto.Name;
 
-        if (!string.IsNullOrEmpty(productDto.Name)) product.Name = productDto.Name;
 
-        // checking if category id is not empty
-        if (productDto.CategoryId != Guid.Empty && productDto.CategoryId != product.Categories.First().CategoryId)
-        {
+        // Validation for nullables and Guids will be made in controller body with ModelState.IsValid
+        // if (productDto.CategoryId != Guid.Empty && productDto.CategoryId != product.Categories.First().CategoryId)
+        // {
             // checking if category with given id exists
             var category = await _db.Categories.FindAsync(productDto.CategoryId);
             if (category == null)
@@ -178,29 +177,33 @@ public class ProductRepository : BaseRepository, IProductRepository
 
             var initialOrder = CalculateDepth(category);
             AddToCategories(category, product, initialOrder);
-        }
+        // }
 
 
-        if (!string.IsNullOrEmpty(productDto.Description)) product.Description = productDto.Description;
+        if (!string.IsNullOrEmpty(productDto.Description)) 
+            product.Description = productDto.Description;
+        
         if (!string.IsNullOrEmpty(productDto.SizeChartImageUrl))
             product.SizeChartImageUrl = productDto.SizeChartImageUrl;
+        
+        // Validation for enums will be made in controller body with ModelState.IsValid
+        
+        // if (!string.IsNullOrEmpty(productDto.Gender))
+        // {
+        //     if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
+        //         throw new ArgumentException(
+        //             $"Invalid gender value. Valid gender options are: ({string.Join(", ", Enum.GetNames<Gender>())})");
+        //
+        //     product.Gender = gender;
+        // }
 
-        if (!string.IsNullOrEmpty(productDto.Gender))
-        {
-            if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
-                throw new ArgumentException(
-                    $"Invalid gender value. Valid gender options are: ({string.Join(", ", Enum.GetNames<Gender>())})");
-
-            product.Gender = gender;
-        }
-
-        if (!string.IsNullOrEmpty(productDto.Season))
-        {
-            if (!Enum.TryParse<Season>(productDto.Season, out var season))
-                throw new ArgumentException(
-                    $"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
-            product.Season = season;
-        }
+        // if (!string.IsNullOrEmpty(productDto.Season))
+        // {
+        //     if (!Enum.TryParse<Season>(productDto.Season, out var season))
+        //         throw new ArgumentException(
+        //             $"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
+        //     product.Season = season;
+        // }
 
         if (productDto.OccasionId != Guid.Empty)
         {
@@ -615,32 +618,4 @@ public class ProductRepository : BaseRepository, IProductRepository
         ;
     }
 
-
-    private static void ValidateCreateProductDtoOnModelLevel(CreateProductDto productDto)
-    {
-        if (productDto == null) throw new ArgumentException("Request body is empty");
-        
-        if (productDto.CategoryId == Guid.Empty) throw new ArgumentException("Product must have valid category id");
-        if (productDto.Stocks.Any(
-                s => s.SizeId == Guid.Empty || s.ColorId == Guid.Empty || s.Stock <= 0 || s.Price <= 0))
-            throw new ArgumentException("Product stock must have valid size, color, stock and price");
-        if (productDto.Materials.Any(m => m.Id == Guid.Empty))
-            throw new ArgumentException("Product must have valid material id");
-        if (productDto.MainMaterialId == Guid.Empty)
-            throw new ArgumentException("Product must have valid main material id");
-        if (productDto.OccasionId == Guid.Empty) throw new ArgumentException("Product must have valid occasion id");
-        if (string.IsNullOrEmpty(productDto.Name)) throw new ArgumentException("Product must have name");
-        if (productDto.Discount is < 0 or > 1)
-            throw new ArgumentException("Product discount must be between 0 and 1(represents percentage)");
-
-        // Check if gender is a valid value from Gender Enum
-        if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
-            throw new ArgumentException(
-                $"Invalid gender value. Valid genders are: ({string.Join(", ", Enum.GetNames<Gender>())})");
-
-        // Check if season is a valid value from Season Enum
-        if (!Enum.TryParse<Season>(productDto.Season, out var season))
-            throw new ArgumentException(
-                $"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
-    }
 }
