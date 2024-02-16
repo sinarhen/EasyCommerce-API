@@ -14,7 +14,6 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
     public async Task<Models.Entities.Billboard> CreateBillboardForCollectionAsync(Guid collectionId, string userId,
         CreateBillboardDto createBillboardDto, bool isAdmin)
     {
-        if (createBillboardDto == null) throw new ArgumentException("Request body is empty");
         var collection = await _db.Collections
                              .Include(c => c.Store)
                              .Include(c => c.Billboards)
@@ -56,12 +55,6 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
                            ?? throw new ArgumentException("Size for billboard filter not found");
             }
 
-            if (Enum.TryParse<ProductsOrderBy>(createBillboardDto.BillboardFilter.OrderBy, true, out var orderBy))
-                billboard.BillboardFilter.OrderBy = orderBy;
-            else
-            {
-                
-            }
             if (!string.IsNullOrEmpty(createBillboardDto.BillboardFilter.Search))
                 billboard.BillboardFilter.Search = createBillboardDto.BillboardFilter.Search;
             billboard.BillboardFilter.FromPrice = createBillboardDto.BillboardFilter.FromPrice;
@@ -131,21 +124,18 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
         var filterDto = updateBillboardDto.BillboardFilter;
         if (filterDto != null)
         {
-            if (Enum.TryParse<ProductsOrderBy>(filterDto.OrderBy, true, out var orderBy))
-                billboard.BillboardFilter.OrderBy = orderBy;
-            else
-            {
-                throw new ArgumentException($"Invalid OrderBy, valid values are: {string.Join(", ", Enum.GetNames(typeof(ProductsOrderBy)))}");
-            }
-
             if (!string.IsNullOrEmpty(filterDto.Search)) billboard.BillboardFilter.Search = filterDto.Search;
 
             billboard.BillboardFilter.FromPrice = filterDto.FromPrice;
 
             billboard.BillboardFilter.ToPrice = filterDto.ToPrice;
 
-            if (filterDto.Gender != null && !Enum.IsDefined(typeof(Gender), filterDto.Gender))
-                throw new ArgumentException("Invalid Gender");
+            billboard.BillboardFilter.Gender = filterDto.Gender;
+            billboard.BillboardFilter.CategoryId = filterDto.CategoryId;
+            billboard.BillboardFilter.ColorId = filterDto.ColorId;
+            billboard.BillboardFilter.SizeId = filterDto.SizeId;
+
+            billboard.BillboardFilter.Season = filterDto.Season;            
             billboard.BillboardFilter.Title = filterDto.Title;
             billboard.BillboardFilter.Subtitle = filterDto.Subtitle;
         }
