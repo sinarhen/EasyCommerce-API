@@ -70,7 +70,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         if (sellerInfo.Name == null) throw new ArgumentException(" name is required");
         if (sellerInfo.Description == null) throw new ArgumentException(" description is required");
         if (sellerInfo.Email == null) throw new ArgumentException(" email is required");
-        if (sellerInfo.PhoneNumber == null) throw new ArgumentException(" phone number is required");
+        if (sellerInfo.Phone == null) throw new ArgumentException(" phone number is required");
 
         var nameExists = await _db.SellerUpgradeRequests.Where(req =>
                 req.Status == SellerUpgradeRequestStatus.Approved && sellerInfo.Name == req.SellerInfo.Name)
@@ -86,7 +86,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             Name = sellerInfo.Name,
             Description = sellerInfo.Description,
             Email = sellerInfo.Email,
-            Phone = sellerInfo.PhoneNumber
+            Phone = sellerInfo.Phone
         };
         await _db.Sellers.AddAsync(seller);
         await _db.SellerUpgradeRequests.AddAsync(new SellerUpgradeRequest
