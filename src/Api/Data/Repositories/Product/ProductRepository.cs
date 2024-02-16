@@ -45,9 +45,6 @@ public class ProductRepository : BaseRepository, IProductRepository
         var isOwner = ValidateOwner(userId, ownerId, isAdmin);
         if (!isOwner) throw new UnauthorizedAccessException("You are not the owner of this store");
         
-        // Will be made in controller body with ModelState.IsValid
-        // ValidateCreateProductDtoOnModelLevel(productDto);
-        
         var colorIds = productDto.Stocks.Select(s => s.ColorId).ToList();
         var existingColorIds = await _db.Colors
             .AsNoTracking()
@@ -148,7 +145,8 @@ public class ProductRepository : BaseRepository, IProductRepository
         // TODO: Optimize this method
         var product = await _db.Products
             .Include(product => product.Stocks)
-            .Include(product => product.Categories).ThenInclude(c => c.Category).ThenInclude(c => c.ParentCategory)
+            .Include(product => product.Categories).ThenInclude(c => c.Category)
+            .ThenInclude(c => c.ParentCategory)
             .Include(product => product.Materials)
             .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -159,25 +157,14 @@ public class ProductRepository : BaseRepository, IProductRepository
 
         if (!ValidateOwner(userId, ownerId, isAdmin))
             throw new UnauthorizedAccessException("You have no permission to update this product");
+        var category = await _db.Categories.FindAsync(productDto.CategoryId);
+        if (category == null)
+            throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
 
-        // Will be made in controller body with ModelState.IsValid
-        // if (!string.IsNullOrEmpty(productDto.Name)) product.Name = productDto.Name;
+        ClearProductCategories(product);
 
-
-        // Validation for nullables and Guids will be made in controller body with ModelState.IsValid
-        // if (productDto.CategoryId != Guid.Empty && productDto.CategoryId != product.Categories.First().CategoryId)
-        // {
-            // checking if category with given id exists
-            var category = await _db.Categories.FindAsync(productDto.CategoryId);
-            if (category == null)
-                throw new ArgumentException($"Category with ID {productDto.CategoryId} does not exist");
-
-            // clearing all categories from product
-            ClearProductCategories(product);
-
-            var initialOrder = CalculateDepth(category);
-            AddToCategories(category, product, initialOrder);
-        // }
+        var initialOrder = CalculateDepth(category);
+        AddToCategories(category, product, initialOrder);
 
 
         if (!string.IsNullOrEmpty(productDto.Description)) 
@@ -187,23 +174,6 @@ public class ProductRepository : BaseRepository, IProductRepository
             product.SizeChartImageUrl = productDto.SizeChartImageUrl;
         
         // Validation for enums will be made in controller body with ModelState.IsValid
-        
-        // if (!string.IsNullOrEmpty(productDto.Gender))
-        // {
-        //     if (!Enum.TryParse<Gender>(productDto.Gender, out var gender))
-        //         throw new ArgumentException(
-        //             $"Invalid gender value. Valid gender options are: ({string.Join(", ", Enum.GetNames<Gender>())})");
-        //
-        //     product.Gender = gender;
-        // }
-
-        // if (!string.IsNullOrEmpty(productDto.Season))
-        // {
-        //     if (!Enum.TryParse<Season>(productDto.Season, out var season))
-        //         throw new ArgumentException(
-        //             $"Invalid season value. Valid seasons are: ({string.Join(", ", Enum.GetNames<Season>())})");
-        //     product.Season = season;
-        // }
 
         if (productDto.OccasionId != Guid.Empty)
         {

@@ -1,5 +1,5 @@
 using AutoMapper;
-using Data.Repositories.Review;
+using ECommerce.Data.Repositories.Review;
 using ECommerce.Models.DTOs.Review;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
