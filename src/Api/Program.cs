@@ -68,6 +68,7 @@ builder.Services.AddAuthorizationWithPolicies();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddJwtService();
 builder.Services.AddRepositories();
+builder.Services.AddScoped<ValidationService>();
 
 var app = builder.Build();
 
