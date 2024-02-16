@@ -14,7 +14,6 @@ namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-//TODO: Extract the db logic to a repository
 public class AuthController : GenericController
 {
     private readonly JwtService _jwtService;
@@ -34,6 +33,7 @@ public class AuthController : GenericController
     }
 
     [HttpPost("register")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> Register([FromBody] RegisterDto dto)
     {
         // Check if a user with the same email exists
@@ -73,6 +73,7 @@ public class AuthController : GenericController
     }
 
     [HttpPost("login")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult<JwtSecurityToken>> Login([FromBody] LoginDto dto)
     {
         if (dto == null) return BadRequest("Empty data");
@@ -156,6 +157,7 @@ public class AuthController : GenericController
     }
     
     [HttpPost("change-password")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
         if (dto == null) return BadRequest("Empty data");
@@ -181,6 +183,7 @@ public class AuthController : GenericController
     }
 
     [HttpPost("change-email")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
     {
         if (dto == null) return BadRequest("Empty data");

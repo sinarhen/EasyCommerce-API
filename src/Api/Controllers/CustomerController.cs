@@ -2,6 +2,7 @@ using AutoMapper;
 using ECommerce.Data.Repositories.Customer;
 using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.User;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,6 +67,7 @@ public class CustomerController : GenericController
     }
     
     [HttpPost("cart")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> AddToCart([FromBody] CreateCartItemDto cartItem)
     {
         try
@@ -89,6 +91,7 @@ public class CustomerController : GenericController
     }
 
     [HttpPost("upgrade")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoCreateDto sellerInfo)
     {
         try

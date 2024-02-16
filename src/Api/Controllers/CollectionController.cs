@@ -2,10 +2,11 @@
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Collection;
 using ECommerce.Models.DTOs.Collection;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.Controllers.Collection;
+namespace ECommerce.Controllers;
 
 [ApiController]
 [Route("api/collections")]
@@ -50,6 +51,7 @@ public class CollectionController : GenericController
 
     [HttpPut("{id}")]
     [Authorize(Policy = Policies.SellerPolicy)]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateCollection(Guid id, CreateCollectionDto collectionDto)
     {
         try
@@ -83,6 +85,7 @@ public class CollectionController : GenericController
 
     [HttpPost]
     [Authorize(Policy = Policies.SellerPolicy)]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> CreateCollection(CreateCollectionDto collectionDto)
     {
         try

@@ -4,6 +4,7 @@ using ECommerce.Data.Repositories.Product;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,6 +72,7 @@ public class ProductController : GenericController
 
     [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPost]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto productDto)
     {
         try
@@ -98,6 +100,7 @@ public class ProductController : GenericController
 
     [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPut("{id}")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {
         try

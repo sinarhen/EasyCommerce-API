@@ -2,6 +2,7 @@
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Store;
 using ECommerce.Models.DTOs.Store;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -75,6 +76,7 @@ public class StoreController : GenericController
 
     [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPost]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> CreateStore(StoreDto storeDto)
     {
         try
@@ -99,6 +101,7 @@ public class StoreController : GenericController
 
     [Authorize(Policy = Policies.SellerPolicy)]
     [HttpPut("{id}")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
         try
@@ -123,6 +126,7 @@ public class StoreController : GenericController
 
     [Authorize(Policy = Policies.SellerPolicy)]
     [HttpDelete("{id}")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> DeleteStore(Guid id)
     {
         try

@@ -3,6 +3,7 @@ using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Category;
 using ECommerce.Models.DTOs.Category;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,6 +57,7 @@ public class CategoryController : GenericController
 
     [Authorize(Policy = Policies.AdminPolicy)]
     [HttpPost]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> CreateCategory(WriteCategoryDto categoryDto)
     {
         try

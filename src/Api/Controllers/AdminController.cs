@@ -4,6 +4,7 @@ using ECommerce.Data.Repositories.Admin;
 using ECommerce.Models.DTOs.Admin;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -77,6 +78,7 @@ public class AdminController : GenericController
 
     // PUT: api/admin/users/{id}/ban
     [HttpPut("users/{id}/ban")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> BanUser(string id, [FromBody] BanUserDto data)
     {
         try

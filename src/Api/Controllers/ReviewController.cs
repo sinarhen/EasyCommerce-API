@@ -1,6 +1,7 @@
 using AutoMapper;
 using ECommerce.Data.Repositories.Review;
 using ECommerce.Models.DTOs.Review;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,30 +17,11 @@ public class ReviewController : GenericController
     {
         _repository = repository;
     }
-
-
-    // [HttpGet]
-    // public async Task<IActionResult> GetReviewsForProduct(Guid productId)
-    // {
-    //     try {
-    //         //TODO: Implement
-    //         throw new NotImplementedException();
-    //     } 
-    //     catch (UnauthorizedAccessException e) {
-    //         return Unauthorized(e.Message);
-    //     }
-    //     catch (ArgumentException e)
-    //     {
-    //         return BadRequest(e.Message);
-    //     }
-    //     catch (Exception e) {
-    //         return StatusCode(500, e.Message);
-
-    //     }
-    // }
+    
 
     [HttpPost]
     [Authorize]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> CreateReviewForProduct(Guid productId, CreateReviewDto createReviewDto)
     {
         try

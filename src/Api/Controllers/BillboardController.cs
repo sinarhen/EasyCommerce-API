@@ -2,6 +2,7 @@ using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Billboard;
 using ECommerce.Models.DTOs.Billboard;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,7 @@ public class BillboardController : GenericController
 
     [HttpPost]
     [Authorize(Policy = Policies.SellerPolicy)]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId,
         [FromBody] CreateBillboardDto createBillboardDto)
     {
@@ -69,6 +71,7 @@ public class BillboardController : GenericController
 
     [HttpPut("{billboardId}")]
     [Authorize(Policy = Policies.SellerPolicy)]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)
     {
         try
