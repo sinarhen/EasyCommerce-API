@@ -36,8 +36,6 @@ public class AuthController : GenericController
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] RegisterDto dto)
     {
-        if (dto == null) return BadRequest("Empty data");
-
         // Check if a user with the same email exists
         var userExistsTask = _userManager.Users.AnyAsync(x => x.Email == dto.Email);
 
