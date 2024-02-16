@@ -7,13 +7,15 @@ public class Store : BaseEntity
 {
     public Guid Id { get; set; }
     
-    [StringLength(55, ErrorMessage = "Name is too long. max 55 characters.")]
+    [Required]
+    [StringLength(55, MinimumLength = 3, ErrorMessage = "Name should be between 3 and 55 characters.")]
     public string Name { get; set; }
     
     [StringLength(3000, ErrorMessage = "Description is too long. max 3000 characters.")]
     public string Description { get; set; }
     
     [StringLength(2000, ErrorMessage = "Banner URL is too long")]
+    [Url]
     public string BannerUrl { get; set; }
     
     [StringLength(2000, ErrorMessage = "Logo URL is too long")]

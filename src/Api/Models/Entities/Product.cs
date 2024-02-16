@@ -10,14 +10,17 @@ public class Product : BaseEntity
 {
     [Key] public Guid Id { get; set; }
 
+    [Required]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "Name is too long. max 100 characters.")]
     public string Name { get; set; }
 
+    [StringLength(3000, ErrorMessage = "Description is too long. max 3000 characters.")]
     public string Description { get; set; }
 
 
     [Key] public Guid? OccasionId { get; set; }
 
-
+    [StringLength(2000, ErrorMessage = "Size Chart URL is too long")]
     public string SizeChartImageUrl { get; set; }
     public Gender? Gender { get; set; }
 

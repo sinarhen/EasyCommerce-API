@@ -13,6 +13,9 @@ public class Category : BaseEntity
 
     public Guid? ParentCategoryId { get; set; }
 
+    [Required]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "Name should be between 2 and 100 characters.")]
+    
     public string Name { get; set; }
 
     public string ImageUrl { get; set; }
