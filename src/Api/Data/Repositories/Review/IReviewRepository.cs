@@ -1,6 +1,6 @@
 using ECommerce.Models.DTOs.Review;
 
-namespace Data.Repositories.Review;
+namespace ECommerce.Data.Repositories.Review;
 
 public interface IReviewRepository
 {

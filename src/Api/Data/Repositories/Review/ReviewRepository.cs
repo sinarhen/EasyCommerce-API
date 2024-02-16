@@ -1,10 +1,8 @@
-using ECommerce.Data;
-using ECommerce.Data.Repositories;
 using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Review;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data.Repositories.Review;
+namespace ECommerce.Data.Repositories.Review;
 
 public class ReviewRepository : BaseRepository, IReviewRepository
 {
