@@ -146,7 +146,6 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         {
             "new" => query.Where(c => c.CreatedAt >= DateTime.Now.AddDays(-7)),
             "verified" => query.Where(c => c.Store.IsVerified),
-            "has_sale" => query.Where(c => c.HasSale),
             _ => query
         };
 
