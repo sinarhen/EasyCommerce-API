@@ -14,20 +14,9 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
     public async Task<Models.Entities.Collection> CreateCollectionAsync(CreateCollectionDto collection, string ownerId,
         List<string> ownerRoles)
     {
-        if (collection == null) throw new ArgumentException("Request body is empty");
-        if (Guid.Empty.Equals(ownerId)) throw new UnauthorizedAccessException("OwnerId is empty. Internal error");
-        if (collection.StoreId == Guid.Empty) throw new ArgumentException("StoreId is empty");
-
         var store = await _db.Stores.FindAsync(collection.StoreId) ?? throw new ArgumentException("Store not found");
 
-        // If the user is a Seller, check if they are the owner of the store
-        if (ownerRoles.Contains(UserRoles.Seller) && !ownerRoles.Contains(UserRoles.Admin) &&
-            !ownerRoles.Contains(UserRoles.SuperAdmin))
-        {
-            var isOwner = store.OwnerId == ownerId;
-            if (!isOwner) throw new UnauthorizedAccessException("You are not the owner of any store");
-        }
-
+        ValidateOwner(store.OwnerId, ownerId, ownerRoles.Contains(UserRoles.Admin));
 
         var coll = new Models.Entities.Collection
         {
@@ -44,9 +33,6 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
 
     public async Task DeleteCollectionAsync(Guid collectionId, string ownerId, List<string> ownerRoles)
     {
-        if (Guid.Empty.Equals(collectionId)) throw new ArgumentException("Id is empty. Internal error");
-        if (Guid.Empty.Equals(ownerId)) throw new UnauthorizedAccessException("OwnerId is empty. Internal error");
-
         var existingCollection = await _db.Collections
                                      .Include(c => c.Store)
                                      .FirstOrDefaultAsync(c => collectionId == c.Id)
@@ -86,11 +72,6 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
     public async Task UpdateCollectionAsync(Guid collectionId, CreateCollectionDto collection, string ownerId,
         List<string> ownerRoles)
     {
-        if (collection == null) throw new ArgumentException("Request body is empty");
-
-        if (Guid.Empty.Equals(collectionId)) throw new ArgumentException("Id is empty. Internal error");
-        if (Guid.Empty.Equals(ownerId)) throw new UnauthorizedAccessException("OwnerId is empty. Internal error");
-
         var existingCollection = await _db.Collections
                                      .Include(c => c.Store)
                                      .FirstOrDefaultAsync(c => collectionId == c.Id)
@@ -119,8 +100,6 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
         if (!string.IsNullOrEmpty(searchParams.SearchTerm))
             query = query.Where(c => c.Name.Contains(searchParams.SearchTerm));
 
-
-        var includedStocks = false;
         if (searchParams.MinPrice > 0)
         {
             query = query.Include(c => c.Products).ThenInclude(p => p.Stocks);
@@ -131,7 +110,7 @@ public class CollectionRepository : BaseRepository, ICollectionRepository
 
         if (searchParams.MaxPrice < decimal.MaxValue)
         {
-            if (!includedStocks) query = query.Include(c => c.Products).ThenInclude(p => p.Stocks);
+            query = query.Include(c => c.Products).ThenInclude(p => p.Stocks);
             query = query.Where(c => c.Products.Max(p => p.Stocks.Max(s => s.Price)) <= searchParams.MaxPrice);
         }
 
