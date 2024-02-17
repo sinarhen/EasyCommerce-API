@@ -27,9 +27,6 @@ public class AdminController : GenericController
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
-        // Should return 500 status code because of the middleware
-        // TODO: remove
-        throw new Exception("Test");
         return Ok(await _repository.GetAllUsers());
     }
 
@@ -45,20 +42,9 @@ public class AdminController : GenericController
     [HttpGet("users/{id}")]
     public async Task<ActionResult<User>> GetUserById(string id)
     {
-        try
-        {
             var user = await _repository.GetUserById(id);
 
             return Ok(user);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
     }
 
     // PUT: api/admin/users/{id}/ban
@@ -66,59 +52,31 @@ public class AdminController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> BanUser(string id, [FromBody] BanUserDto data)
     {
-        try
-        {
             var bannedUser = await _repository.BanUser(id, data);
             return Ok(new
             {
                 message = "User has been banned",
                 bannedUser
             });
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
     }
+    
 
     // PUT: api/admin/users/{id}/ban
     [HttpPut("users/{id}/unban")]
     public async Task<ActionResult> UnbanUser(string id)
     {
-        try
-        {
             await _repository.UnbanUser(id);
             return Ok(new
             {
                 message = "User has been unbanned"
             });
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
     }
 
     // GET: api/admin/users/banned
     [HttpGet("users/banned")]
     public async Task<ActionResult<IEnumerable<BannedUser>>> GetBannedUsers()
     {
-        try
-        {
-            return Ok(await _repository.GetBannedUsers());
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        return Ok(await _repository.GetBannedUsers());
     }
 
 
@@ -126,58 +84,31 @@ public class AdminController : GenericController
     [HttpPut("users/{id}/role")]
     public async Task<ActionResult> UpdateUserRole(string id, [FromBody] ChangeUserRoleDto dto)
     {
-        try
-        {
-            await _repository.UpdateUserRole(id, dto.Role, UserRoles.GetHighestUserRole(GetUserRoles()));
-            return Ok(
-                new
-                {
-                    message = "User role has been updated"
-                }
-            );
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return StatusCode(500, e.Message);
-        }
+        await _repository.UpdateUserRole(id, dto.Role, UserRoles.GetHighestUserRole(GetUserRoles()));
+        return Ok(
+            new
+            {
+                message = "User role has been updated"
+            }
+        );
     }
 
     [HttpGet("users/upgrade-requests")]
     public async Task<ActionResult<IEnumerable<SellerUpgradeRequestDto>>> GetUpgradeRequests()
     {
-        try
-        {
-            return Ok(await _repository.GetSellerUpgradeRequests());
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        return Ok(await _repository.GetSellerUpgradeRequests());
     }
 
     [HttpGet("users/upgrade-requests/{id:guid}")]
     public async Task<ActionResult<SellerUpgradeRequestDetailsDto>> GetUpgradeRequestById(Guid id)
     {
-        try
-        {
-            return Ok(await _repository.GetSellerUpgradeRequestById(id));
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        return Ok(await _repository.GetSellerUpgradeRequestById(id));
     }
 
     [HttpPut("users/upgrade-requests/{id:guid}")]
+    [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateUpgradeRequestStatus(Guid id, [FromBody] SellerUpgradeRequestDto dto)
     {
-        try
-        {
             if (dto.Status == null) return BadRequest("Status is required");
 
             if (SellerUpgradeRequestStatus.Approved.GetDisplayName() != dto.Status && SellerUpgradeRequestStatus.Rejected.GetDisplayName() != dto.Status)
@@ -187,14 +118,5 @@ public class AdminController : GenericController
             {
                 message = "Seller upgrade request status has been updated"
             });
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
     }
 }
