@@ -23,8 +23,6 @@ public class CategoryController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
-        try
-        {
             var categories = await _repository.GetCategoriesAsync();
             return Ok(
                 new
@@ -32,27 +30,14 @@ public class CategoryController : GenericController
                     Categories = _mapper.Map<List<CategoryDto>>(categories)
                 }
             );
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetCategory(Guid id)
     {
-        try
-        {
-            if (id == Guid.Empty) return BadRequest();
             var category = await _repository.GetCategoryAsync(id);
             if (category == null) return NotFound();
             return Ok(_mapper.Map<CategoryDto>(category));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
     }
 
     [Authorize(Policy = Policies.AdminPolicy)]
@@ -60,33 +45,16 @@ public class CategoryController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> CreateCategory(WriteCategoryDto categoryDto)
     {
-        try
-        {
-            await _repository.CreateCategoryAsync(categoryDto);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        await _repository.CreateCategoryAsync(categoryDto);
 
         return Ok();
     }
 
     [Authorize(Policy = Policies.AdminPolicy)]
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     public async Task<ActionResult> UpdateCategory(Guid id, WriteCategoryDto categoryDto)
     {
-        Console.WriteLine("UpdateCategory User: " + User.Identity?.Name + "\n\n roles: " +
-                          User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value));
-        try
-        {
-            await _repository.UpdateCategoryAsync(id, categoryDto);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-
+        await _repository.UpdateCategoryAsync(id, categoryDto);
         return Ok();
     }
 
@@ -94,15 +62,7 @@ public class CategoryController : GenericController
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteCategory(Guid id)
     {
-        try
-        {
-            await _repository.DeleteCategoryAsync(id);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-
+        await _repository.DeleteCategoryAsync(id);
         return Ok();
     }
 }
