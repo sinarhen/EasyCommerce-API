@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using ECommerce.Config;
 using ECommerce.Data;
+using ECommerce.Middleware;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
 using Lib;
@@ -84,6 +85,7 @@ if (app.Environment.IsDevelopment())
 // app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();
 
 

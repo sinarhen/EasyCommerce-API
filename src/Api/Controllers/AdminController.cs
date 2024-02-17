@@ -27,33 +27,18 @@ public class AdminController : GenericController
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
-        try
-        {
-            return Ok(await _repository.GetAllUsers());
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        // Should return 500 status code because of the middleware
+        // TODO: remove
+        throw new Exception("Test");
+        return Ok(await _repository.GetAllUsers());
     }
 
     // DELETE: api/admin/users/{id}
     [HttpDelete("users/{id}")]
     public ActionResult DeleteUser(string id)
     {
-        try
-        {
-            _repository.DeleteUser(id);
-            return Ok("Successfully deleted user");
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        _repository.DeleteUser(id);
+        return Ok("Successfully deleted user");
     }
 
     // GET: api/admin/users/{id}
