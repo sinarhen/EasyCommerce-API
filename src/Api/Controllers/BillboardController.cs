@@ -23,23 +23,8 @@ public class BillboardController : GenericController
     [HttpGet]
     public async Task<IActionResult> GetBillboardsForCollection(Guid collectionId)
     {
-        try
-        {
             var billboards = await _repository.GetBillboardsForCollectionAsync(collectionId);
             return Ok(_mapper.Map<List<BillboardDto>>(billboards));
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
     }
 
     [HttpPost]
@@ -48,50 +33,20 @@ public class BillboardController : GenericController
     public async Task<IActionResult> CreateBillboardForCollection(Guid collectionId,
         [FromBody] CreateBillboardDto createBillboardDto)
     {
-        try
-        {
-            var billboard =
-                await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto,
-                    IsAdmin());
-            return Ok(_mapper.Map<BillboardDto>(billboard));
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        var billboard =
+            await _repository.CreateBillboardForCollectionAsync(collectionId, GetUserId(), createBillboardDto,
+                IsAdmin());
+        return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
-    [HttpPut("{billboardId}")]
+    [HttpPut("{billboardId:guid}")]
     [Authorize(Policy = Policies.SellerPolicy)]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)
     {
-        try
-        {
-            var billboard =
-                await _repository.UpdateBillboardAsync(billboardId, updateBillboardDto, GetUserId(), IsAdmin());
-            return Ok(_mapper.Map<BillboardDto>(billboard));
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        var billboard =
+            await _repository.UpdateBillboardAsync(billboardId, updateBillboardDto, GetUserId(), IsAdmin());
+        return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
     [HttpDelete("{billboardId}")]
