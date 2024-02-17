@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using ECommerce.Config;
 using ECommerce.Data;
 using ECommerce.Middleware;
@@ -17,7 +18,11 @@ var envFile = builder.Environment.IsDevelopment() ? ".env.dev" : ".env";
 Env.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), envFile));
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -71,6 +76,7 @@ builder.Services.AddJwtService();
 builder.Services.AddRepositories();
 builder.Services.AddScoped<ValidationService>();
 builder.Services.EnableModelStateInvalidFilterSuppression();
+
 
 var app = builder.Build();
 

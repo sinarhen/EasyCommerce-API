@@ -9,6 +9,11 @@ public class ErrorDetails
 
     public override string ToString()
     {
-        return JsonSerializer.Serialize(this);
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+        return JsonSerializer.Serialize(this, jsonSerializerOptions);
     }
 }
