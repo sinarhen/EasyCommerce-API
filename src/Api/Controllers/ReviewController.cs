@@ -17,73 +17,22 @@ public class ReviewController : GenericController
     {
         _repository = repository;
     }
-    
+
 
     [HttpPost]
     [Authorize]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> CreateReviewForProduct(Guid productId, CreateReviewDto createReviewDto)
     {
-        try
-        {
-            var res = await _repository.CreateReviewForProduct(productId, GetUserId(), createReviewDto);
-            return Ok(res);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        var res = await _repository.CreateReviewForProduct(productId, GetUserId(), createReviewDto);
+        return Ok(res);
     }
 
-    // [HttpPut("{reviewId}")]
-    // public async Task<IActionResult> UpdateReview(Guid reviewId) // TODO: [FromBody] UpdateReviewDto updateReviewDto
-    // {
-    //     try {
-    //         //TODO: Implement
-    //         throw new NotImplementedException();
-    //     } 
-    //     catch (UnauthorizedAccessException e) {
-    //         return Unauthorized(e.Message);
-    //     }
-    //     catch (ArgumentException e)
-    //     {
-    //         return BadRequest(e.Message);
-    //     }
-    //     catch (Exception e) {
-    //         return StatusCode(500, e.Message);
-
-    //     }
-
-    // } Probably not needed
-
-    [HttpDelete("{reviewId}")]
+    [HttpDelete("{reviewId:guid}")]
     [Authorize]
     public async Task<IActionResult> DeleteReview(Guid reviewId)
     {
-        try
-        {
-            await _repository.DeleteReviewForCollectionAsync(reviewId, GetUserId());
-            return Ok();
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        await _repository.DeleteReviewForCollectionAsync(reviewId, GetUserId());
+        return Ok();
     }
 }
