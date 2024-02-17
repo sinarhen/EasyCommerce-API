@@ -2,7 +2,6 @@
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Product;
 using ECommerce.Models.DTOs.Product;
-using ECommerce.RequestHelpers;
 using ECommerce.RequestHelpers.SearchParams;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,50 +23,26 @@ public class ProductController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] ProductSearchParams searchParams)
     {
-        try
-        {
-            var products = await _repository.GetProductsAsync(searchParams);
+        var products = await _repository.GetProductsAsync(searchParams);
 
-            if (products == null) return NotFound();
-            return Ok(new
-            {
-                Products = products,
-                Total = products.Count(),
-                searchParams.PageNumber,
-                searchParams.PageSize
-            });
-        }
-        catch (ArgumentException e)
+        if (products == null) return NotFound();
+        var productDtos = products as ProductDto[] ?? products.ToArray();
+        return Ok(new
         {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+            Products = productDtos,
+            Total = productDtos.Length,
+            searchParams.PageNumber,
+            searchParams.PageSize
+        });
     }
 
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
     {
-        try
-        {
-            var product = await _repository.GetProductAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return Ok(product);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        var product = await _repository.GetProductAsync(id);
+        if (product == null) return NotFound();
+        return Ok(product);
     }
 
     [Authorize(Policy = Policies.SellerPolicy)]
@@ -75,58 +50,28 @@ public class ProductController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto productDto)
     {
-        try
-        {
-            var product = await _repository.CreateProductAsync(productDto, GetUserId(), IsAdmin());
+        var product = await _repository.CreateProductAsync(productDto, GetUserId(), IsAdmin());
 
-            return StatusCode(201, new
-            {
-                product.Id
-            });
-        }
-        catch (ArgumentException e)
+        return StatusCode(201, new
         {
-            return BadRequest(e.Message);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+            product.Id
+        });
     }
 
     [Authorize(Policy = Policies.SellerPolicy)]
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {
-        try
-        {
-            var product = await _repository.UpdateProductAsync(id, productDto, GetUserId(), IsAdmin());
+        var product = await _repository.UpdateProductAsync(id, productDto, GetUserId(), IsAdmin());
 
-            if (product == null) return NotFound();
+        if (product == null) return NotFound();
 
-            return Ok();
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        return Ok();
     }
 
     [Authorize(Policy = Policies.SellerPolicy)]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
         await _repository.DeleteProductAsync(id, GetUserId(), IsAdmin());
