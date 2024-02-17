@@ -42,7 +42,7 @@ public class CustomerController : GenericController
         return Ok("Successfully added to cart");
     }
 
-    [HttpDelete("cart/{cartProductId}")]
+    [HttpDelete("cart/{cartProductId:guid}")]
     public async Task<IActionResult> RemoveFromCart(Guid cartProductId)
     {
         await _repository.RemoveProductFromCart(GetUserId(), cartProductId);
