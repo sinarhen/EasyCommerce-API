@@ -23,94 +23,37 @@ public class CustomerController : GenericController
     [HttpGet("reviews")]
     public async Task<IActionResult> GetReviewsForUser()
     {
-        try
-        {
-            var res = await _repository.GetReviewsForUser(GetUserId(), GetUserRoles());
-
-            return Ok(res);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        var res = await _repository.GetReviewsForUser(GetUserId(), GetUserRoles());
+        return Ok(res);
     }
 
     [HttpGet("cart")]
     public async Task<IActionResult> GetCart()
     {
-        try
-        {
-            var res = await _repository.GetCartForUser(GetUserId());
-
-            return Ok(res);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        var res = await _repository.GetCartForUser(GetUserId());
+        return Ok(res);
     }
-    
+
     [HttpPost("cart")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> AddToCart([FromBody] CreateCartItemDto cartItem)
     {
-        try
-        {
-            await _repository.AddProductToCart(GetUserId(), cartItem);
+        await _repository.AddProductToCart(GetUserId(), cartItem);
+        return Ok("Successfully added to cart");
+    }
 
-            return Ok("Successfully added to cart");
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+    [HttpDelete("cart/{cartProductId}")]
+    public async Task<IActionResult> RemoveFromCart(Guid cartProductId)
+    {
+        await _repository.RemoveProductFromCart(GetUserId(), cartProductId);
+        return Ok("Successfully removed from cart");
     }
 
     [HttpPost("upgrade")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpgradeToSeller([FromBody] SellerInfoCreateDto sellerInfo)
     {
-        try
-        {
-            await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
-
-            return Ok("Successfully requested to upgrade to seller");
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            return Unauthorized(e.Message);
-        }
-        catch (ArgumentException e)
-        {
-            return BadRequest(e.Message);
-        }
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
+        return Ok("Successfully requested to upgrade to seller");
     }
 }
