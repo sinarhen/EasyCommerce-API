@@ -13,6 +13,6 @@ public class ValidationService : IActionFilter
 
     public void OnActionExecuted(ActionExecutedContext context)
     {
-        throw new NotImplementedException();
+        // Do nothing
     }
 }
