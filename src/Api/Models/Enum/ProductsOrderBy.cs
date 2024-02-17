@@ -3,7 +3,7 @@
 public enum ProductsOrderBy
 {
     Price,
-    PriceDesc ,
+    PriceDesc,
     Name,
     NameDesc,
     Newest,

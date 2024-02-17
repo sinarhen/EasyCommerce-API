@@ -1,8 +1,6 @@
-using ECommerce.Models.DTOs;
 using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.User;
-using ECommerce.Models.Entities;
 
 namespace ECommerce.Data.Repositories.Customer;
 
@@ -11,16 +9,16 @@ public interface ICustomerRepository
     Task<UserReviewsDto> GetReviewsForUser(string userId, IReadOnlyList<string> roles);
 
     Task RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
-    
+
     Task<CartDto> GetCartForUser(string userId);
 
     Task AddProductToCart(string userId, CreateCartItemDto cartProduct);
-    
+
     Task RemoveProductFromCart(string userId, Guid cartProductId);
-    
+
     Task UpdateProductInCart(string userId, CreateCartItemDto cartProduct);
-    
+
     Task ClearCart(string userId);
-    
-    Task Checkout(string userId); 
+
+    Task Checkout(string userId);
 }

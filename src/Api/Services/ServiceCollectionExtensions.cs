@@ -28,12 +28,10 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection EnableModelStateInvalidFilterSuppression(this IServiceCollection services)
     {
-        services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.SuppressModelStateInvalidFilter = true;
-        });
+        services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
         return services;
     }
+
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IAdminRepository, AdminRepository>();

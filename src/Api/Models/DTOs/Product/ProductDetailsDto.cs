@@ -10,6 +10,6 @@ public class ProductDetailsDto : ProductDto
     public List<MaterialDto> Materials { get; set; }
     public List<SizeDto> Sizes { get; set; }
     public List<ReviewDto> Reviews { get; set; }
-    
+
     public List<ProductStockDto> Stocks { get; set; }
 }

@@ -16,10 +16,10 @@ namespace ECommerce.Controllers;
 [Route("api/auth")]
 public class AuthController : GenericController
 {
+    private readonly ProductDbContext _db;
     private readonly JwtService _jwtService;
     private readonly UserManager<User> _userManager;
-    private readonly ProductDbContext _db;
-    
+
     public AuthController(
         IMapper mapper,
         UserManager<User> userManager,
@@ -105,7 +105,7 @@ public class AuthController : GenericController
 
         return Ok(principal);
     }
-    
+
     [HttpGet("refresh-token")]
     public async Task<ActionResult<JwtSecurityToken>> RefreshToken()
     {
@@ -132,8 +132,8 @@ public class AuthController : GenericController
             expiration = newToken.ValidTo
         });
     }
-    
-    
+
+
     [HttpGet("me")]
     public async Task<ActionResult<UserDto>> GetMe()
     {
@@ -141,7 +141,7 @@ public class AuthController : GenericController
         var user = await _userManager.FindByIdAsync(id);
         if (user == null) return NotFound();
         var roles = await _userManager.GetRolesAsync(user);
-        
+
         return Ok(new UserDto
         {
             Id = user.Id,
@@ -155,7 +155,7 @@ public class AuthController : GenericController
             UpdatedAt = user.UpdatedAt
         });
     }
-    
+
     [HttpPost("change-password")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)

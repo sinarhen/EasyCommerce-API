@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Category;
 using ECommerce.Models.DTOs.Category;
@@ -23,21 +22,21 @@ public class CategoryController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetCategories()
     {
-            var categories = await _repository.GetCategoriesAsync();
-            return Ok(
-                new
-                {
-                    Categories = _mapper.Map<List<CategoryDto>>(categories)
-                }
-            );
+        var categories = await _repository.GetCategoriesAsync();
+        return Ok(
+            new
+            {
+                Categories = _mapper.Map<List<CategoryDto>>(categories)
+            }
+        );
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetCategory(Guid id)
     {
-            var category = await _repository.GetCategoryAsync(id);
-            if (category == null) return NotFound();
-            return Ok(_mapper.Map<CategoryDto>(category));
+        var category = await _repository.GetCategoryAsync(id);
+        if (category == null) return NotFound();
+        return Ok(_mapper.Map<CategoryDto>(category));
     }
 
     [Authorize(Policy = Policies.AdminPolicy)]

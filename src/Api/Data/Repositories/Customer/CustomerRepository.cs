@@ -73,7 +73,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
         var user = await GetAuthorizedUserAsync(userId);
         await CheckIfUserIsSeller(user);
-        
+
         var seller = new SellerInfo
         {
             Name = sellerInfo.Name,
@@ -89,6 +89,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         });
         await SaveChangesAsyncWithTransaction();
     }
+
     public async Task<CartDto> GetCartForUser(string userId)
     {
         var userQuery = _db.Users
@@ -134,11 +135,12 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                         {
                             Id = i.SizeId,
                             Name = i.Size.Name,
-                            Value = i.Size.Value,
+                            Value = i.Size.Value
                         },
-                        ImageUrl = i.Product.Images.FirstOrDefault(productImage => productImage.ColorId == i.ColorId).ImageUrls.FirstOrDefault(),
+                        ImageUrl = i.Product.Images.FirstOrDefault(productImage => productImage.ColorId == i.ColorId)
+                            .ImageUrls.FirstOrDefault(),
                         SellerId = i.Product.SellerId,
-                        SellerName = i.Product.Seller.FirstName,
+                        SellerName = i.Product.Seller.FirstName
                     },
                     Quantity = i.Quantity
                 }).ToList()
@@ -148,14 +150,14 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         {
             Customer = new UserDto
             {
-                Id = userId,
-                
+                Id = userId
             },
             Products = new List<CartItemDto>()
         };
 
         return cart;
     }
+
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
         var user = await _db.Users
@@ -164,26 +166,26 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null) throw new ArgumentException("User not found");
-        
+
         var product = await _db.Products
             .AsNoTracking()
             .Include(p => p.Stocks)
             .FirstOrDefaultAsync(p => p.Id == cartProduct.ProductId);
         if (product == null) throw new ArgumentException("Product not found");
-        
+
         var stock = product
             .Stocks
             .FirstOrDefault(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId);
-   
+
         if (stock == null) throw new ArgumentException("Stock not found");
         if (stock.Stock < cartProduct.Quantity) throw new ArgumentException("Not enough stock for this product");
-        
+
         var color = await _db.Colors.FindAsync(cartProduct.ColorId);
         if (color == null) throw new ArgumentException("Color not found");
-        
+
         var size = await _db.Sizes.FindAsync(cartProduct.SizeId);
         if (size == null) throw new ArgumentException("Size not found");
-        
+
         if (user.Cart == null)
         {
             user.Cart = new Cart
@@ -200,26 +202,35 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                                  && p.SizeId == cartProduct.SizeId);
 
         if (existingProduct != null)
-        {
             existingProduct.Quantity += cartProduct.Quantity;
-        }
         else
-        {
             await _db.CartProducts.AddAsync(new CartProduct
             {
                 CartId = user.Cart.Id,
                 ProductId = cartProduct.ProductId,
                 ColorId = cartProduct.ColorId,
                 SizeId = cartProduct.SizeId,
-                Quantity = cartProduct.Quantity,
+                Quantity = cartProduct.Quantity
             });
-        }
 
         await SaveChangesAsyncWithTransaction();
     }
-    public Task RemoveProductFromCart(string userId, Guid cartProductId)
+
+    public async Task RemoveProductFromCart(string userId, Guid cartProductId)
     {
-        throw new NotImplementedException();
+        var user = await _db.Users
+            .Include(u => u.Cart)
+            .ThenInclude(c => c.Products)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null) throw new ArgumentException("User not found");
+
+        var product = user.Cart.Products.FirstOrDefault(p => p.Id == cartProductId);
+        if (product == null) throw new ArgumentException("Product not found in cart");
+
+        _db.CartProducts.Remove(product);
+
+        await SaveChangesAsyncWithTransaction();
     }
 
     public Task UpdateProductInCart(string userId, CreateCartItemDto cartProduct)

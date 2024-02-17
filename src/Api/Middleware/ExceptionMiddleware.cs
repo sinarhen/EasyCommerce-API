@@ -34,7 +34,7 @@ public class ExceptionMiddleware
             _ => StatusCodes.Status500InternalServerError
         };
 
-        return context.Response.WriteAsync(new ErrorDetails()
+        return context.Response.WriteAsync(new ErrorDetails
         {
             StatusCode = context.Response.StatusCode,
             Message = exception.Message

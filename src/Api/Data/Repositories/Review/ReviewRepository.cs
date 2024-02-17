@@ -10,7 +10,7 @@ public class ReviewRepository : BaseRepository, IReviewRepository
     {
     }
 
-    public async Task<ECommerce.Models.Entities.Review> CreateReviewForProduct(Guid productId, string userId,
+    public async Task<Models.Entities.Review> CreateReviewForProduct(Guid productId, string userId,
         CreateReviewDto createReviewDto)
     {
         var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
@@ -21,7 +21,7 @@ public class ReviewRepository : BaseRepository, IReviewRepository
             throw new ArgumentException("Invalid rating. Must be integer number between 1 and 5");
 
 
-        var review = new ECommerce.Models.Entities.Review
+        var review = new Models.Entities.Review
         {
             ProductId = productId,
             CustomerId = userId,

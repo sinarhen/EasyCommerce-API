@@ -1,6 +1,4 @@
-﻿using ECommerce.Models.Entities;
-
-namespace ECommerce.Config;
+﻿namespace ECommerce.Config;
 
 public static class UserRoles
 {
@@ -33,5 +31,4 @@ public static class UserRoles
             SuperAdmin
         };
     }
-    
 }

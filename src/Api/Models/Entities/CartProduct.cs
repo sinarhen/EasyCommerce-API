@@ -14,12 +14,11 @@ public class CartProduct : BaseEntity
     public Guid ColorId { get; set; }
 
     // Navigation properties
-    [ForeignKey("CartId")]
-    public Cart Cart { get; set; }
-    [ForeignKey("ProductId")]
-    public Product Product { get; set; }
-    [ForeignKey("SizeId")]
-    public Size Size { get; set; }
-    [ForeignKey("ColorId")]
-    public Color Color { get; set; }
+    [ForeignKey("CartId")] public Cart Cart { get; set; }
+
+    [ForeignKey("ProductId")] public Product Product { get; set; }
+
+    [ForeignKey("SizeId")] public Size Size { get; set; }
+
+    [ForeignKey("ColorId")] public Color Color { get; set; }
 }

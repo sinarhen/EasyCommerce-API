@@ -23,8 +23,8 @@ public class BillboardController : GenericController
     [HttpGet]
     public async Task<IActionResult> GetBillboardsForCollection(Guid collectionId)
     {
-            var billboards = await _repository.GetBillboardsForCollectionAsync(collectionId);
-            return Ok(_mapper.Map<List<BillboardDto>>(billboards));
+        var billboards = await _repository.GetBillboardsForCollectionAsync(collectionId);
+        return Ok(_mapper.Map<List<BillboardDto>>(billboards));
     }
 
     [HttpPost]

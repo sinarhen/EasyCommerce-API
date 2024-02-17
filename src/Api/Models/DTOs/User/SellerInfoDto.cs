@@ -41,16 +41,14 @@ public class SellerInfoDto
     public string Applepay { get; set; }
     public string Googlepay { get; set; }
     public string Samsungpay { get; set; }
-    
+
     public int OrderCount { get; set; }
     public int ProductCount { get; set; }
     public int CollectionCount { get; set; }
     public int ReviewCount { get; set; }
     public double Rating { get; set; }
     public bool IsVerified { get; set; }
-    
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    
-    
 }

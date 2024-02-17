@@ -4,7 +4,6 @@ namespace ECommerce.Models.DTOs.User;
 
 public class SellerInfoCreateDto
 {
-
     [Required]
     [StringLength(100, ErrorMessage = "Name is too long. max 100 characters.")]
     public string Name { get; set; }

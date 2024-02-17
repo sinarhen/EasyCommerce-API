@@ -37,7 +37,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<Size> Sizes { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Occasion> Occasions { get; set; }
-    
+
     public override int SaveChanges()
     {
         UpdateTimestamps();
@@ -49,7 +49,6 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
         UpdateTimestamps();
         return base.SaveChangesAsync(cancellationToken);
     }
-
 
 
     private void UpdateTimestamps()

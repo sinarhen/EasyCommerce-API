@@ -1,6 +1,5 @@
-using ECommerce.Entities.Enum;
 using ECommerce.Models.DTOs.Billboard;
-using ECommerce.Models.Enum;
+using ECommerce.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Billboard;
@@ -32,7 +31,7 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
             Subtitle = createBillboardDto.Subtitle,
             ImageUrl = createBillboardDto.ImageUrl,
             CollectionId = collectionId,
-            BillboardFilter = new Models.Entities.BillboardFilter()
+            BillboardFilter = new BillboardFilter()
         };
 
         if (createBillboardDto.BillboardFilter != null)
@@ -135,7 +134,7 @@ public class BillboardRepository : BaseRepository, IBillboardRepository
             billboard.BillboardFilter.ColorId = filterDto.ColorId;
             billboard.BillboardFilter.SizeId = filterDto.SizeId;
 
-            billboard.BillboardFilter.Season = filterDto.Season;            
+            billboard.BillboardFilter.Season = filterDto.Season;
             billboard.BillboardFilter.Title = filterDto.Title;
             billboard.BillboardFilter.Subtitle = filterDto.Subtitle;
         }

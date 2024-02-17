@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Data.Repositories.Seller;
 
-public class SellerRepository: BaseRepository, ISellerRepository
+public class SellerRepository : BaseRepository, ISellerRepository
 {
     private readonly UserManager<User> _userManager;
+
     public SellerRepository(ProductDbContext db, UserManager<User> userManager) : base(db)
     {
         _userManager = userManager;
@@ -19,9 +20,8 @@ public class SellerRepository: BaseRepository, ISellerRepository
         user.SellerInfo = sellerInfo;
 
         await SaveChangesAsyncWithTransaction();
-        
     }
-        
+
     public async Task<SellerInfoDto> GetSellerInfo(string id)
     {
         var user = await _db
@@ -79,10 +79,7 @@ public class SellerRepository: BaseRepository, ISellerRepository
             })
             .FirstOrDefaultAsync();
 
-        if (user == null)
-        {
-            throw new ArgumentException("User not found or not a seller");
-        }
+        if (user == null) throw new ArgumentException("User not found or not a seller");
 
         return user;
     }

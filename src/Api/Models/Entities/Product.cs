@@ -23,12 +23,13 @@ public class Product : BaseEntity
 
     [StringLength(2000, ErrorMessage = "Size Chart URL is too long")]
     public string SizeChartImageUrl { get; set; }
+
     public Gender? Gender { get; set; }
 
     public Season? Season { get; set; }
 
     public string SellerId { get; set; }
-    
+
     public Guid? CollectionId { get; set; }
 
     // Navigation properties
@@ -39,7 +40,7 @@ public class Product : BaseEntity
 
     // Using denormalization to avoid joins and improve performance.
     [ForeignKey("SellerId")] public User Seller { get; set; }
-    
+
     public ICollection<ProductMaterial> Materials { get; set; } = new List<ProductMaterial>();
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ECommerce.Models.DTOs.Billboard;
 
 public class WriteBillboardDto
-{    
+{
     [Required]
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Title must be between 6 and 100 characters.")]
     public string Title { get; set; }

@@ -1,8 +1,6 @@
-﻿namespace ECommerce.Models.Validation;
+﻿using System.ComponentModel.DataAnnotations;
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+namespace ECommerce.Models.Validation;
 
 public class EnumValueAttribute : ValidationAttribute
 {
@@ -17,12 +15,12 @@ public class EnumValueAttribute : ValidationAttribute
     {
         if (value is not string stringValue) return false;
 
-        return Enum.TryParse(_enumType, stringValue, true, out _);
+        return System.Enum.TryParse(_enumType, stringValue, true, out _);
     }
 
     public override string FormatErrorMessage(string name)
     {
-        var validOptions = string.Join(", ", Enum.GetNames(_enumType));
+        var validOptions = string.Join(", ", System.Enum.GetNames(_enumType));
         return $"The field {name} must be one of the following: {validOptions}.";
     }
 }

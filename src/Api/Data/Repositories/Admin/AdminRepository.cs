@@ -165,7 +165,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
                     Id = r.UserId,
                     Username = r.User.UserName,
                     Email = r.User.Email,
-                    Role = r.Status == SellerUpgradeRequestStatus.Pending ? UserRoles.Customer : UserRoles.Seller, 
+                    Role = r.Status == SellerUpgradeRequestStatus.Pending ? UserRoles.Customer : UserRoles.Seller,
                     CreatedAt = r.User.CreatedAt,
                     UpdatedAt = r.User.UpdatedAt,
                     ImageUrl = r.User.ImageUrl
@@ -178,27 +178,29 @@ public class AdminRepository : BaseRepository, IAdminRepository
     public async Task<SellerUpgradeRequestDetailsDto> GetSellerUpgradeRequestById(Guid id)
     {
         return await _db.SellerUpgradeRequests
-            .AsNoTracking()
-            .Select(r => new SellerUpgradeRequestDetailsDto
-            {
-                Id = r.Id,
-                Status = r.Status.GetDisplayName(),
-                DecidedAt = r.DecidedAt,
-                Message = r.Message,
-                SellerInfo = r.SellerInfo,
-                User = new UserDto
-                {
-                    Id = r.UserId,
-                    // Made this to avoid additional query for roles and banned status, but it's maybe not the best solution
-                    Role = r.Status == SellerUpgradeRequestStatus.Pending ? UserRoles.Customer : UserRoles.Seller, 
-                    Username = r.User.UserName,
-                    Email = r.User.Email,
-                    CreatedAt = r.User.CreatedAt,
-                    UpdatedAt = r.User.UpdatedAt,
-                    ImageUrl = r.User.ImageUrl
-                }
-            })
-            .FirstOrDefaultAsync(r => r.Id == id) 
+                   .AsNoTracking()
+                   .Select(r => new SellerUpgradeRequestDetailsDto
+                   {
+                       Id = r.Id,
+                       Status = r.Status.GetDisplayName(),
+                       DecidedAt = r.DecidedAt,
+                       Message = r.Message,
+                       SellerInfo = r.SellerInfo,
+                       User = new UserDto
+                       {
+                           Id = r.UserId,
+                           // Made this to avoid additional query for roles and banned status, but it's maybe not the best solution
+                           Role = r.Status == SellerUpgradeRequestStatus.Pending
+                               ? UserRoles.Customer
+                               : UserRoles.Seller,
+                           Username = r.User.UserName,
+                           Email = r.User.Email,
+                           CreatedAt = r.User.CreatedAt,
+                           UpdatedAt = r.User.UpdatedAt,
+                           ImageUrl = r.User.ImageUrl
+                       }
+                   })
+                   .FirstOrDefaultAsync(r => r.Id == id)
                ?? throw new ArgumentException("Request not found");
     }
 
@@ -208,8 +210,8 @@ public class AdminRepository : BaseRepository, IAdminRepository
             .Include(r => r.User)
             .Where(r => _db.BannedUsers.All(b => b.UserId != r.UserId))
             .FirstOrDefaultAsync(r => r.Id == id) ?? throw new ArgumentException("Request not found");
-        
-        
+
+
         if (request.Status != SellerUpgradeRequestStatus.Pending)
             throw new ArgumentException("Upgrade already reviewed");
         request.Status = Enum.Parse<SellerUpgradeRequestStatus>(status);
@@ -218,12 +220,11 @@ public class AdminRepository : BaseRepository, IAdminRepository
         if (status == SellerUpgradeRequestStatus.Approved.GetDisplayName())
         {
             var user = request.User;
-            await _userManager.AddToRoleAsync(user, UserRoles.Seller); 
-            
+            await _userManager.AddToRoleAsync(user, UserRoles.Seller);
+
             user.SellerInfoId = request.SellerInfoId;
-            
         }
-        
+
         await SaveChangesAsyncWithTransaction();
     }
 

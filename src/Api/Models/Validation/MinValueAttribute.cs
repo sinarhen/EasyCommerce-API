@@ -1,6 +1,6 @@
-﻿namespace ECommerce.Models.Validation;
+﻿using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations;
+namespace ECommerce.Models.Validation;
 
 public class MinValueAttribute : ValidationAttribute
 {
@@ -13,10 +13,7 @@ public class MinValueAttribute : ValidationAttribute
 
     public override bool IsValid(object value)
     {
-        if (value is int intValue)
-        {
-            return intValue >= _minValue;
-        }
+        if (value is int intValue) return intValue >= _minValue;
 
         return false;
     }

@@ -3,7 +3,7 @@ using ECommerce.Models.Entities;
 
 namespace ECommerce.Models.DTOs.Product;
 
-public class ProductDto: BaseEntity
+public class ProductDto : BaseEntity
 {
     public Guid Id { get; set; }
     public ProductCategoryDto[] Categories { get; set; }

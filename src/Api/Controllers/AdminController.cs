@@ -42,9 +42,9 @@ public class AdminController : GenericController
     [HttpGet("users/{id}")]
     public async Task<ActionResult<User>> GetUserById(string id)
     {
-            var user = await _repository.GetUserById(id);
+        var user = await _repository.GetUserById(id);
 
-            return Ok(user);
+        return Ok(user);
     }
 
     // PUT: api/admin/users/{id}/ban
@@ -52,24 +52,24 @@ public class AdminController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> BanUser(string id, [FromBody] BanUserDto data)
     {
-            var bannedUser = await _repository.BanUser(id, data);
-            return Ok(new
-            {
-                message = "User has been banned",
-                bannedUser
-            });
+        var bannedUser = await _repository.BanUser(id, data);
+        return Ok(new
+        {
+            message = "User has been banned",
+            bannedUser
+        });
     }
-    
+
 
     // PUT: api/admin/users/{id}/ban
     [HttpPut("users/{id}/unban")]
     public async Task<ActionResult> UnbanUser(string id)
     {
-            await _repository.UnbanUser(id);
-            return Ok(new
-            {
-                message = "User has been unbanned"
-            });
+        await _repository.UnbanUser(id);
+        return Ok(new
+        {
+            message = "User has been unbanned"
+        });
     }
 
     // GET: api/admin/users/banned
@@ -109,14 +109,15 @@ public class AdminController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateUpgradeRequestStatus(Guid id, [FromBody] SellerUpgradeRequestDto dto)
     {
-            if (dto.Status == null) return BadRequest("Status is required");
+        if (dto.Status == null) return BadRequest("Status is required");
 
-            if (SellerUpgradeRequestStatus.Approved.GetDisplayName() != dto.Status && SellerUpgradeRequestStatus.Rejected.GetDisplayName() != dto.Status)
-                return BadRequest("Invalid status. Valid statuses are `Approved` or `Rejected`");
-            await _repository.UpgradeSellerUpgradeRequestStatus(id, dto.Message, dto.Status);
-            return Ok(new
-            {
-                message = "Seller upgrade request status has been updated"
-            });
+        if (SellerUpgradeRequestStatus.Approved.GetDisplayName() != dto.Status &&
+            SellerUpgradeRequestStatus.Rejected.GetDisplayName() != dto.Status)
+            return BadRequest("Invalid status. Valid statuses are `Approved` or `Rejected`");
+        await _repository.UpgradeSellerUpgradeRequestStatus(id, dto.Message, dto.Status);
+        return Ok(new
+        {
+            message = "Seller upgrade request status has been updated"
+        });
     }
 }

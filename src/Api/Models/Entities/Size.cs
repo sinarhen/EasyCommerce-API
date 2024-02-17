@@ -8,6 +8,7 @@ public class Size : BaseEntity
 
     [StringLength(30, ErrorMessage = "Size name is too long. max 30 characters.")]
     public string Name { get; set; }
+
     public int Value { get; set; }
 
 
