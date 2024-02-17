@@ -9,9 +9,10 @@ namespace ECommerce.Controllers;
 [ApiController]
 [Route("api/seller")]
 [Authorize(Policy = Policies.SellerPolicy)]
-public class SellerController: GenericController
+public class SellerController : GenericController
 {
     private readonly ISellerRepository _repository;
+
     public SellerController(IMapper mapper, ISellerRepository sellerRepository) : base(mapper)
     {
         _repository = sellerRepository;
@@ -20,19 +21,10 @@ public class SellerController: GenericController
     [HttpGet]
     public async Task<IActionResult> GetSellerInfo()
     {
-        try
-        {
-            var id = GetUserId();
+        var id = GetUserId();
 
-            var info = await _repository.GetSellerInfo(id);
-            
-            return Ok(info);
+        var info = await _repository.GetSellerInfo(id);
 
-        } 
-        catch (Exception e)
-        {
-            return StatusCode(500, e.Message);
-        }
+        return Ok(info);
     }
-
 }
