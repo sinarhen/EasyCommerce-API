@@ -233,20 +233,22 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public async  Task UpdateProductInCart(string userId, Guid cartProductId, CreateCartItemDto cartProduct)
+    public async Task UpdateProductInCart(string userId, Guid cartProductId, ChangeCartItemDto cartProduct)
     {
-        var user = await _db.Users
-            .Include(u => u.Cart)
-            .ThenInclude(c => c.Products)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        var cart = await _db.Carts
+            .Where(c => c.CustomerId == userId)
+            .Include(c => c.Products)
+            .FirstOrDefaultAsync();
         
-        if (user == null) throw new ArgumentException("User not found");
+        if (cart == null) throw new ArgumentException("Cart not found");
         
-        var product = user.Cart.Products.FirstOrDefault(p => p.Id == cartProductId);
+        var product = cart.Products.FirstOrDefault(p => p.Id == cartProductId);
         
         if (product == null) throw new ArgumentException("Product not found in cart");
-        // TODO: Update product in cart
-        throw new NotImplementedException();
+        
+        product.Quantity = cartProduct.Quantity;
+        
+        await SaveChangesAsyncWithTransaction();
     }
 
     public Task ClearCart(string userId)

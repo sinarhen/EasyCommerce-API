@@ -16,7 +16,7 @@ public interface ICustomerRepository
 
     Task RemoveProductFromCart(string userId, Guid cartProductId);
 
-    Task UpdateProductInCart(string userId, Guid cartProductId, CreateCartItemDto cartProduct);
+    Task UpdateProductInCart(string userId, Guid cartProductId, ChangeCartItemDto cartProduct);
 
     Task ClearCart(string userId);
 
