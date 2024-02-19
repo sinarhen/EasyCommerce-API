@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ECommerce.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
@@ -11,9 +10,7 @@ public class Order : BaseEntity
     [Key] public Guid Id { get; set; }
 
     [Key] public string CustomerId { get; set; }
-
-    public OrderStatus Status { get; set; }
-
+    
     // Navigation properties
     [ForeignKey("CustomerId")] public User User { get; set; }
 

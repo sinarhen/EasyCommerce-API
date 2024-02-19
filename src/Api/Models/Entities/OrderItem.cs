@@ -17,7 +17,7 @@ public class OrderItem : BaseEntity
     public int Quantity { get; set; }
 
     public Guid SizeId { get; set; }
-
+    
     public OrderStatus Status { get; set; }
 
     // Navigation properties

@@ -409,9 +409,6 @@ namespace ECommerce.Data.Migrations
                     b.Property<string>("CustomerId")
                         .HasColumnType("text");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 

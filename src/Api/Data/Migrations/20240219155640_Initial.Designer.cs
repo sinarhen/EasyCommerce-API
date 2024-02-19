@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240219145736_Initial")]
+    [Migration("20240219155640_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -411,9 +411,6 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<string>("CustomerId")
                         .HasColumnType("text");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
