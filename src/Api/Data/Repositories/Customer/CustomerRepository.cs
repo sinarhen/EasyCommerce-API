@@ -266,6 +266,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public Task Checkout(string userId)
     {
+        // TODO: Implement after order system is implemented
         throw new NotImplementedException();
     }
 
