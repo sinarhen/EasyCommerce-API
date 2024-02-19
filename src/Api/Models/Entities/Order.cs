@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ECommerce.Entities.Enum;
+using ECommerce.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
@@ -14,6 +15,10 @@ public class Order : BaseEntity
 
     public OrderStatus Status { get; set; }
 
+    public string PaymentIntentId { get; set; }
+    
+    public string TransactionId { get; set; }
+    
     // Navigation properties
     [ForeignKey("CustomerId")] public User User { get; set; }
 
