@@ -290,19 +290,19 @@ public static class InitDb
     private static async Task SeedInitialProducts(ProductDbContext context, Collection collection)
     {
         // Colors
-        var white = CreateColorEntity("White", "#FFFFFF");
-        var black = CreateColorEntity("Black", "#000000");
-        var red = CreateColorEntity("Red", "#FF0000");
-        var green = CreateColorEntity("Green", "#008000");
-        var blue = CreateColorEntity("Blue", "#0000FF");
-        var yellow = CreateColorEntity("Yellow", "#FFFF00");
-        var cyan = CreateColorEntity("Cyan", "#00FFFF");
-        var silver = CreateColorEntity("Silver", "#C0C0C0");
-        var purple = CreateColorEntity("Purple", "#800080");
-        var orange = CreateColorEntity("Orange", "#FFA500");
-        var violet = CreateColorEntity("Violet", "#EE82EE");
-        var brown = CreateColorEntity("Brown", "#A52A2A");
-        var khaki = CreateColorEntity("Khaki", "#F0E68C");
+        var white = CreateColorEntity("White", "FFFFFF");
+        var black = CreateColorEntity("Black", "000000");
+        var red = CreateColorEntity("Red", "FF0000");
+        var green = CreateColorEntity("Green", "008000");
+        var blue = CreateColorEntity("Blue", "0000FF");
+        var yellow = CreateColorEntity("Yellow", "FFFF00");
+        var cyan = CreateColorEntity("Cyan", "00FFFF");
+        var silver = CreateColorEntity("Silver", "C0C0C0");
+        var purple = CreateColorEntity("Purple", "800080");
+        var orange = CreateColorEntity("Orange", "FFA500");
+        var violet = CreateColorEntity("Violet", "EE82EE");
+        var brown = CreateColorEntity("Brown", "A52A2A");
+        var khaki = CreateColorEntity("Khaki", "F0E68C");
 
 
         await context.Colors.AddRangeAsync(white, black, red, green, blue, yellow, cyan, silver, purple, orange, violet,
