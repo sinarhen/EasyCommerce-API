@@ -39,7 +39,7 @@ public class BillboardController : GenericController
         return Ok(_mapper.Map<BillboardDto>(billboard));
     }
 
-    [HttpPut("{billboardId:guid}")]
+    [HttpPatch("{billboardId:guid}")]
     [Authorize(Policy = Policies.SellerPolicy)]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpdateBillboard(Guid billboardId, [FromBody] UpdateBillboardDto updateBillboardDto)

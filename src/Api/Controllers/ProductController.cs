@@ -37,7 +37,7 @@ public class ProductController : GenericController
     }
 
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<ProductDto>> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
     {
         var product = await _repository.GetProductAsync(id);
@@ -59,7 +59,7 @@ public class ProductController : GenericController
     }
 
     [Authorize(Policy = Policies.SellerPolicy)]
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductDto productDto)
     {

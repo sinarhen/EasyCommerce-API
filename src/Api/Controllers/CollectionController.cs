@@ -26,7 +26,7 @@ public class CollectionController : GenericController
         return Ok(_mapper.Map<List<CollectionDto>>(collections));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetCollection(Guid id)
     {
         var collection = await _repository.GetCollectionByIdAsync(id);
@@ -34,7 +34,7 @@ public class CollectionController : GenericController
     }
 
 
-    [HttpPut("{id}")]
+    [HttpPatch("{id:guid}")]
     [Authorize(Policy = Policies.SellerPolicy)]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateCollection(Guid id, CreateCollectionDto collectionDto)
@@ -45,7 +45,7 @@ public class CollectionController : GenericController
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteCollection(Guid id)
     {
         var ownerId = GetUserId();

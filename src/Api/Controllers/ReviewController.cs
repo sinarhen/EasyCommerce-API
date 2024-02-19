@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerce.Controllers;
 
 [ApiController]
-[Route("api/products/{productId}/reviews")]
+[Route("api/products/{productId:guid}/reviews")]
 public class ReviewController : GenericController
 {
     private readonly IReviewRepository _repository;

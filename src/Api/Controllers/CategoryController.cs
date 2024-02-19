@@ -50,7 +50,7 @@ public class CategoryController : GenericController
     }
 
     [Authorize(Policy = Policies.AdminPolicy)]
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<ActionResult> UpdateCategory(Guid id, WriteCategoryDto categoryDto)
     {
         await _repository.UpdateCategoryAsync(id, categoryDto);

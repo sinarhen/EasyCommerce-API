@@ -49,7 +49,7 @@ public class CustomerController : GenericController
         return Ok("Successfully removed from cart");
     }
     
-    [HttpPut("cart/{cartProductId:guid}")]
+    [HttpPatch("cart/{cartProductId:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpdateCartItem(Guid cartProductId, [FromBody] ChangeCartItemDto updateCartItem)
     {

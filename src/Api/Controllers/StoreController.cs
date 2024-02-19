@@ -71,7 +71,7 @@ public class StoreController : GenericController
 
 
     [Authorize(Policy = Policies.SellerPolicy)]
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateStore(Guid id, StoreDto storeDto)
     {
