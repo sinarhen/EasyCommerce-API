@@ -251,9 +251,17 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public Task ClearCart(string userId)
+    public async Task ClearCart(string userId)
     {
-        throw new NotImplementedException();
+        var cart = await _db.Carts
+            .Include(c => c.Products)
+            .FirstOrDefaultAsync(c => c.CustomerId == userId);
+        
+        if (cart == null) throw new ArgumentException("User not found or cart is empty");
+        
+        _db.CartProducts.RemoveRange(cart.Products);
+        
+        await SaveChangesAsyncWithTransaction();
     }
 
     public Task Checkout(string userId)

@@ -56,6 +56,14 @@ public class CustomerController : GenericController
         await _repository.UpdateProductInCart(GetUserId(), cartProductId, updateCartItem);
         return Ok("Successfully updated cart item");
     }
+    
+    [HttpPut("cart")]
+    [ServiceFilter(typeof(ValidationService))]
+    public async Task<IActionResult> ClearCart()
+    {
+        await _repository.ClearCart(GetUserId());
+        return Ok("Successfully cleared cart");
+    }
 
     [HttpPost("upgrade")]
     [ServiceFilter(typeof(ValidationService))]
