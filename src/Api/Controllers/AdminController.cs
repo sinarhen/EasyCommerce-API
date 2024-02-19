@@ -48,7 +48,7 @@ public class AdminController : GenericController
     }
 
     // PUT: api/admin/users/{id}/ban
-    [HttpPut("users/{id}/ban")]
+    [HttpPatch("users/{id}/ban")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> BanUser(string id, [FromBody] BanUserDto data)
     {
@@ -62,7 +62,7 @@ public class AdminController : GenericController
 
 
     // PUT: api/admin/users/{id}/ban
-    [HttpPut("users/{id}/unban")]
+    [HttpPatch("users/{id}/unban")]
     public async Task<ActionResult> UnbanUser(string id)
     {
         await _repository.UnbanUser(id);
@@ -81,7 +81,7 @@ public class AdminController : GenericController
 
 
     [Authorize(Policy = Policies.AdminPolicy)]
-    [HttpPut("users/{id}/role")]
+    [HttpPatch("users/{id}/role")]
     public async Task<ActionResult> UpdateUserRole(string id, [FromBody] ChangeUserRoleDto dto)
     {
         await _repository.UpdateUserRole(id, dto.Role, UserRoles.GetHighestUserRole(GetUserRoles()));
@@ -105,7 +105,7 @@ public class AdminController : GenericController
         return Ok(await _repository.GetSellerUpgradeRequestById(id));
     }
 
-    [HttpPut("users/upgrade-requests/{id:guid}")]
+    [HttpPatch("users/upgrade-requests/{id:guid}")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> UpdateUpgradeRequestStatus(Guid id, [FromBody] SellerUpgradeRequestDto dto)
     {
@@ -114,6 +114,7 @@ public class AdminController : GenericController
         if (SellerUpgradeRequestStatus.Approved.GetDisplayName() != dto.Status &&
             SellerUpgradeRequestStatus.Rejected.GetDisplayName() != dto.Status)
             return BadRequest("Invalid status. Valid statuses are `Approved` or `Rejected`");
+        
         await _repository.UpgradeSellerUpgradeRequestStatus(id, dto.Message, dto.Status);
         return Ok(new
         {
