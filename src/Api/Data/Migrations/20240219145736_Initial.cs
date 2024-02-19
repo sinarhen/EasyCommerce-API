@@ -47,7 +47,7 @@ namespace ECommerce.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentCategoryId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -67,8 +67,8 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    HexCode = table.Column<string>(type: "text", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    HexCode = table.Column<string>(type: "character varying(6)", maxLength: 6, nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -82,7 +82,7 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -96,8 +96,8 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -111,44 +111,44 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CompanyName = table.Column<string>(type: "text", nullable: true),
-                    CompanyDescription = table.Column<string>(type: "text", nullable: true),
-                    CompanyAddress = table.Column<string>(type: "text", nullable: true),
-                    CompanyPhone = table.Column<string>(type: "text", nullable: true),
-                    CompanyEmail = table.Column<string>(type: "text", nullable: true),
-                    CompanyWebsite = table.Column<string>(type: "text", nullable: true),
-                    CompanyLogo = table.Column<string>(type: "text", nullable: true),
-                    CompanyBanner = table.Column<string>(type: "text", nullable: true),
-                    CompanyFacebook = table.Column<string>(type: "text", nullable: true),
-                    CompanyTwitter = table.Column<string>(type: "text", nullable: true),
-                    CompanyInstagram = table.Column<string>(type: "text", nullable: true),
-                    CompanyLinkedin = table.Column<string>(type: "text", nullable: true),
-                    CompanyYoutube = table.Column<string>(type: "text", nullable: true),
-                    CompanyTiktok = table.Column<string>(type: "text", nullable: true),
-                    CompanySnapchat = table.Column<string>(type: "text", nullable: true),
-                    CompanyPinterest = table.Column<string>(type: "text", nullable: true),
-                    CompanyReddit = table.Column<string>(type: "text", nullable: true),
-                    CompanyTumblr = table.Column<string>(type: "text", nullable: true),
-                    CompanyWhatsapp = table.Column<string>(type: "text", nullable: true),
-                    CompanyTelegram = table.Column<string>(type: "text", nullable: true),
-                    CompanySignal = table.Column<string>(type: "text", nullable: true),
-                    CompanyViber = table.Column<string>(type: "text", nullable: true),
-                    CompanyWechat = table.Column<string>(type: "text", nullable: true),
-                    CompanyLine = table.Column<string>(type: "text", nullable: true),
-                    CompanyWeibo = table.Column<string>(type: "text", nullable: true),
-                    CompanyVk = table.Column<string>(type: "text", nullable: true),
-                    CompanySkype = table.Column<string>(type: "text", nullable: true),
-                    CompanyDiscord = table.Column<string>(type: "text", nullable: true),
-                    CompanyTwitch = table.Column<string>(type: "text", nullable: true),
-                    CompanyClubhouse = table.Column<string>(type: "text", nullable: true),
-                    CompanyPatreon = table.Column<string>(type: "text", nullable: true),
-                    CompanyCashapp = table.Column<string>(type: "text", nullable: true),
-                    CompanyPaypal = table.Column<string>(type: "text", nullable: true),
-                    CompanyVenmo = table.Column<string>(type: "text", nullable: true),
-                    CompanyZelle = table.Column<string>(type: "text", nullable: true),
-                    CompanyApplepay = table.Column<string>(type: "text", nullable: true),
-                    CompanyGooglepay = table.Column<string>(type: "text", nullable: true),
-                    CompanySamsungpay = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
+                    Address = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Website = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Logo = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Banner = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Facebook = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Twitter = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Instagram = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Linkedin = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Youtube = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Tiktok = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Snapchat = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Pinterest = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Reddit = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Tumblr = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Whatsapp = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Telegram = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Signal = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Viber = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Wechat = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Line = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Weibo = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Vk = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Skype = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Discord = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Twitch = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Clubhouse = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Patreon = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Cashapp = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Paypal = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Venmo = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Zelle = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Applepay = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Googlepay = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Samsungpay = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -163,7 +163,7 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
                     Value = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -199,13 +199,13 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    FirstName = table.Column<string>(type: "text", nullable: true),
-                    LastName = table.Column<string>(type: "text", nullable: true),
-                    Address = table.Column<string>(type: "text", nullable: true),
-                    City = table.Column<string>(type: "text", nullable: true),
-                    Country = table.Column<string>(type: "text", nullable: true),
-                    PostalCode = table.Column<string>(type: "text", nullable: true),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Address = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    City = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    PostalCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    ImageUrl = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     CartId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -245,17 +245,17 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: true),
-                    Subtitle = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Subtitle = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
                     Gender = table.Column<int>(type: "integer", nullable: true),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: true),
                     Season = table.Column<int>(type: "integer", nullable: true),
                     ColorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    OrderBy = table.Column<string>(type: "text", nullable: true),
+                    OrderBy = table.Column<int>(type: "integer", nullable: false),
                     FromPrice = table.Column<decimal>(type: "numeric", nullable: true),
                     ToPrice = table.Column<decimal>(type: "numeric", nullable: true),
                     SizeId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Search = table.Column<string>(type: "text", nullable: true),
+                    Search = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     BillboardId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -396,7 +396,7 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    Reason = table.Column<string>(type: "text", nullable: true),
+                    Reason = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     BanStartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     BanEndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -438,8 +438,9 @@ namespace ECommerce.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: true),
+                    Message = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
                     DecidedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    SellerInfoId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -451,6 +452,12 @@ namespace ECommerce.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SellerUpgradeRequests_Sellers_SellerInfoId",
+                        column: x => x.SellerInfoId,
+                        principalTable: "Sellers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -458,13 +465,13 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    BannerUrl = table.Column<string>(type: "text", nullable: true),
-                    LogoUrl = table.Column<string>(type: "text", nullable: true),
-                    Address = table.Column<string>(type: "text", nullable: true),
-                    Contacts = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(55)", maxLength: 55, nullable: false),
+                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
+                    BannerUrl = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    LogoUrl = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Address = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Contacts = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     OwnerId = table.Column<string>(type: "text", nullable: true),
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -486,7 +493,7 @@ namespace ECommerce.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StoreId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Reason = table.Column<string>(type: "text", nullable: true),
+                    Reason = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
                     BanStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     BanEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -508,9 +515,8 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    HasSale = table.Column<bool>(type: "boolean", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
                     StoreId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -531,9 +537,9 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: true),
-                    Subtitle = table.Column<string>(type: "text", nullable: true),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Subtitle = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    ImageUrl = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     CollectionId = table.Column<Guid>(type: "uuid", nullable: false),
                     BillboardFilterId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -561,12 +567,13 @@ namespace ECommerce.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
                     OccasionId = table.Column<Guid>(type: "uuid", nullable: true),
-                    SizeChartImageUrl = table.Column<string>(type: "text", nullable: true),
+                    SizeChartImageUrl = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     Gender = table.Column<int>(type: "integer", nullable: true),
                     Season = table.Column<int>(type: "integer", nullable: true),
+                    SellerId = table.Column<string>(type: "text", nullable: true),
                     CollectionId = table.Column<Guid>(type: "uuid", nullable: true),
                     SizeId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -575,6 +582,11 @@ namespace ECommerce.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_AspNetUsers_SellerId",
+                        column: x => x.SellerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Products_Collections_CollectionId",
                         column: x => x.CollectionId,
@@ -650,27 +662,27 @@ namespace ECommerce.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderDetails", x => x.Id);
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Colors_ColorId",
+                        name: "FK_OrderItems_Colors_ColorId",
                         column: x => x.ColorId,
                         principalTable: "Colors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Orders_OrderId",
+                        name: "FK_OrderItems_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Products_ProductId",
+                        name: "FK_OrderItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Sizes_SizeId",
+                        name: "FK_OrderItems_Sizes_SizeId",
                         column: x => x.SizeId,
                         principalTable: "Sizes",
                         principalColumn: "Id",
@@ -801,8 +813,8 @@ namespace ECommerce.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     CustomerId = table.Column<string>(type: "text", nullable: true),
-                    Title = table.Column<string>(type: "text", nullable: true),
-                    Content = table.Column<string>(type: "text", nullable: true),
+                    Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Content = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: true),
                     Rating = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -938,22 +950,22 @@ namespace ECommerce.Data.Migrations
                 column: "StoreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetails_ColorId",
+                name: "IX_OrderItems_ColorId",
                 table: "OrderItems",
                 column: "ColorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetails_OrderId",
+                name: "IX_OrderItems_OrderId",
                 table: "OrderItems",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetails_ProductId",
+                name: "IX_OrderItems_ProductId",
                 table: "OrderItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetails_SizeId",
+                name: "IX_OrderItems_SizeId",
                 table: "OrderItems",
                 column: "SizeId");
 
@@ -988,6 +1000,11 @@ namespace ECommerce.Data.Migrations
                 column: "OccasionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_SellerId",
+                table: "Products",
+                column: "SellerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_SizeId",
                 table: "Products",
                 column: "SizeId");
@@ -1011,6 +1028,11 @@ namespace ECommerce.Data.Migrations
                 name: "IX_Reviews_ProductId",
                 table: "Reviews",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SellerUpgradeRequests_SellerInfoId",
+                table: "SellerUpgradeRequests",
+                column: "SellerInfoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SellerUpgradeRequests_UserId",
