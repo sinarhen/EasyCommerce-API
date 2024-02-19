@@ -400,7 +400,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("ECommerce.Models.Entities.OrderDetail", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -440,7 +440,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>
@@ -1256,7 +1256,7 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ECommerce.Models.Entities.OrderDetail", b =>
+            modelBuilder.Entity("ECommerce.Models.Entities.OrderItem", b =>
                 {
                     b.HasOne("ECommerce.Models.Entities.Color", "Color")
                         .WithMany("Orders")
@@ -1265,7 +1265,7 @@ namespace ECommerce.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("ECommerce.Models.Entities.Order", "Order")
-                        .WithMany("OrderDetails")
+                        .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1556,7 +1556,7 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.Order", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Product", b =>

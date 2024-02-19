@@ -47,7 +47,7 @@ public class Product : BaseEntity
 
     [Required] public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
-    public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
+    public ICollection<OrderItem> Orders { get; set; } = new List<OrderItem>();
     public ICollection<ProductCategory> Categories { get; set; } = new List<ProductCategory>();
 
     // public ICollectiion<CartProduct> Carts { get; set; } = new List<CartProduct>();

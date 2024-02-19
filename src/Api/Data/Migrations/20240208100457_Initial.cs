@@ -635,7 +635,7 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderDetails",
+                name: "OrderItems",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -939,22 +939,22 @@ namespace ECommerce.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ColorId",
-                table: "OrderDetails",
+                table: "OrderItems",
                 column: "ColorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_OrderId",
-                table: "OrderDetails",
+                table: "OrderItems",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ProductId",
-                table: "OrderDetails",
+                table: "OrderItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_SizeId",
-                table: "OrderDetails",
+                table: "OrderItems",
                 column: "SizeId");
 
             migrationBuilder.CreateIndex(
@@ -1057,7 +1057,7 @@ namespace ECommerce.Data.Migrations
                 name: "CategorySizes");
 
             migrationBuilder.DropTable(
-                name: "OrderDetails");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
                 name: "ProductCategories");

@@ -17,5 +17,5 @@ public class Color : BaseEntity
 
     // Navigation properties
     public ICollection<ProductStock> Stocks { get; set; } = new List<ProductStock>();
-    public ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
+    public ICollection<OrderItem> Orders { get; set; } = new List<OrderItem>();
 }

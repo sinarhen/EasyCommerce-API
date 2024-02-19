@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
-public class OrderDetail : BaseEntity
+public class OrderItem : BaseEntity
 {
     [Key] public Guid Id { get; set; }
 

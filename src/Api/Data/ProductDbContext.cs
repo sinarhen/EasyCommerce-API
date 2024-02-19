@@ -32,7 +32,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<CartProduct> CartProducts { get; set; }
     public DbSet<Order> Orders { get; set; }
 
-    public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<OrderItem> OrderDetails { get; set; }
     public DbSet<Color> Colors { get; set; }
     public DbSet<Size> Sizes { get; set; }
     public DbSet<Review> Reviews { get; set; }

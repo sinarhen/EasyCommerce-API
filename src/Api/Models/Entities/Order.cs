@@ -17,5 +17,5 @@ public class Order : BaseEntity
     // Navigation properties
     [ForeignKey("CustomerId")] public User User { get; set; }
 
-    public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }
