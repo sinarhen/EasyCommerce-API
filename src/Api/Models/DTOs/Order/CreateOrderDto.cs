@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ECommerce.Entities.Enum;
+using ECommerce.Models.Enum;
 using ECommerce.Models.Validation;
 
 namespace ECommerce.Models.DTOs.Order;
 
 public class CreateOrderDto
 {
-    [EnumValue(typeof(OrderStatus))]
+    [EnumValue(typeof(OrderItemStatus))]
     public string Status { get; set; }
     
     [Required]

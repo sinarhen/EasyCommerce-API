@@ -18,7 +18,7 @@ public class OrderItem : BaseEntity
 
     public Guid SizeId { get; set; }
     
-    public OrderStatus Status { get; set; }
+    public OrderItemStatus Status { get; set; }
 
     // Navigation properties
     [ForeignKey("ColorId")] public Color Color { get; set; }
@@ -28,4 +28,14 @@ public class OrderItem : BaseEntity
     [ForeignKey("OrderId")] public Order Order { get; set; }
 
     [ForeignKey("SizeId")] public Size Size { get; set; }
+}
+
+public enum OrderItemStatus
+{
+    Processing,
+    Accepted,
+    Rejected,
+    Shipped,
+    Delivered,
+    Cancelled
 }
