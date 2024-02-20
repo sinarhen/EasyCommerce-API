@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using ECommerce.Config;
 using ECommerce.Data;
+using ECommerce.Hubs;
 using ECommerce.Middleware;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
@@ -73,7 +74,7 @@ builder.Services.AddJwtService();
 builder.Services.AddRepositories();
 builder.Services.AddScoped<ValidationService>();
 builder.Services.EnableModelStateInvalidFilterSuppression();
-
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -85,22 +86,27 @@ if (app.Environment.IsDevelopment())
 }
 
 
-// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.MapHub<OrderHub>("/order");
 app.MapControllers();
 
 
-try
+if (app.Environment.IsDevelopment())
 {
-    // Seeding data to database if not exists 
-    await InitDb.InitializeAsync(app);
-}
-catch (Exception ex)
-{
-    Console.WriteLine("Error happened while seeding data: ", ex.Message);
-    throw;
+    try
+    {
+        // Seeding data to database if not exists 
+        await InitDb.InitializeAsync(app);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error happened while seeding data: ", ex.Message);
+        throw;
+    }
 }
 
 app.Run();
