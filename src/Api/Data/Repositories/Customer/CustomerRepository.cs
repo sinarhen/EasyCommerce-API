@@ -1,12 +1,16 @@
 using ECommerce.Config;
+using ECommerce.Entities.Enum;
+using ECommerce.Hubs;
 using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.DTOs.Order;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
 using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using CartDto = ECommerce.Models.DTOs.Cart.CartDto;
 
@@ -15,10 +19,12 @@ namespace ECommerce.Data.Repositories.Customer;
 public class CustomerRepository : BaseRepository, ICustomerRepository
 {
     private readonly UserManager<User> _userManager;
-
-    public CustomerRepository(ProductDbContext context, UserManager<User> userManager) : base(context)
+    private readonly IHubContext<OrderHub> _orderHubContext;
+        
+    public CustomerRepository(ProductDbContext context, UserManager<User> userManager, IHubContext<OrderHub> orderHubContext) : base(context)
     {
         _userManager = userManager;
+        _orderHubContext = orderHubContext;
     }
 
 
@@ -260,6 +266,55 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         if (cart == null) throw new ArgumentException("User not found or cart is empty");
         
         _db.CartProducts.RemoveRange(cart.Products);
+        
+        await SaveChangesAsyncWithTransaction();
+    }
+    
+    public async Task CreateOrder(string userId, CreateOrderDto order)
+    {
+        var cart = await _db.Carts
+            .Include(c => c.Products)
+            .FirstOrDefaultAsync(c => c.CustomerId == userId);
+        
+        if (cart == null || cart.Products.Count == 0) throw new ArgumentException("Cart is empty");
+        
+        var orderEntity = new Order
+        {
+            Id = new Guid(),
+            CustomerId = userId,
+        };
+        
+        foreach (var cartProduct in cart.Products)
+        {
+            var product = await _db.Products
+                .Include(p => p.Stocks)
+                .FirstOrDefaultAsync(p => p.Id == cartProduct.ProductId);
+            
+            if (product == null) throw new ArgumentException("Product not found");
+            
+            var stock = product.Stocks.FirstOrDefault(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId);
+            
+            if (stock == null) throw new ArgumentException("Stock not found");
+            if (stock.Stock < cartProduct.Quantity) throw new ArgumentException("Not enough stock for this product");
+            
+            stock.Stock -= cartProduct.Quantity;
+            
+            var orderItem = new OrderItem
+            {
+                Id = new Guid(),
+                OrderId = orderEntity.Id,
+                ProductId = cartProduct.ProductId,
+                ColorId = cartProduct.ColorId,
+                SizeId = cartProduct.SizeId,
+                Quantity = cartProduct.Quantity,
+                Status = OrderStatus.Pending
+            };
+            
+            await _orderHubContext.Clients.User(product.SellerId).SendAsync(Channels.OrderCreated, orderEntity.Id, orderItem.Status.ToString());
+        }
+        
+        _db.Orders.Add(orderEntity);
+        _db.Carts.Remove(cart);
         
         await SaveChangesAsyncWithTransaction();
     }
