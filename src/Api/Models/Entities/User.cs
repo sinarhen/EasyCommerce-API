@@ -41,5 +41,4 @@ public class User : IdentityUser
 
     public ICollection<Store> Stores { get; set; } = new List<Store>();
 
-    [ForeignKey("CartId")] public Cart Cart { get; set; }
 }

@@ -1,18 +1,14 @@
 using ECommerce.Config;
-using ECommerce.Entities.Enum;
 using ECommerce.Hubs;
 using ECommerce.Models.DTOs.Cart;
-using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Order;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
-using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using CartDto = ECommerce.Models.DTOs.Cart.CartDto;
 
 namespace ECommerce.Data.Repositories.Customer;
 
@@ -96,82 +92,65 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
     }
 
-    public async Task<CartDto> GetCartForUser(string userId)
+    public async Task<OrderDto> GetCartForUser(string userId)
     {
-        var userQuery = _db.Users
+        var lastOrder = await _db.Orders
             .AsNoTracking()
-            .Where(u => u.Id == userId);
+            .Include(o => o.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product)
+            .ThenInclude(product => product.Stocks)
+            .Include(o => o.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product)
+            .ThenInclude(product => product.Images)
+            .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync();
 
-        var cartQuery = userQuery
-            .Select(u => u.Cart);
+        if (lastOrder == null) return new OrderDto();
 
-        var productsQuery = cartQuery
-            .SelectMany(c => c.Products)
-            .Where(i => i.Product != null && i.Color != null && i.Size != null);
-
-        var cartDtoQuery = userQuery
-            .Select(u => new CartDto
-            {
-                Id = u.Cart.Id,
-                Customer = new UserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    Username = u.FirstName,
-                    ImageUrl = u.ImageUrl,
-                    CreatedAt = u.CreatedAt,
-                    UpdatedAt = u.UpdatedAt
-                },
-                Products = productsQuery.Select(i => new CartItemDto
-                {
-                    Id = i.Id,
-                    Product = new CartItemProductDto
-                    {
-                        Id = i.Product.Id,
-                        Name = i.Product.Name,
-                        Description = i.Product.Description,
-                        Price = i.Product.Stocks.OrderBy(s => s.Price).First().Price,
-                        Color = new ColorDto
-                        {
-                            Id = i.ColorId,
-                            HexCode = i.Color.HexCode,
-                            Name = i.Color.Name
-                        },
-                        Size = new SizeDto
-                        {
-                            Id = i.SizeId,
-                            Name = i.Size.Name,
-                            Value = i.Size.Value
-                        },
-                        ImageUrl = i.Product.Images.FirstOrDefault(productImage => productImage.ColorId == i.ColorId)
-                            .ImageUrls.FirstOrDefault(),
-                        SellerId = i.Product.SellerId,
-                        SellerName = i.Product.Seller.FirstName
-                    },
-                    Quantity = i.Quantity
-                }).ToList()
-            });
-
-        var cart = await cartDtoQuery.FirstOrDefaultAsync() ?? new CartDto
+        return new OrderDto
         {
-            Customer = new UserDto
+            Id = lastOrder.Id,
+            Products = lastOrder.OrderItems.Select(oi => new OrderItemDto
             {
-                Id = userId
-            },
-            Products = new List<CartItemDto>()
+                Id = oi.Id,
+                Product = new OrderItemProductDto
+                {
+                    Id = oi.Product.Id,
+                    Name = oi.Product.Name,
+                    Description = oi.Product.Description,
+                    Price = oi.Product.Stocks.MinBy(s => s.Price).Price,
+                    ImageUrl = oi.Product.Images.FirstOrDefault()?.ImageUrls.FirstOrDefault()
+                },
+                Quantity = oi.Quantity
+            }).ToList()
         };
-
-        return cart;
     }
 
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
-        var user = await _db.Users
-            .Include(u => u.Cart)
-            .ThenInclude(c => c.Products)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
+        var user = await GetAuthorizedUserAsync(userId);
         if (user == null) throw new ArgumentException("User not found");
+        
+        
+        var lastOrder = await _db.Orders
+            .Include(o => o.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product)
+            .ThenInclude(product => product.Stocks)
+            .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (lastOrder == null)
+        {
+            lastOrder = new Order
+            {
+                Id = new Guid(),
+                CustomerId = userId,
+                Status = OrderStatus.Pending
+            };
+            await _db.Orders.AddAsync(lastOrder);
+        }
 
         var product = await _db.Products
             .AsNoTracking()
@@ -186,23 +165,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         if (stock == null) throw new ArgumentException("Stock not found");
         if (stock.Stock < cartProduct.Quantity) throw new ArgumentException("Not enough stock for this product");
 
-        var color = await _db.Colors.FindAsync(cartProduct.ColorId);
-        if (color == null) throw new ArgumentException("Color not found");
-
-        var size = await _db.Sizes.FindAsync(cartProduct.SizeId);
-        if (size == null) throw new ArgumentException("Size not found");
-
-        if (user.Cart == null)
-        {
-            user.Cart = new Cart
-            {
-                Id = new Guid(),
-                CustomerId = userId
-            };
-            _db.Carts.Add(user.Cart);
-        }
-
-        var existingProduct = user.Cart.Products
+        var existingProduct = lastOrder.OrderItems
             .FirstOrDefault(p => p.ProductId == cartProduct.ProductId
                                  && p.ColorId == cartProduct.ColorId
                                  && p.SizeId == cartProduct.SizeId);
@@ -210,9 +173,9 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         if (existingProduct != null)
             existingProduct.Quantity += cartProduct.Quantity;
         else
-            await _db.CartProducts.AddAsync(new CartProduct
+            await _db.OrderItems.AddAsync(new OrderItem
             {
-                CartId = user.Cart.Id,
+                OrderId = lastOrder.Id,
                 ProductId = cartProduct.ProductId,
                 ColorId = cartProduct.ColorId,
                 SizeId = cartProduct.SizeId,
@@ -221,109 +184,74 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
         await SaveChangesAsyncWithTransaction();
     }
-
-    public async Task RemoveProductFromCart(string userId, Guid cartProductId)
+    public async Task RemoveProductFromCart(string userId, Guid orderItemId)
     {
-        var user = await _db.Users
-            .Include(u => u.Cart)
-            .ThenInclude(c => c.Products)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        var lastOrder = await _db.Orders
+            .Include(o => o.OrderItems)
+            .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync();
 
-        if (user == null) throw new ArgumentException("User not found");
+        if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
 
-        var product = user.Cart.Products.FirstOrDefault(p => p.Id == cartProductId);
-        if (product == null) throw new ArgumentException("Product not found in cart");
+        var orderItem = lastOrder.OrderItems.FirstOrDefault(oi => oi.Id == orderItemId);
+        if (orderItem == null) throw new ArgumentException("Product not found in the order");
 
-        _db.CartProducts.Remove(product);
+        _db.OrderItems.Remove(orderItem);
 
         await SaveChangesAsyncWithTransaction();
     }
-
-    public async Task UpdateProductInCart(string userId, Guid cartProductId, ChangeCartItemDto cartProduct)
+    public async Task UpdateProductInCart(string userId, Guid orderItemId, ChangeCartItemDto cartProduct)
     {
-        var cart = await _db.Carts
-            .Where(c => c.CustomerId == userId)
-            .Include(c => c.Products)
+        var lastOrder = await _db.Orders
+            .Include(o => o.OrderItems)
+            .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
             .FirstOrDefaultAsync();
-        
-        if (cart == null) throw new ArgumentException("Cart not found");
-        
-        var product = cart.Products.FirstOrDefault(p => p.Id == cartProductId);
-        
-        if (product == null) throw new ArgumentException("Product not found in cart");
-        
-        product.Quantity = cartProduct.Quantity;
-        
+
+        if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
+
+        var orderItem = lastOrder.OrderItems.FirstOrDefault(oi => oi.Id == orderItemId);
+        if (orderItem == null) throw new ArgumentException("Product not found in the order");
+
+        orderItem.Quantity = cartProduct.Quantity;
+
         await SaveChangesAsyncWithTransaction();
     }
 
     public async Task ClearCart(string userId)
     {
-        var cart = await _db.Carts
-            .Include(c => c.Products)
-            .FirstOrDefaultAsync(c => c.CustomerId == userId);
+        var lastOrder = await _db.Orders
+            .Include(o => o.OrderItems)
+            .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync();
         
-        if (cart == null) throw new ArgumentException("User not found or cart is empty");
+        if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
         
-        _db.CartProducts.RemoveRange(cart.Products);
+        _db.OrderItems.RemoveRange(lastOrder.OrderItems);
         
         await SaveChangesAsyncWithTransaction();
     }
     
-    public async Task CreateOrder(string userId, CreateOrderDto order)
+    public async Task ConfirmCart(string userId, CreateOrderDto order)
     {
-        var cart = await _db.Carts
-            .Include(c => c.Products)
-            .FirstOrDefaultAsync(c => c.CustomerId == userId);
+        var lastOrder = await _db.Orders
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .ThenInclude(p => p.Stocks)
+            .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
+            .FirstOrDefaultAsync();
         
-        if (cart == null || cart.Products.Count == 0) throw new ArgumentException("Cart is empty");
+        if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
         
-        var orderEntity = new Order
-        {
-            Id = new Guid(),
-            CustomerId = userId,
-        };
-        
-        foreach (var cartProduct in cart.Products)
-        {
-            var product = await _db.Products
-                .Include(p => p.Stocks)
-                .FirstOrDefaultAsync(p => p.Id == cartProduct.ProductId);
-            
-            if (product == null) throw new ArgumentException("Product not found");
-            
-            var stock = product.Stocks.FirstOrDefault(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId);
-            
-            if (stock == null) throw new ArgumentException("Stock not found");
-            if (stock.Stock < cartProduct.Quantity) throw new ArgumentException("Not enough stock for this product");
-            
-            stock.Stock -= cartProduct.Quantity;
-            
-            var orderItem = new OrderItem
-            {
-                Id = new Guid(),
-                OrderId = orderEntity.Id,
-                ProductId = cartProduct.ProductId,
-                ColorId = cartProduct.ColorId,
-                SizeId = cartProduct.SizeId,
-                Quantity = cartProduct.Quantity,
-                Status = OrderStatus.Pending
-            };
-            
-            await _orderHubContext.Clients.User(product.SellerId).SendAsync(Channels.OrderCreated, orderEntity.Id, orderItem.Status.ToString());
-        }
-        
-        _db.Orders.Add(orderEntity);
-        _db.Carts.Remove(cart);
+        lastOrder.Status = OrderStatus.Accepted;
         
         await SaveChangesAsyncWithTransaction();
+        
     }
 
-    public Task Checkout(string userId)
-    {
-        // TODO: Implement after order system is implemented
-        throw new NotImplementedException();
-    }
 
     private async Task<User> GetAuthorizedUserAsync(string userId)
     {

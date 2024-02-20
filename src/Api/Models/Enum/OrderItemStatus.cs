@@ -1,6 +1,6 @@
-namespace ECommerce.Entities.Enum;
+namespace ECommerce.Models.Enum;
 
-public enum OrderStatus
+public enum OrderItemStatus
 {
     Pending,
     Processing,

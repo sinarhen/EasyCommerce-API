@@ -28,10 +28,8 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<Category> Categories { get; set; }
     public DbSet<CategorySize> CategorySizes { get; set; }
 
-    public DbSet<Cart> Carts { get; set; }
-    public DbSet<CartProduct> CartProducts { get; set; }
     public DbSet<Order> Orders { get; set; }
-
+    
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Color> Colors { get; set; }
     public DbSet<Size> Sizes { get; set; }

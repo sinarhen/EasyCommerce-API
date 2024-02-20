@@ -11,8 +11,16 @@ public class Order : BaseEntity
 
     [Key] public string CustomerId { get; set; }
     
+    public OrderStatus Status { get; set; }
+    
     // Navigation properties
-    [ForeignKey("CustomerId")] public User User { get; set; }
+    [ForeignKey("CustomerId")] public User Customer { get; set; }
 
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+}
+
+public enum OrderStatus
+{
+    Pending,
+    Accepted
 }

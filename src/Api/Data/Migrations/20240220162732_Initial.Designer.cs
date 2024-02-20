@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ProductDbContext))]
-    [Migration("20240219155640_Initial")]
+    [Migration("20240220162732_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -184,66 +184,6 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("BillboardFilters");
                 });
 
-            modelBuilder.Entity("ECommerce.Models.Entities.Cart", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("ECommerce.Models.Entities.CartProduct", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CartId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ColorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("SizeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("ColorId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("SizeId");
-
-                    b.ToTable("CartProducts");
-                });
-
             modelBuilder.Entity("ECommerce.Models.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -411,6 +351,9 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<string>("CustomerId")
                         .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1050,9 +993,6 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CartId")
-                        .IsUnique();
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -1259,41 +1199,6 @@ namespace ECommerce.Data.Migrations
                     b.Navigation("Size");
                 });
 
-            modelBuilder.Entity("ECommerce.Models.Entities.CartProduct", b =>
-                {
-                    b.HasOne("ECommerce.Models.Entities.Cart", "Cart")
-                        .WithMany("Products")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Models.Entities.Color", "Color")
-                        .WithMany()
-                        .HasForeignKey("ColorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Models.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Models.Entities.Size", "Size")
-                        .WithMany()
-                        .HasForeignKey("SizeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Color");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Size");
-                });
-
             modelBuilder.Entity("ECommerce.Models.Entities.Category", b =>
                 {
                     b.HasOne("ECommerce.Models.Entities.Category", "ParentCategory")
@@ -1335,11 +1240,11 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.Order", b =>
                 {
-                    b.HasOne("ECommerce.Models.Entities.User", "User")
+                    b.HasOne("ECommerce.Models.Entities.User", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId");
 
-                    b.Navigation("User");
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.OrderItem", b =>
@@ -1531,15 +1436,9 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Models.Entities.User", b =>
                 {
-                    b.HasOne("ECommerce.Models.Entities.Cart", "Cart")
-                        .WithOne("Customer")
-                        .HasForeignKey("ECommerce.Models.Entities.User", "CartId");
-
                     b.HasOne("ECommerce.Models.Entities.SellerInfo", "SellerInfo")
                         .WithMany()
                         .HasForeignKey("SellerInfoId");
-
-                    b.Navigation("Cart");
 
                     b.Navigation("SellerInfo");
                 });
@@ -1598,13 +1497,6 @@ namespace ECommerce.Data.Migrations
             modelBuilder.Entity("ECommerce.Models.Entities.BillboardFilter", b =>
                 {
                     b.Navigation("Billboard");
-                });
-
-            modelBuilder.Entity("ECommerce.Models.Entities.Cart", b =>
-                {
-                    b.Navigation("Customer");
-
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ECommerce.Models.Entities.Category", b =>

@@ -1,4 +1,5 @@
 using ECommerce.Models.DTOs.Cart;
+using ECommerce.Models.DTOs.Order;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.User;
 
@@ -10,7 +11,7 @@ public interface ICustomerRepository
 
     Task RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
 
-    Task<CartDto> GetCartForUser(string userId);
+    Task<OrderDto> GetCartForUser(string userId);
 
     Task AddProductToCart(string userId, CreateCartItemDto cartProduct);
 
@@ -20,5 +21,4 @@ public interface ICustomerRepository
 
     Task ClearCart(string userId);
 
-    Task Checkout(string userId);
 }

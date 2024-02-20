@@ -64,6 +64,13 @@ public class CustomerController : GenericController
         await _repository.ClearCart(GetUserId());
         return Ok("Successfully cleared cart");
     }
+    
+    [HttpPost("cart/checkout")]
+    [ServiceFilter(typeof(ValidationService))]
+    public async Task<IActionResult> Checkout()
+    {
+        throw new NotImplementedException();
+    }
 
     [HttpPost("upgrade")]
     [ServiceFilter(typeof(ValidationService))]

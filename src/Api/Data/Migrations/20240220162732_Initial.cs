@@ -28,20 +28,6 @@ namespace ECommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Carts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CustomerId = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Carts", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -229,11 +215,6 @@ namespace ECommerce.Data.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Carts_CartId",
-                        column: x => x.CartId,
-                        principalTable: "Carts",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_AspNetUsers_Sellers_SellerInfoId",
                         column: x => x.SellerInfoId,
                         principalTable: "Sellers",
@@ -417,6 +398,7 @@ namespace ECommerce.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CustomerId = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -601,48 +583,6 @@ namespace ECommerce.Data.Migrations
                         column: x => x.SizeId,
                         principalTable: "Sizes",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CartProducts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CartId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
-                    SizeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ColorId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CartProducts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CartProducts_Carts_CartId",
-                        column: x => x.CartId,
-                        principalTable: "Carts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CartProducts_Colors_ColorId",
-                        column: x => x.ColorId,
-                        principalTable: "Colors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CartProducts_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CartProducts_Sizes_SizeId",
-                        column: x => x.SizeId,
-                        principalTable: "Sizes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -866,12 +806,6 @@ namespace ECommerce.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_CartId",
-                table: "AspNetUsers",
-                column: "CartId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_SellerInfoId",
                 table: "AspNetUsers",
                 column: "SellerInfoId");
@@ -912,26 +846,6 @@ namespace ECommerce.Data.Migrations
                 name: "IX_Billboards_CollectionId",
                 table: "Billboards",
                 column: "CollectionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CartProducts_CartId",
-                table: "CartProducts",
-                column: "CartId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CartProducts_ColorId",
-                table: "CartProducts",
-                column: "ColorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CartProducts_ProductId",
-                table: "CartProducts",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CartProducts_SizeId",
-                table: "CartProducts",
-                column: "SizeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentCategoryId",
@@ -1072,9 +986,6 @@ namespace ECommerce.Data.Migrations
                 name: "Billboards");
 
             migrationBuilder.DropTable(
-                name: "CartProducts");
-
-            migrationBuilder.DropTable(
                 name: "CategorySizes");
 
             migrationBuilder.DropTable(
@@ -1133,9 +1044,6 @@ namespace ECommerce.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Carts");
 
             migrationBuilder.DropTable(
                 name: "Sellers");
