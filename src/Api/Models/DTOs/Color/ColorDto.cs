@@ -18,6 +18,4 @@ public class ColorDto
         get => "#" + _hexCode;
         set => _hexCode = value;
     }
-
-    public List<string> ImageUrls { get; set; }
 }

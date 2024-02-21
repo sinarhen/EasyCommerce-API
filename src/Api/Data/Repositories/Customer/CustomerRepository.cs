@@ -1,9 +1,11 @@
 using ECommerce.Config;
 using ECommerce.Hubs;
 using ECommerce.Models.DTOs.Cart;
+using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Order;
 using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.Review;
+using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -101,7 +103,11 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             .ThenInclude(product => product.Stocks)
             .Include(o => o.OrderItems)
             .ThenInclude(orderItem => orderItem.Product)
-            .ThenInclude(product => product.Images)
+            .ThenInclude(product => product.Images).Include(order => order.OrderItems)
+            .ThenInclude(orderItem => orderItem.Color).Include(order => order.OrderItems)
+            .ThenInclude(orderItem => orderItem.Size).Include(order => order.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product).ThenInclude(product => product.Seller)
+            .ThenInclude(user => user.SellerInfo)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
             .OrderByDescending(o => o.CreatedAt)
             .FirstOrDefaultAsync();
@@ -120,16 +126,31 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                     Name = oi.Product.Name,
                     Description = oi.Product.Description,
                     Price = oi.Product.Stocks.MinBy(s => s.Price).Price,
-                    ImageUrl = oi.Product.Images.FirstOrDefault()?.ImageUrls.FirstOrDefault()
+                    ImageUrl = oi.Product.Images.FirstOrDefault(i => oi.ColorId == i.ColorId)?.ImageUrls.FirstOrDefault(),
+                    Color = new ColorDto
+                    {
+                        Id = oi.Color.Id,
+                        Name = oi.Color.Name,
+                        HexCode = oi.Color.HexCode,
+                    },
+                    Size = new SizeDto
+                    {
+                        Id = oi.Size.Id,
+                        Name = oi.Size.Name,
+                        Value = oi.Size.Value
+                    },
+                    SellerName = oi.Product.Seller?.SellerInfo?.Name ?? "Unknown",
+                    SellerId = oi.Product.SellerId
                 },
                 Quantity = oi.Quantity
-            }).ToList()
+            }).ToList(),
+            TotalPrice = lastOrder.OrderItems.Sum(oi => oi.Product.Stocks.MinBy(s => s.Price).Price * oi.Quantity),
+            TotalQuantity = lastOrder.OrderItems.Sum(oi => oi.Quantity)
         };
     }
 
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
-        // Fetch the last order and product in one call
         var lastOrderAndProduct = await _db.Orders
             .Include(o => o.OrderItems)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
@@ -138,7 +159,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             {
                 Order = o,
                 Product = _db.Products
-                    .AsNoTracking()
                     .Include(p => p.Stocks)
                     .FirstOrDefault(p => p.Id == cartProduct.ProductId)
             })
@@ -177,7 +197,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         }
 
         var existingProduct = lastOrder.OrderItems.FirstOrDefault(p => p.ProductId == cartProduct.ProductId && p.ColorId == cartProduct.ColorId && p.SizeId == cartProduct.SizeId);
-
+        
         if (existingProduct != null)
         {
             existingProduct.Quantity += cartProduct.Quantity;
