@@ -283,6 +283,11 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
         
     }
+    
+    public async Task<List<OrderDto>> GetOrdersForUser(string userId)
+    {
+        throw new NotImplementedException();
+    }
 
 
     private async Task<User> GetAuthorizedUserAsync(string userId)

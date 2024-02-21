@@ -81,4 +81,11 @@ public class CustomerController : GenericController
         await _repository.RequestUpgradingToSeller(GetUserId(), sellerInfo);
         return Ok("Successfully requested to upgrade to seller");
     }
+    
+    [HttpGet("orders")]
+    public async Task<IActionResult> GetOrders()
+    {
+        var res = await _repository.GetOrdersForUser(GetUserId());
+        return Ok(res);
+    }
 }

@@ -12,7 +12,9 @@ public interface ICustomerRepository
     Task RequestUpgradingToSeller(string userId, SellerInfoCreateDto sellerInfo);
 
     Task<OrderDto> GetCartForUser(string userId);
-
+    
+    Task<List<OrderDto>> GetOrdersForUser(string userId);
+ 
     Task AddProductToCart(string userId, CreateCartItemDto cartProduct);
 
     Task RemoveProductFromCart(string userId, Guid cartProductId);
