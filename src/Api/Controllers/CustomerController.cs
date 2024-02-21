@@ -69,7 +69,9 @@ public class CustomerController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> Checkout()
     {
-        throw new NotImplementedException();
+        await _repository.ConfirmCart(GetUserId());
+        
+        return Ok("Successfully checked out");
     }
 
     [HttpPost("upgrade")]

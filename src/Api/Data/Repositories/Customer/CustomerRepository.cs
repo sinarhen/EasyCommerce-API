@@ -246,7 +246,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await SaveChangesAsyncWithTransaction();
     }
     
-    public async Task ConfirmCart(string userId, CreateOrderDto order)
+    public async Task ConfirmCart(string userId)
     {
         var lastOrder = await _db.Orders
             .Include(o => o.OrderItems)
