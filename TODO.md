@@ -114,12 +114,6 @@
 ### Store
 - [x] IStoreRepository.cs (Interface)
 - [x] StoreRepository.cs (Interface implementation)
-### Order
-- [ ] IOrderRepository.cs (Interface)
-- [ ] OrderRepository.cs (Interface implementation)
-### Cart
-- [ ] ICartRepository.cs (Interface)
-- [ ] CartRepository.cs (Interface implementation)
 
 ## Other
 - [x] Error handling and logging
