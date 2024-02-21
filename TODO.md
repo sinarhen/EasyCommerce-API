@@ -59,8 +59,9 @@
 - [x] StoreController
 - [ ] SellerController
 	- [X] GetSellerInfo - Retrieves all products for a specific seller.
-    - [ ] GetOrdersForSeller - Retrieves all orders made by user.
+    - [X] GetOrdersForSeller - Retrieves all orders made by user.
     - [ ] GetSellsInfoForSeller - Retrieves all sells info for seller.
+	- [ ] ChangeOrderStatus - Changes order status.
 
 ## Config
 
