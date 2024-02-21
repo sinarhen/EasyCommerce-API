@@ -4,6 +4,7 @@ namespace ECommerce.Models.DTOs.Color;
 
 public class ColorDto
 {
+    private string _hexCode;
     public Guid Id { get; set; }
 
     [Required]
@@ -12,7 +13,11 @@ public class ColorDto
 
     [Required]
     [StringLength(6, MinimumLength = 6, ErrorMessage = "Hex code must be 6 characters long.(e.g. FFFFFF)")]
-    public string HexCode { get; set; }
+    public string HexCode
+    {
+        get => "#" + _hexCode;
+        set => _hexCode = value;
+    }
 
     public List<string> ImageUrls { get; set; }
 }
