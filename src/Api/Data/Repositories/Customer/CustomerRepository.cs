@@ -286,7 +286,60 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     
     public async Task<List<OrderDto>> GetOrdersForUser(string userId)
     {
-        throw new NotImplementedException();
+        var orders = await _db.Orders
+            .AsNoTracking()
+            .Include(o => o.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product)
+            .ThenInclude(product => product.Stocks)
+            .Include(o => o.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product)
+            .ThenInclude(product => product.Images)
+            .Include(order => order.OrderItems)
+            .ThenInclude(orderItem => orderItem.Color)
+            .Include(order => order.OrderItems)
+            .ThenInclude(orderItem => orderItem.Size)
+            .Include(order => order.OrderItems)
+            .ThenInclude(orderItem => orderItem.Product)
+            .ThenInclude(product => product.Seller)
+            .ThenInclude(user => user.SellerInfo)
+            .Where(o => o.CustomerId == userId && o.Status != OrderStatus.Pending)
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new OrderDto
+            {
+                Id = o.Id,
+                Products = o.OrderItems.Select(oi => new OrderItemDto
+                {
+                    Id = oi.Id,
+                    Product = new OrderItemProductDto
+                    {
+                        Id = oi.Product.Id,
+                        Name = oi.Product.Name,
+                        Description = oi.Product.Description,
+                        Price = oi.Product.Stocks.SingleOrDefault(s => s.SizeId == oi.SizeId && s.ColorId == oi.ColorId).Price,
+                        ImageUrl = oi.Product.Images.SingleOrDefault(i => oi.ColorId == i.ColorId).ImageUrls.FirstOrDefault(),
+                        Color = new ColorDto
+                        {
+                            Id = oi.Color.Id,
+                            Name = oi.Color.Name,
+                            HexCode = oi.Color.HexCode,
+                        },
+                        Size = new SizeDto
+                        {
+                            Id = oi.Size.Id,
+                            Name = oi.Size.Name,
+                            Value = oi.Size.Value
+                        },
+                        SellerName = oi.Product.Seller.SellerInfo.Name ?? "Unknown",
+                        SellerId = oi.Product.SellerId
+                    },
+                    Quantity = oi.Quantity
+                }).ToList(),
+                TotalPrice = o.OrderItems.Sum(oi => oi.Product.Stocks.SingleOrDefault(s => s.SizeId == oi.SizeId && s.ColorId == oi.ColorId).Price * oi.Quantity),
+                TotalQuantity = o.OrderItems.Sum(oi => oi.Quantity),
+            })
+            .ToListAsync();
+        
+        return orders;
     }
 
 
