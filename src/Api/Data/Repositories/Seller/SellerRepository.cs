@@ -1,4 +1,5 @@
-﻿using ECommerce.Models.DTOs.User;
+﻿using ECommerce.Models.DTOs.Order;
+using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -77,10 +78,15 @@ public class SellerRepository : BaseRepository, ISellerRepository
                 CreatedAt = u.SellerInfo.CreatedAt,
                 UpdatedAt = u.SellerInfo.UpdatedAt ?? u.SellerInfo.CreatedAt
             })
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
 
         if (user == null) throw new ArgumentException("User not found or not a seller");
 
         return user;
+    }
+    
+    public async Task<IEnumerable<OrderDto>> GetOrdersForSeller(string id)
+    {
+        throw new NotImplementedException();
     }
 }

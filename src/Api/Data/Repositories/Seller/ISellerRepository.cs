@@ -1,4 +1,5 @@
-﻿using ECommerce.Models.DTOs.User;
+﻿using ECommerce.Models.DTOs.Order;
+using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 
 namespace ECommerce.Data.Repositories.Seller;
@@ -9,4 +10,6 @@ public interface ISellerRepository
 
     Task UpdateSellerInfo(string id, SellerInfo sellerInfo);
     Task<SellerInfoDto> GetSellerInfo(string id);
+    
+    Task<IEnumerable<OrderDto>> GetOrdersForSeller(string id);
 }

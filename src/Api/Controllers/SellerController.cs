@@ -27,4 +27,15 @@ public class SellerController : GenericController
 
         return Ok(info);
     }
+    
+    
+    [HttpGet("orders")]
+    public async Task<IActionResult> GetOrders()
+    {
+        var id = GetUserId();
+
+        var orders = await _repository.GetOrdersForSeller(id);
+
+        return Ok(orders);
+    }
 }

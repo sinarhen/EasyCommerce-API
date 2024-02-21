@@ -61,8 +61,6 @@
 	- [X] GetSellerInfo - Retrieves all products for a specific seller.
     - [ ] GetOrdersForSeller - Retrieves all orders made by user.
     - [ ] GetSellsInfoForSeller - Retrieves all sells info for seller.
-- [ ] OrderController
-- [ ] CartController 
 
 ## Config
 
