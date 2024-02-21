@@ -45,7 +45,7 @@
     - [X] UpdateProductCart - Updates cart.
 	- [X] ClearCart - Clears cart.
     - [X] ConfirmCart - Changes order status to confirmed.
-	- [ ] GetOrdersForUser - Retrieves all orders made by user.
+	- [X] GetOrdersForUser - Retrieves all orders made by user.
 - [x] GenericController
 - [x] `ProductController`
 	- [x] `GetProducts`: Retrieves a list of products based on the provided search parameters.
