@@ -11,5 +11,5 @@ public interface ISellerRepository
     Task UpdateSellerInfo(string id, SellerInfo sellerInfo);
     Task<SellerInfoDto> GetSellerInfo(string id);
     
-    Task<IEnumerable<OrderDto>> GetOrdersForSeller(string id);
+    Task<IEnumerable<OrderItemDto>> GetOrdersForSeller(string id);
 }

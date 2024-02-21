@@ -1,4 +1,7 @@
-﻿using ECommerce.Models.DTOs.Order;
+﻿using ECommerce.Config;
+using ECommerce.Models.DTOs.Color;
+using ECommerce.Models.DTOs.Order;
+using ECommerce.Models.DTOs.Size;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -85,8 +88,48 @@ public class SellerRepository : BaseRepository, ISellerRepository
         return user;
     }
     
-    public async Task<IEnumerable<OrderDto>> GetOrdersForSeller(string id)
+    public async Task<IEnumerable<OrderItemDto>> GetOrdersForSeller(string id)
     {
-        throw new NotImplementedException();
+        return await _db
+            .OrderItems
+            .AsNoTracking()
+            .Select(oi => new OrderItemDto
+            {
+                Id = oi.Id,
+                Product = new OrderItemProductDto
+                {
+                    Id = oi.Product.Id,
+                    Name = oi.Product.Name,
+                    Description = oi.Product.Description,
+                    Price = oi.Product.Stocks.SingleOrDefault(s => s.SizeId == oi.SizeId && s.ColorId == oi.ColorId)
+                        .Price,
+                    ImageUrl = oi.Product.Images.SingleOrDefault(i => oi.ColorId == i.ColorId).ImageUrls
+                        .FirstOrDefault(),
+                    Color = new ColorDto
+                    {
+                        Id = oi.Color.Id,
+                        Name = oi.Color.Name,
+                        HexCode = oi.Color.HexCode,
+                    },
+                    Size = new SizeDto
+                    {
+                        Id = oi.Size.Id,
+                        Name = oi.Size.Name,
+                        Value = oi.Size.Value
+                    },
+                    SellerName = oi.Product.Seller.SellerInfo.Name ?? "Unknown",
+                    SellerId = oi.Product.SellerId
+                },
+                Customer = new UserDto
+                {
+                    Id = oi.Order.Customer.Id,
+                    Username = oi.Order.Customer.UserName,
+                    Email = oi.Order.Customer.Email,
+                    PhoneNumber = oi.Order.Customer.PhoneNumber,
+                    ImageUrl = oi.Order.Customer.ImageUrl,
+                    Role = UserRoles.Customer,
+                },
+                Quantity = oi.Quantity
+            }).ToListAsync();
     }
 }
