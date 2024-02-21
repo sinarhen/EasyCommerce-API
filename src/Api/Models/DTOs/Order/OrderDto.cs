@@ -1,5 +1,4 @@
-﻿using ECommerce.Models.DTOs.Cart;
-using ECommerce.Models.DTOs.User;
+﻿using ECommerce.Models.DTOs.User;
 
 namespace ECommerce.Models.DTOs.Order;
 

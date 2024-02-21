@@ -44,7 +44,7 @@
     - [X] RemoveFromCart - Removes product from cart.
     - [X] UpdateProductCart - Updates cart.
 	- [X] ClearCart - Clears cart.
-    - [ ] Checkout - Checkout cart.
+    - [X] ConfirmCart - Changes order status to confirmed.
 	- [ ] GetOrdersForUser - Retrieves all orders made by user.
 - [x] GenericController
 - [x] `ProductController`
