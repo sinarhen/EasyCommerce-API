@@ -65,7 +65,7 @@ public class CustomerController : GenericController
         return Ok("Successfully cleared cart");
     }
     
-    [HttpPost("cart/checkout")]
+    [HttpPost("cart/confirm")]
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> Checkout()
     {

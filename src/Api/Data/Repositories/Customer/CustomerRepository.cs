@@ -129,20 +129,44 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
-        var user = await GetAuthorizedUserAsync(userId);
-        if (user == null) throw new ArgumentException("User not found");
-        
-        
-        var lastOrder = await _db.Orders
+        // Fetch the last order and product in one call
+        var lastOrderAndProduct = await _db.Orders
             .Include(o => o.OrderItems)
-            .ThenInclude(orderItem => orderItem.Product)
-            .ThenInclude(product => product.Stocks)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
             .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new 
+            {
+                Order = o,
+                Product = _db.Products
+                    .AsNoTracking()
+                    .Include(p => p.Stocks)
+                    .FirstOrDefault(p => p.Id == cartProduct.ProductId)
+            })
             .FirstOrDefaultAsync();
+
+        var lastOrder = lastOrderAndProduct?.Order;
+        var product = lastOrderAndProduct?.Product;
+
+        if (product == null)
+        {
+            throw new ArgumentException("Product not found");
+        }
+
+        var stock = product.Stocks.FirstOrDefault(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId);
+
+        if (stock == null || stock.Stock < cartProduct.Quantity)
+        {
+            throw new ArgumentException("Not enough stock");
+        }
 
         if (lastOrder == null)
         {
+            var user = await GetAuthorizedUserAsync(userId);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found");
+            }
+
             lastOrder = new Order
             {
                 Id = new Guid(),
@@ -152,27 +176,14 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             await _db.Orders.AddAsync(lastOrder);
         }
 
-        var product = await _db.Products
-            .AsNoTracking()
-            .Include(p => p.Stocks)
-            .FirstOrDefaultAsync(p => p.Id == cartProduct.ProductId);
-        if (product == null) throw new ArgumentException("Product not found");
-
-        var stock = product
-            .Stocks
-            .FirstOrDefault(s => s.ColorId == cartProduct.ColorId && s.SizeId == cartProduct.SizeId);
-
-        if (stock == null) throw new ArgumentException("Stock not found");
-        if (stock.Stock < cartProduct.Quantity) throw new ArgumentException("Not enough stock for this product");
-
-        var existingProduct = lastOrder.OrderItems
-            .FirstOrDefault(p => p.ProductId == cartProduct.ProductId
-                                 && p.ColorId == cartProduct.ColorId
-                                 && p.SizeId == cartProduct.SizeId);
+        var existingProduct = lastOrder.OrderItems.FirstOrDefault(p => p.ProductId == cartProduct.ProductId && p.ColorId == cartProduct.ColorId && p.SizeId == cartProduct.SizeId);
 
         if (existingProduct != null)
+        {
             existingProduct.Quantity += cartProduct.Quantity;
+        }
         else
+        {
             await _db.OrderItems.AddAsync(new OrderItem
             {
                 OrderId = lastOrder.Id,
@@ -181,6 +192,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
                 SizeId = cartProduct.SizeId,
                 Quantity = cartProduct.Quantity
             });
+        }
 
         await SaveChangesAsyncWithTransaction();
     }
@@ -256,6 +268,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
     private async Task<User> GetAuthorizedUserAsync(string userId)
     {
         var user = await _db.Users
+            .AsNoTracking()
             .Include(u => u.BannedUser)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
