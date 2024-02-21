@@ -68,9 +68,17 @@ public class AdminRepository : BaseRepository, IAdminRepository
         return userDto;
     }
 
-    public Task DeleteUser(string id)
+    public async Task DeleteUser(string id)
     {
-        throw new NotImplementedException();
+        var user = await FindUser(id) ?? throw new ArgumentException("User not found");
+        var roles = await GetUserRoles(user);
+        
+        var hierarchy = UserRoles.RoleHierarchy;
+        if (hierarchy[UserRoles.GetHighestUserRole(roles)] >= hierarchy[UserRoles.Admin])
+            throw new ArgumentException("You cannot delete an admin");
+        
+        _db.Users.Remove(user);
+        await SaveChangesAsyncWithTransaction();
     }
 
     public async Task<BannedUser> BanUser(string id, BanUserDto data)

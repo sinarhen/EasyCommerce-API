@@ -32,9 +32,9 @@ public class AdminController : GenericController
 
     // DELETE: api/admin/users/{id}
     [HttpDelete("users/{id}")]
-    public ActionResult DeleteUser(string id)
+    public async Task<ActionResult<string>> DeleteUser(string id)
     {
-        _repository.DeleteUser(id);
+        await _repository.DeleteUser(id);
         return Ok("Successfully deleted user");
     }
 
@@ -60,7 +60,8 @@ public class AdminController : GenericController
         });
     }
 
-
+    
+    
     // PUT: api/admin/users/{id}/ban
     [HttpPatch("users/{id}/unban")]
     public async Task<ActionResult> UnbanUser(string id)
