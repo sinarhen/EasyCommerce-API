@@ -19,4 +19,7 @@
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ASPNETCORE_URLS=http://+:7777
-      - 
+    ports:
+        - 7001:80
+    depends_on:
+        - postgres
