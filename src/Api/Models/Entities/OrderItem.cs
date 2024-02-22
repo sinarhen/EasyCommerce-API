@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ECommerce.Entities.Enum;
+using ECommerce.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
@@ -28,14 +28,4 @@ public class OrderItem : BaseEntity
     [ForeignKey("OrderId")] public Order Order { get; set; }
 
     [ForeignKey("SizeId")] public Size Size { get; set; }
-}
-
-public enum OrderItemStatus
-{
-    Processing,
-    Accepted,
-    Rejected,
-    Shipped,
-    Delivered,
-    Cancelled
 }
