@@ -1,18 +1,18 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["Ecommerce/Ecommerce.csproj", "Ecommerce/"]
-RUN dotnet restore "Ecommerce/Ecommerce.csproj"
-COPY . .
-WORKDIR "/src/Ecommerce"
-RUN dotnet build "Ecommerce.csproj" -c Release -o /app/build
+COPY Ecommerce.sln Ecommerce.sln
+COPY src/Api/Api.csporj src/Api/Api.csproj
+COPY src/Lib/Lib.csproj src/Lib/Lib.csproj
 
-FROM build AS publish
-RUN dotnet publish "Ecommerce.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+RUN dotnet restore ECommerce.sln
+
+COPY src/Api src/Api
+COPY src/Lib src/Lib
+WORKDIR /app/src/Api
+RUN dotnet publish -c Release -o /app/src/out
 
 FROM base AS final
 WORKDIR /app
