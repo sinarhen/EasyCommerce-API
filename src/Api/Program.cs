@@ -7,17 +7,12 @@ using ECommerce.Hubs;
 using ECommerce.Middleware;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
-using Lib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
-
-var envFile = builder.Environment.IsDevelopment() ? ".env.dev" : ".env";
-Env.LoadFile(Path.Combine(Directory.GetCurrentDirectory(), envFile));
-
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; });
@@ -29,6 +24,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ProductDbContext>(options =>
 {
     var connString = Secrets.DbConnectionString;
+    Console.WriteLine("Connection string: " + connString);
     options.UseNpgsql(connString);
 });
 builder.Services.AddIdentity<User, UserRole>(options =>
