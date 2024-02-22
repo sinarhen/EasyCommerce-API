@@ -136,10 +136,17 @@ public class SellerRepository : BaseRepository, ISellerRepository
             }).ToListAsync();
     }
     
-    public async Task UpdateOrderStatus(Guid id, OrderItemStatus status)
+    public async Task UpdateOrderStatus(Guid id, string userId, OrderItemStatus status, bool isAdmin = false)
     {
-        var orderItem = await _db.OrderItems.FindAsync(id) ?? throw new ArgumentException("Order not found");
-
+        var orderItem = await _db.OrderItems
+                            .Include(oi => oi.Product)
+                            .SingleOrDefaultAsync(oi => oi.Id == id) ??
+                        throw new ArgumentException("Order item not found");
+        if (orderItem.Product.SellerId != userId && !isAdmin)
+            throw new ArgumentException("You are not the seller of this order's product");
+        if (orderItem.Status is OrderItemStatus.Cancelled or OrderItemStatus.Delivered)
+            throw new ArgumentException("Order item status cannot be updated");
+        
         orderItem.Status = status;
 
         await SaveChangesAsyncWithTransaction();

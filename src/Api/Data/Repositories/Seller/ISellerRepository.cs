@@ -14,5 +14,5 @@ public interface ISellerRepository
     
     Task<IEnumerable<OrderItemDto>> GetOrdersForSeller(string id);
     
-    Task UpdateOrderStatus(Guid id, OrderItemStatus status);
+    Task UpdateOrderStatus(Guid id, string userId, OrderItemStatus status, bool isAdmin = false);
 }

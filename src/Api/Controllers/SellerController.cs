@@ -45,7 +45,7 @@ public class SellerController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<IActionResult> UpdateOrderStatus(Guid orderId, [FromBody] UpdateOrderStatusDto status)
     {
-        await _repository.UpdateOrderStatus(orderId, Enum.Parse<OrderItemStatus>(status.Status));
+        await _repository.UpdateOrderStatus(orderId, GetUserId(), Enum.Parse<OrderItemStatus>(status.Status), IsAdmin());
         return Ok("Order status updated");
     }
 }
