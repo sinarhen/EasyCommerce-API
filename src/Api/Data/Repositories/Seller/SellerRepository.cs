@@ -6,6 +6,7 @@ using ECommerce.Models.DTOs.User;
 using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 
 namespace ECommerce.Data.Repositories.Seller;
 
@@ -96,6 +97,7 @@ public class SellerRepository : BaseRepository, ISellerRepository
             .Select(oi => new OrderItemDto
             {
                 Id = oi.Id,
+                Status = oi.Status.GetDisplayName(),
                 Product = new OrderItemProductDto
                 {
                     Id = oi.Product.Id,

@@ -8,4 +8,6 @@ public class OrderItemDto
     public OrderItemProductDto Product { get; set; }
     public int Quantity { get; set; }
     public UserDto Customer { get; set; }
+    
+    public string Status { get; set; }
 }
