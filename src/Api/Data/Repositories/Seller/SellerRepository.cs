@@ -7,6 +7,7 @@ using ECommerce.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
+using OrderItemStatus = ECommerce.Models.Enum.OrderItemStatus;
 
 namespace ECommerce.Data.Repositories.Seller;
 
@@ -133,5 +134,14 @@ public class SellerRepository : BaseRepository, ISellerRepository
                 },
                 Quantity = oi.Quantity
             }).ToListAsync();
+    }
+    
+    public async Task UpdateOrderStatus(Guid id, OrderItemStatus status)
+    {
+        var orderItem = await _db.OrderItems.FindAsync(id) ?? throw new ArgumentException("Order not found");
+
+        orderItem.Status = status;
+
+        await SaveChangesAsyncWithTransaction();
     }
 }

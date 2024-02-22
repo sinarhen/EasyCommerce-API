@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Seller;
+using ECommerce.Models.Enum;
+using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,5 +39,13 @@ public class SellerController : GenericController
         var orders = await _repository.GetOrdersForSeller(id);
 
         return Ok(orders);
+    }
+    
+    [HttpPatch("orders/{orderId:guid}")]
+    [ServiceFilter(typeof(ValidationService))]
+    public async Task<IActionResult> UpdateOrderStatus(Guid orderId, [FromBody] UpdateOrderStatusDto status)
+    {
+        await _repository.UpdateOrderStatus(orderId, Enum.Parse<OrderItemStatus>(status.Status));
+        return Ok("Order status updated");
     }
 }
