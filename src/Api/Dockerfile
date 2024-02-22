@@ -9,8 +9,7 @@ COPY src/Lib/Lib.csproj src/Lib/Lib.csproj
 
 RUN dotnet restore Ecommerce.sln
 
-COPY src/Api src/Api
-COPY src/Lib src/Lib
+COPY . .
 WORKDIR /app/src/Api
 RUN dotnet publish -c Release -o /app/src/out
 

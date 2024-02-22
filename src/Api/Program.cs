@@ -7,10 +7,14 @@ using ECommerce.Hubs;
 using ECommerce.Middleware;
 using ECommerce.Models.Entities;
 using ECommerce.Services;
+using Lib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+
+
+Env.LoadFile(".env.dev");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +28,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ProductDbContext>(options =>
 {
     var connString = Secrets.DbConnectionString;
-    Console.WriteLine("Connection string: " + connString);
     options.UseNpgsql(connString);
 });
 builder.Services.AddIdentity<User, UserRole>(options =>
