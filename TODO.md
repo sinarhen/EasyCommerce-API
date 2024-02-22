@@ -57,11 +57,10 @@
 	- [x] `CreateReviewForProduct`: Creates a new review for a specific product. This action is only allowed for authenticated users.
 	- [x] `DeleteReview`: Deletes a specific review. This action is only allowed for authenticated users.
 - [x] StoreController
-- [ ] SellerController
+- [X] SellerController
 	- [X] GetSellerInfo - Retrieves all products for a specific seller.
     - [X] GetOrdersForSeller - Retrieves all orders made by user.
-    - [ ] GetSellsInfoForSeller - Retrieves all sells info for seller.
-	- [ ] ChangeOrderStatus - Changes order status.
+	- [X] UpdateOrderStatus - Changes order status.
 
 ## Config
 
