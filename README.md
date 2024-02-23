@@ -54,12 +54,19 @@ The project has the following structure:
 <summary>Click to expand</summary>
 
 To install and run the project, you have two options:
+1. **Using Docker Compose**
+```bash
+docker-compose up --build
+```
+This will build the Docker images and start the services, including the PostgreSQL container.
 
-1. **Using Docker Compose**: Run the command `docker-compose up --build`. This will build the Docker images and start the services, including the PostgreSQL container.
-
-2. **Locally without Docker**: Change the `DB_CONNECTION_STRING` in the `appsettings.Development.json` file to point to your local PostgreSQL database. Then, run the project using your preferred method (e.g., your IDE, `dotnet run`, etc.).
-
-Before building the project, you might want to run `dotnet restore` to ensure all NuGet packages used in the project are restored. However, this step is not strictly necessary as `dotnet build` will implicitly run `dotnet restore` if it's needed.
+2. **Locally without Docker**
+Before building the project, you might want to run
+```bash
+dotnet restore
+dotnet run
+```
+Change the `DB_CONNECTION_STRING` in the `appsettings.Development.json` file to point to your local PostgreSQL database.
 
 </details>
 
@@ -67,15 +74,17 @@ Before building the project, you might want to run `dotnet restore` to ensure al
 <details>
 <summary>Click to expand</summary>
 
-Instructions on how to use the project.
+To use the EasyCommerce-API, follow these steps:
 
-</details>
+1. **Start the Application**: If you're using Docker, run `docker-compose up --build` in the terminal from the root directory of the project. If you're running the project locally, use `dotnet run` from the terminal or start the project from your IDE.
 
-## 👥 Contributing
-<details>
-<summary>Click to expand</summary>
+2. **Access the API**: The API will be accessible at `http://localhost:5000`. You can use tools like Postman or curl to send HTTP requests to the API.
 
-Instructions on how to contribute to the project.
+3. **API Endpoints**: Refer to the [API Endpoints](#-api-endpoints) section for details on the available endpoints and their functionality.
+
+4. **Authentication**: Some endpoints may require authentication. Refer to the [Authentication and Authorization](#-authentication-and-authorization) section for details on how to authenticate.
+
+Remember to replace the `DB_CONNECTION_STRING` in the `appsettings.Development.json` file with your local PostgreSQL database connection string if you're running the project locally.
 
 </details>
 
@@ -91,10 +100,31 @@ Information about the project's license.
 <details>
 <summary>Click to expand</summary>
 
-List of features in the project.
+The EasyCommerce-API provides a wide range of features to facilitate online commerce. Here are the main features:
+
+- 🚀 **User Management**: Admins can manage users, including banning/unbanning users, handling user upgrade requests, and changing user roles.
+
+- 🔒 **Authentication**: Users can register, login, change their email or password, and refresh their tokens. The API also provides a way to validate tokens.
+
+- 🏷️ **Category Management**: Users can create, read, update, and delete product categories.
+
+- 🎨 **Collection and Billboard Management**: Users can manage collections and their associated billboards.
+
+- 🛒 **Cart and Order Management**: Customers can manage their shopping cart, confirm their cart to place an order, and view their orders.
+
+- ⭐ **Product Reviews**: Customers can review products.
+
+- 🧾 **Seller Management**: Sellers can view their orders.
+
+- 🏪 **Store Management**: Sellers can manage their stores.
+
+- 📦 **Product Management**: Users can create, read, update, and delete products.
+
+- 📊 **Product Stock Management**: Each product, specific to color and size, has a separate quantity. This allows for detailed stock management and availability tracking.
+
+- 🖼️ **Image Management**: Each product color can have its own set of images. This allows customers to see the product in different colors and from various angles, enhancing the shopping experience.
 
 </details>
-
 ## 🌐 API Endpoints
 <details>
 <summary>Click to expand</summary>
