@@ -1,5 +1,8 @@
 ﻿# 💾 Database Documentation
 
+![Database Schema](images/DBStructure.svg)
+
+
 This document provides detailed information about the database schema.
 - [Database Documentation](#database-documentation)
     - [Tables](#tables)

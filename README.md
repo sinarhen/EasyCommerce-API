@@ -183,6 +183,8 @@ Preview:
 
 </details>
 
+Details of the database schema can be found [here](docs/database-schema.md)
+
 ## 🔒 Authentication and Authorization
 <details>
 <summary>Click to expand</summary>
