@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 
 Env.LoadFile(".env.dev");
@@ -74,6 +75,10 @@ builder.Services.AddRepositories();
 builder.Services.AddScoped<ValidationService>();
 builder.Services.EnableModelStateInvalidFilterSuppression();
 builder.Services.AddSignalR();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo {Title = "ECommerce", Version = "v1"});
+});
 
 var app = builder.Build();
 
