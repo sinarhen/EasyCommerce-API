@@ -183,28 +183,41 @@ Preview:
 
 </details>
 
-Details of the database schema can be found [here](docs/database-schema.md)
+Details of the database schema can be found [here](docs/database.md)
 
 ## 🔒 Authentication and Authorization
-<details>
-<summary>Click to expand</summary>
-
-Description of how authentication and authorization is handled in the project.
-
-</details>
+Documentation about the authentication and authorization can be found [here](docs/auth.md)
 
 ## ⚠️ Error Handling
 <details>
 <summary>Click to expand</summary>
 
-Description of how errors are handled in the project.
+In the EasyCommerce-API project, error handling is managed through a middleware called `ExceptionMiddleware`. This middleware is a custom piece of software that is inserted into the HTTP request/response pipeline. It catches any exceptions that occur during the execution of the application and handles them appropriately.
+
+The `ExceptionMiddleware` is defined in the `ExceptionMiddleware.cs` file. It has a constructor that takes a `RequestDelegate` as a parameter. This delegate represents the next middleware in the pipeline.
+
+The `InvokeAsync` method is where the middleware's logic is implemented. It awaits the execution of the next middleware in the pipeline inside a try-catch block. If an exception is thrown during the execution of the next middleware, it is caught and passed to the `HandleExceptionAsync` method.
+
+The `HandleExceptionAsync` method is responsible for handling the exception. It sets the response's content type to "application/json" and determines the status code based on the type of the exception. If the exception is an `UnauthorizedAccessException`, the status code is set to 401 (Unauthorized). If the exception is an `ArgumentException`, the status code is set to 400 (Bad Request). For all other exceptions, the status code is set to 500 (Internal Server Error).
+**Note** Reason of this is main operations made with repositories and to translate the exception to a meaningful message for the client, it is necessary to catch the exception and handle it.
+But actually throwing an error is not a cheap operation, so it is better to avoid throwing exceptions. Maybe in the future, it is better to use a different approach to handle errors.
+
+Finally, the method writes an `ErrorDetails` object to the response. This object includes the status code and the message of the exception.
+
+Here is a high-level overview of how the `ExceptionMiddleware` works:
+
+1. An HTTP request comes into the application.
+2. The request passes through the middleware pipeline, reaching the `ExceptionMiddleware`.
+3. If no exceptions are thrown during the processing of the request, the `ExceptionMiddleware` simply passes the request along to the next piece of middleware.
+4. If an exception is thrown, the `ExceptionMiddleware` catches it.
+5. The `ExceptionMiddleware` processes the exception, which can involve logging it, wrapping it, or suppressing it.
+6. The `ExceptionMiddleware` returns an HTTP response that reflects the outcome of the exception processing.
+
+Please refer to the `ExceptionMiddleware.cs` file for the specific implementation details of the `ExceptionMiddleware`.
 
 </details>
 
 ## 🧪 Testing
-<details>
-<summary>Click to expand</summary>
-
-Description of how testing is done in the project.
-
-</details>
+Only manual testing with Postman was done. Automated testing was not implemented.
+ 
+Postman collection and environment settings can be found [here](tests/postman) 
