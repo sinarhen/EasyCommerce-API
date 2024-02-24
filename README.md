@@ -137,7 +137,10 @@ Description of the API endpoints and their functionality.
 <details>
 <summary>Click to expand</summary>
 
-Description of the database schema used in the project.
+You can find the database schema for the project as svg file at the following path: `docs/images/DBStructure.svg`
+
+Preview:
+![Database Schema](docs/images/DBStructure.svg)
 
 </details>
 
