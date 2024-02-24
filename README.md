@@ -125,12 +125,51 @@ The EasyCommerce-API provides a wide range of features to facilitate online comm
 - 🖼️ **Image Management**: Each product color can have its own set of images. This allows customers to see the product in different colors and from various angles, enhancing the shopping experience.
 
 </details>
+
 ## 🌐 API Endpoints
 <details>
 <summary>Click to expand</summary>
 
-Description of the API endpoints and their functionality.
+Here is a brief description of each API endpoint:
+- `/api/admin/users`: GET request to retrieve all users.
+- `/api/admin/users/banned`: GET request to retrieve all banned users.
+- `/api/admin/users/upgrade-requests`: GET request to retrieve all user upgrade requests.
+- `/api/admin/users/upgrade-requests/{id}`: GET request to retrieve a specific user upgrade request. POST request to approve a user upgrade request.
+- `/api/admin/users/{id}`: GET request to retrieve a specific user. PUT request to update a specific user. DELETE request to delete a specific user.
+- `/api/admin/users/{id}/ban`: POST request to ban a specific user.
+- `/api/admin/users/{id}/role`: PUT request to change the role of a specific user.
+- `/api/admin/users/{id}/unban`: POST request to unban a specific user.
+- `/api/auth/change-email`: POST request to change the email of the authenticated user.
+- `/api/auth/change-password`: POST request to change the password of the authenticated user.
+- `/api/auth/login`: POST request to login a user.
+- `/api/auth/me`: GET request to retrieve the authenticated user.
+- `/api/auth/refresh-token`: POST request to refresh the authentication token.
+- `/api/auth/register`: POST request to register a new user.
+- `/api/auth/validate-token`: POST request to validate an authentication token.
+- `/api/categories`: GET request to retrieve all categories. POST request to create a new category.
+- `/api/categories/{id}`: GET request to retrieve a specific category. PUT request to update a specific category. DELETE request to delete a specific category.
+- `/api/collections`: GET request to retrieve all collections. POST request to create a new collection.
+- `/api/collections/{collectionId}/billboards`: GET request to retrieve all billboards of a specific collection. POST request to create a new billboard in a specific collection.
+- `/api/collections/{collectionId}/billboards/{billboardId}`: GET request to retrieve a specific billboard of a specific collection. PUT request to update a specific billboard of a specific collection. DELETE request to delete a specific billboard of a specific collection.
+- `/api/collections/{id}`: GET request to retrieve a specific collection. PUT request to update a specific collection. DELETE request to delete a specific collection.
+- `/api/customer/cart`: GET request to retrieve the cart of the authenticated customer. POST request to add a product to the cart of the authenticated customer. PUT request to update the cart of the authenticated customer.
+- `/api/customer/cart/confirm`: POST request to confirm the cart of the authenticated customer and place an order.
+- `/api/customer/cart/{cartProductId}`: GET request to retrieve a specific product in the cart of the authenticated customer. DELETE request to remove a specific product from the cart of the authenticated customer.
+- `/api/customer/orders`: GET request to retrieve all orders of the authenticated customer.
+- `/api/customer/reviews`: POST request to create a new review by the authenticated customer.
+- `/api/customer/upgrade`: POST request to request an upgrade for the authenticated customer.
+- `/api/products`: GET request to retrieve all products. POST request to create a new product.
+- `/api/products/{id}`: GET request to retrieve a specific product. PUT request to update a specific product. DELETE request to delete a specific product.
+- `/api/products/{productId}/reviews`: GET request to retrieve all reviews of a specific product.
+- `/api/products/{productId}/reviews/{reviewId}`: DELETE request to delete a specific review of a specific product.
+- `/api/seller`: GET request to retrieve the authenticated seller.
+- `/api/seller/orders`: GET request to retrieve all orders of the authenticated seller.
+- `/api/seller/orders/{orderId}`: GET request to retrieve a specific order of the authenticated seller.
+- `/api/stores`: GET request to retrieve all stores. POST request to create a new store.
+- `/api/stores/my`: GET request to retrieve the store of the authenticated seller.
+- `/api/stores/{id}`: GET request to retrieve a specific store. PUT request to update a specific store. DELETE request to delete a specific store.
 
+Detailed controllers documentation can be found [here](docs/controllers.md)
 </details>
 
 ## 💾 Database Schema
