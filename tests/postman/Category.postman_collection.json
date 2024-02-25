@@ -1,0 +1,169 @@
+{
+	"info": {
+		"_postman_id": "d3fa600f-a4d8-4953-94ef-cffd0dcf6ca5",
+		"name": "Category",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24030809",
+		"_collection_link": "https://www.postman.com/warped-zodiac-240076/workspace/ecommerce/collection/24030809-d3fa600f-a4d8-4953-94ef-cffd0dcf6ca5?action=share&source=collection_link&creator=24030809"
+	},
+	"item": [
+		{
+			"name": "GetAllCategories",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const resp = pm.response.json();\r",
+							"\r",
+							"const shirtsCategory = resp.categories.find(c => c.name.toLowerCase() === \"shirts\");\r",
+							"const beltsCategory = resp.categories.find(c => c.name.toLowerCase() === \"accessories\")?.subCategories?.[0];\r",
+							"\r",
+							"const beltsCategoryId = beltsCategory?.id ?? null;\r",
+							"const shirtsCategoryId = shirtsCategory?.id ?? null;\r",
+							"\r",
+							"pm.collectionVariables.set(\"shirtsCategoryId\", shirtsCategoryId);\r",
+							"pm.collectionVariables.set(\"beltsCategoryId\", beltsCategoryId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/categories",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LoginAsAdmin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseToken = pm.response.json().token;\r",
+							"\r",
+							"pm.collectionVariables.set(\"adminToken\", responseToken)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{adminEmail}}\",\r\n    \"password\": \"{{adminPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddBeltsSubcategoryToShirtsCategory",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"parentCategoryId\": \"{{shirtsCategoryId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/categories/{{beltsCategoryId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"categories",
+						"{{beltsCategoryId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllShirtsSubcategories Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/categories/{{shirtsCategoryId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"categories",
+						"{{shirtsCategoryId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteBelts",
+			"request": {
+				"method": "DELETE",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "shirtsCategoryId",
+			"value": ""
+		},
+		{
+			"key": "beltsCategoryId",
+			"value": ""
+		},
+		{
+			"key": "adminToken",
+			"value": ""
+		}
+	]
+}

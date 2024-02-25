@@ -1,0 +1,694 @@
+{
+	"info": {
+		"_postman_id": "38653c1a-a3f2-4e1f-8f6d-4e1465e7b38a",
+		"name": "Product",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24030809",
+		"_collection_link": "https://www.postman.com/warped-zodiac-240076/workspace/ecommerce/collection/24030809-38653c1a-a3f2-4e1f-8f6d-4e1465e7b38a?action=share&source=collection_link&creator=24030809"
+	},
+	"item": [
+		{
+			"name": "Get",
+			"item": [
+				{
+					"name": "GetAllProducts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetRunningShoesAndTShirts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?category=Running Shoes,T-Shirts",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Running Shoes,T-Shirts"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTShirtsCategoryId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let cats = pm.response.json().products[0].categories;\r",
+									"\r",
+									"pm.collectionVariables.set(\"tShirtsCategoryId\", cats[0].id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?searchTerm=Shirt",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "Shirt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllShirtsAndSave",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"var casualShirtId = response.products[0].id;\r",
+									"\r",
+									"pm.collectionVariables.set(\"casualShirtId\", casualShirtId)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?categoryId={{tShirtsCategoryId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "{{tShirtsCategoryId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProductsWoolPantsSizeMXXLOrderByOldest",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?orderBy=oldest&size=m, xxxl&category=pants,shirts&material=wool",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "orderBy",
+									"value": "oldest"
+								},
+								{
+									"key": "size",
+									"value": "m, xxxl"
+								},
+								{
+									"key": "category",
+									"value": "pants,shirts"
+								},
+								{
+									"key": "material",
+									"value": "wool"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllProductWithPagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?pageSize=3&pageNumber=1&orderBy=price_desc",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "3"
+								},
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "orderBy",
+									"value": "price_desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetShirtByIdWithReviewsSizesAndMaterials",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products/{{casualShirtId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{casualShirtId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "GetTShirtsCategoryId Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let product = pm.response.json().products[0];\r",
+									"\r",
+									"pm.collectionVariables.set(\"shirtsCategoryId\", product.categories[0].id);\r",
+									"pm.collectionVariables.set(\"casualShirtId\", product.id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?searchTerm=Shirt",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "Shirt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetShirtByIdWithReviewsSizesAndMaterials Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products/{{casualShirtId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{casualShirtId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginAsAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var responseToken = pm.response.json().token;\r",
+									"\r",
+									"pm.collectionVariables.set(\"adminToken\", responseToken)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{adminEmail}}\",\r\n    \"password\": \"{{adminPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetCasualShirtItemData",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let shirt = pm.response.json();\r",
+									"\r",
+									"console.log(shirt.collection.id)\r",
+									"console.log(shirt.mainMaterial.id)\r",
+									"\r",
+									"    pm.collectionVariables.set(\"randomMaterialId\", shirt.mainMaterial.id);\r",
+									"    pm.collectionVariables.set(\"randomCategoryId\", shirt.categories[0].id);\r",
+									"    pm.collectionVariables.set(\"randomOccasionId\", shirt.occasion.id);\r",
+									"    pm.collectionVariables.set(\"randomSizeId\", shirt.sizes[0].id)\r",
+									"    pm.collectionVariables.set(\"randomColorId\", shirt.colors[0].id);\r",
+									"    pm.collectionVariables.set(\"randomCollectionId\", shirt.collection.id);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products/{{casualShirtId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{casualShirtId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateProductWithAuth",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"{{$randomProductName}}\",\r\n  \"categoryId\": \"{{randomCategoryId}}\",\r\n  \"description\": \"descriptio2n\",\r\n  \"discount\": 0.1,\r\n  \"gender\": \"Female\",\r\n  \"season\": \"Winter\",\r\n  \"mainMaterialId\": \"{{randomMaterialId}}\",\r\n  \"collectionId\": \"{{randomCollectionId}}\",\r\n  \"occasionId\": \"{{randomOccasionId}}\",\r\n  \"materials\": [\r\n    {\r\n        \"id\": \"{{randomMaterialId}}\",\r\n        \"percentage\": 1.0\r\n    }\r\n  ],\r\n  \"stocks\": [\r\n    {\r\n      \"colorId\": \"{{randomColorId}}\",\r\n      \"sizeId\": \"{{randomSizeId}}\",\r\n      \"price\": 1999.00,\r\n      \"stock\": 4,\r\n      \"discount\": 0.5\r\n    }\r\n  ],\r\n  \"images\": [\r\n    {\r\n        \"colorId\": \"{{randomColorId}}\",\r\n        \"imageUrls\": [\r\n        \"https://martinvalen.com/21513-large_default/men-s-oversize-chest-sleeve-and-back-3d-printed-black-t-shirt.jpg\"\r\n        ]\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Put",
+			"item": [
+				{
+					"name": "GetCasualUnisexSneakers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"casualSneakersId\", pm.response.json().products[0].id);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products?searchTerm=Women's Casual Sneakers",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "Women's Casual Sneakers"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetCasualSneakers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products/{{casualSneakersId}}?sizeId={{randomSizeId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{casualSneakersId}}"
+							],
+							"query": [
+								{
+									"key": "sizeId",
+									"value": "{{randomSizeId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetRandomItemOccasionColorCollectionAndMaterial Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let retrievedProducts = pm.response.json().products; \r",
+									"let randomProduct = retrievedProducts[Math.floor(Math.random() *retrievedProducts.length)]\r",
+									"\r",
+									"\r",
+									"pm.collectionVariables.set(\"randomMaterialId\", randomProduct.materials[0].id);\r",
+									"pm.collectionVariables.set(\"randomCategoryId\", randomProduct.categories[0].id);\r",
+									"pm.collectionVariables.set(\"randomOccasionId\", randomProduct.occasionId);\r",
+									"pm.collectionVariables.set(\"randomColorId\", randomProduct.colors[0].id);\r",
+									"pm.collectionVariables.set(\"randomSizeId\", randomProduct.sizes[0].id)\r",
+									"pm.collectionVariables.set(\"randomCollectionId\", randomProduct.collectionId)\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/products",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LoginAsAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var responseToken = pm.response.json().token;\r",
+									"\r",
+									"pm.collectionVariables.set(\"adminToken\", responseToken)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{adminEmail}}\",\r\n    \"password\": \"{{adminPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateCasualSneakers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AdminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"discount\": 0.5,\r\n    \"description\": \"descriptionUpdated\",\r\n    \"gender\": \"Female\",\r\n    \"categoryId\": \"66d3a439-1f42-4e48-9983-fddb2f4113f9\",\r\n    \"occasionId\": \"{{randomOccasionId}}\",\r\n    \"sizeChartImageUrl\": \"Updated\",\r\n    \"season\": \"Summer\",\r\n    \"mainMaterialId\": \"{{randomMaterialId}}\",\r\n    \"materials\": [\r\n        {\r\n            \"id\": \"{{randomMaterialId}}\",\r\n            \"percentage\": 0.99\r\n        }\r\n    ],\r\n    \"stocks\": [\r\n        {\r\n            \"colorId\": \"{{randomColorId}}\",\r\n            \"sizes\": [\r\n                {\r\n                    \"sizeId\": \"{{randomSizeId}}\",\r\n                    \"stock\": 34,\r\n                    \"price\": 124.99\r\n                }\r\n            ],\r\n            \"imageUrls\": [\r\n                \"https://werare.com.ua/image/catalog/i/cg/bf/a862380693985aadb560a6daacbee428.jpg\"\r\n            ]\r\n        }\r\n    ]\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/products/{{casualSneakersId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"{{casualSneakersId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "endpoint",
+			"value": "http://127.0.0.1:5000/api/products",
+			"disabled": true
+		},
+		{
+			"key": "casualSneakersId",
+			"value": ""
+		},
+		{
+			"key": "tShirtsCategoryId",
+			"value": ""
+		},
+		{
+			"key": "adminEmail",
+			"value": "admin@admin.dev",
+			"type": "string"
+		},
+		{
+			"key": "adminPassword",
+			"value": "Pass123$",
+			"type": "string"
+		},
+		{
+			"key": "host",
+			"value": "localhost:5000"
+		},
+		{
+			"key": "AdminToken",
+			"value": ""
+		},
+		{
+			"key": "cottonMaterial",
+			"value": ""
+		},
+		{
+			"key": "cottonMaterialId",
+			"value": ""
+		},
+		{
+			"key": "randomMaterialId",
+			"value": ""
+		},
+		{
+			"key": "randomCategoryId",
+			"value": ""
+		},
+		{
+			"key": "randomOccasionId",
+			"value": ""
+		},
+		{
+			"key": "randomColorId",
+			"value": ""
+		},
+		{
+			"key": "randomSizeId",
+			"value": ""
+		},
+		{
+			"key": "randomCollectionId",
+			"value": ""
+		},
+		{
+			"key": "createdUserToken",
+			"value": ""
+		},
+		{
+			"key": "createdUserPassword",
+			"value": ""
+		},
+		{
+			"key": "createdUserEmail",
+			"value": ""
+		},
+		{
+			"key": "adminToken",
+			"value": ""
+		},
+		{
+			"key": "casualShirtId",
+			"value": ""
+		},
+		{
+			"key": "shirtsCategoryId",
+			"value": ""
+		}
+	]
+}

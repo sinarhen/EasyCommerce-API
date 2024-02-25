@@ -1,0 +1,283 @@
+{
+	"info": {
+		"_postman_id": "7dfa3e5f-ab12-4f07-ad48-eceb6c98e6dc",
+		"name": "Billboard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24030809",
+		"_collection_link": "https://www.postman.com/warped-zodiac-240076/workspace/ecommerce/collection/24030809-7dfa3e5f-ab12-4f07-ad48-eceb6c98e6dc?action=share&source=collection_link&creator=24030809"
+	},
+	"item": [
+		{
+			"name": "LoginAsAdmin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseToken = pm.response.json().token;\r",
+							"\r",
+							"pm.collectionVariables.set(\"adminToken\", responseToken)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{adminEmail}}\",\r\n    \"password\": \"{{adminPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCollectionId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const collectionId = pm.response.json().products[0].collection.id\r",
+							"pm.collectionVariables.set('collectionId', collectionId)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/products",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new billboard for collection",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const resp = pm.response.json();\r",
+							"\r",
+							"const billboardCreatedId = resp.id\r",
+							"\r",
+							"pm.collectionVariables.set(\"billboardId\", billboardCreatedId)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Explore new amazing clothes 2\",\r\n    \"subtitle\": \"Brand new items in collection for winter 2024!\",\r\n    \"imageUrl\": \"https://i.redd.it/windows-11-abstract-blue-background-1920x1080-v0-ojxmg041a47b1.jpg?s=db98676a7f52767c67ff78763ac186bced7a6dae\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/collections/{{collectionId}}/billboards",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"collections",
+						"{{collectionId}}",
+						"billboards"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCollection",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const billboardId = pm.response.json().billboards[0].id;\r",
+							"\r",
+							"pm.collectionVariables.set('billboardId', billboardId)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/collections/{{collectionId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"collections",
+						"{{collectionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create new billboard for collection Copy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Explore new amazing clothes 2Upd\",\r\n    \"subtitle\": \"Brand new items in collection for winter 2024!Upd\",\r\n    \"billboardFilter\": {\r\n        \"search\": \"Shirts\"\r\n    }\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/collections/{{collectionId}}/billboards/{{billboardId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"collections",
+						"{{collectionId}}",
+						"billboards",
+						"{{billboardId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteBillboardInCollection",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/collections/{{collectionId}}/billboards/{{billboardId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"collections",
+						"{{collectionId}}",
+						"billboards",
+						"{{billboardId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCollection Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/collections/{{collectionId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"collections",
+						"{{collectionId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "adminToken",
+			"value": ""
+		},
+		{
+			"key": "collectionId",
+			"value": ""
+		},
+		{
+			"key": "billboardId",
+			"value": ""
+		}
+	]
+}

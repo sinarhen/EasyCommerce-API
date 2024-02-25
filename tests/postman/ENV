@@ -1,0 +1,27 @@
+{
+	"id": "503cf369-7f77-41a8-b569-4fc57c16e844",
+	"name": "ECommerceEnv",
+	"values": [
+		{
+			"key": "host",
+			"value": "localhost:5000",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "adminEmail",
+			"value": "admin@admin.dev",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "adminPassword",
+			"value": "Pass123$",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2024-02-24T12:17:37.471Z",
+	"_postman_exported_using": "Postman/10.23.5"
+}
