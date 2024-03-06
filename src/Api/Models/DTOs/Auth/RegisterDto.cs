@@ -4,8 +4,6 @@ namespace ECommerce.Models.DTOs.Auth;
 
 public class RegisterDto
 {
-    [StringLength(100, MinimumLength = 6, ErrorMessage = "Username should be between 6 and 100 characters.")]
-    [Required]
     public string UserName { get; set; }
 
     public string FirstName { get; set; }
