@@ -43,7 +43,12 @@ public class AuthController : GenericController
         var user = _mapper.Map<User>(dto);
 
         // Wait for the userExistsTask to complete
-        if (await userExistsTask) return BadRequest("Email already in use");
+        if (await userExistsTask) return BadRequest(new
+        {
+            Message = "User with such email already exists",
+            Field = "email",
+            StatusCode = StatusCodes.Status400BadRequest
+        });
 
         // Create the user and add to role in parallel
         var createUserTask = _userManager.CreateAsync(user, dto.Password);
@@ -76,14 +81,28 @@ public class AuthController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult<JwtSecurityToken>> Login([FromBody] LoginDto dto)
     {
-        if (dto == null) return BadRequest("Empty data");
+        if (dto == null) return UnprocessableEntity(new
+        {
+            Message = "Empty data", 
+            StatusCode = StatusCodes.Status422UnprocessableEntity
+        });
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
-        if (user == null) return Unauthorized();
+        if (user == null) return Unauthorized(new
+        {
+            Message = "User with such email does not exist",
+            Field = "email",
+            StatusCode = StatusCodes.Status401Unauthorized
+        });
 
         var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
-        if (!passwordIsCorrect) return Unauthorized("Password is incorrect");
+        if (!passwordIsCorrect) return Unauthorized(new
+        {
+            Field = "password",
+            Message = "Password is incorrect",
+            StatusCode = StatusCodes.Status401Unauthorized
+        });
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -110,16 +129,25 @@ public class AuthController : GenericController
     public async Task<ActionResult<JwtSecurityToken>> RefreshToken()
     {
         var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-        if (token == null) return BadRequest("Authorization header is required");
+        if (token == null) return BadRequest(new
+        {
+            Message = "Token is required",
+            StatusCode = StatusCodes.Status400BadRequest
+            
+        });
 
         var principal = _jwtService.ValidateToken(token);
-        if (principal == null) return BadRequest("Invalid token");
+        if (principal == null) return BadRequest(new
+        {
+            Message = "Invalid token",
+        });
 
         var id = GetUserId();
-        if (id == null) return BadRequest("User ID is required");
-
         var user = await _userManager.FindByIdAsync(id);
-        if (user == null) return BadRequest("User not found");
+        if (user == null) return BadRequest(new
+        {
+            Message = "User does not exist",
+        });
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -160,13 +188,24 @@ public class AuthController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
     {
-        if (dto == null) return BadRequest("Empty data");
+        if (dto == null) return BadRequest(new
+        {
+            Message = "Empty data",
+        });
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null) return BadRequest("User with such email does not exist");
+        if (user == null) return BadRequest(new
+        {
+            Message = "User with such email does not exist",
+            Field = "email",
+        });
 
         var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.OldPassword);
-        if (!passwordIsCorrect) return Unauthorized("Password is incorrect");
+        if (!passwordIsCorrect) return Unauthorized(new
+        {
+            Field = "password",
+            Message = "Password is incorrect",
+        });
 
         var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
         if (!result.Succeeded) return BadRequest(result.Errors);
@@ -186,13 +225,24 @@ public class AuthController : GenericController
     [ServiceFilter(typeof(ValidationService))]
     public async Task<ActionResult> ChangeEmail([FromBody] ChangeEmailDto dto)
     {
-        if (dto == null) return BadRequest("Empty data");
+        if (dto == null) return BadRequest(new
+        {
+            Message = "Empty data",
+        });
 
         var user = await _userManager.FindByEmailAsync(dto.OldEmail);
-        if (user == null) return BadRequest("User with such email does not exist");
+        if (user == null) return BadRequest(new
+        {
+            Message = "User with such email does not exist",
+            Field = "email",
+        });
 
         var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
-        if (!passwordIsCorrect) return Unauthorized("Password is incorrect");
+        if (!passwordIsCorrect) return Unauthorized(new
+        {
+            Field = "password",
+            Message = "Password is incorrect",
+        });
 
         var result = await _userManager.SetEmailAsync(user, dto.NewEmail);
         if (!result.Succeeded) return BadRequest(result.Errors);
