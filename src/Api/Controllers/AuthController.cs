@@ -167,7 +167,11 @@ public class AuthController : GenericController
     {
         var id = GetUserId();
         var user = await _userManager.FindByIdAsync(id);
-        if (user == null) return NotFound();
+        if (user == null) return BadRequest(new
+        {
+            Message = "User does not exist",
+            StatusCode = StatusCodes.Status400BadRequest
+        });
         var roles = await _userManager.GetRolesAsync(user);
 
         return Ok(new UserDto
