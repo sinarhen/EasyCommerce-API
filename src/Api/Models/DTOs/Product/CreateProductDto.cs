@@ -36,9 +36,3 @@ public class CreateProductDto
     public List<ProductStockDto> Stocks { get; set; }
     public List<ProductImageDto> Images { get; set; }
 }
-
-public class ProductImageDto
-{
-    public Guid ColorId { get; set; }
-    public List<string> ImageUrls { get; set; }
-}
