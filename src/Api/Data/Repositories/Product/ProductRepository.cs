@@ -560,21 +560,20 @@ public class ProductRepository : BaseRepository, IProductRepository
             IsBestseller = p.Orders.Count > 10,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt,
+            // Select only unique colors
             Colors = p.Stocks
                 .Select(ps => new ColorDto
                 {
                     Id = ps.Color.Id,
                     Name = ps.Color.Name,
                     HexCode = ps.Color.HexCode
-                    // ImageUrls = ps.Product.Images
-                    //     .Where(i => i.ColorId == ps.ColorId)
-                    //     .SelectMany(i => i.ImageUrls)
-                    //     .ToList(),
                 })
+                .Distinct()
                 .ToList(),
             IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
             MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0
         }).ToListAsync();
         ;
     }
+    
 }
