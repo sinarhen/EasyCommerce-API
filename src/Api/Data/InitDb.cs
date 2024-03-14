@@ -480,12 +480,12 @@ public static class InitDb
         AddImagesToProduct(shoesProductOne, black,
             new List<string>
             {
-                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61ZA59Q2OIL._AC_SY395_.jpg" /*...other urls...*/
+                "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/377028/01/fnd/UKR/w/1000/h/1000/fmt/png" /*...other urls...*/
             });
         AddImagesToProduct(shoesProductOne, white,
             new List<string>
             {
-                "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/51+49v7ksXL._AC_SY395_.jpg" /*...other urls...*/
+                "https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa/global/379438/05/sv01/fnd/UKR/w/1000/h/1000/fmt/png" /*...other urls...*/
             });
         AddMaterialsToProduct(shoesProductOne, rubberMaterial, 0.4);
         AddMaterialsToProduct(shoesProductOne, polyesterMaterial, 0.6);
@@ -521,19 +521,15 @@ public static class InitDb
 
         var pantsProductOne = CreateProductEntity("Men's Casual Pants",
             "Comfortable and stylish pants for everyday wear.", Gender.Male, casualOccasion, Season.DemiSeason);
-        pantsProductOne.SizeChartImageUrl =
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61q0QLQ1EFL._AC_SX342_.jpg";
         AddImagesToProduct(pantsProductOne, black, new List<string>
         {
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/81uCZWI6cUL._AC_SY445_.jpg",
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/71UQKwNyieL._AC_SY445_.jpg",
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/71obafsgPfL._AC_SY445_.jpg"
+            "https://slimages.macysassets.com/is/image/MCY/products/7/optimized/26326657_fpx.tif?op_sharpen=1&wid=500&hei=611&fit=fit,1&fmt=webp",
+            "https://slimages.macysassets.com/is/image/MCY/products/7/optimized/26326647_fpx.tif?op_sharpen=1&wid=250&hei=306&fit=fit,1&fmt=webp",
         });
         AddImagesToProduct(pantsProductOne, khaki, new List<string>
         {
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/81uoaWwCjuL._AC_SY445_.jpg",
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/81j44iOBYCL._AC_SY445_.jpg",
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/712wBPy9LkL._AC_SY445_.jpg"
+            "https://slimages.macysassets.com/is/image/MCY/products/3/optimized/26326683_fpx.tif?op_sharpen=1&wid=250&hei=306&fit=fit,1&fmt=webp",
+            "https://slimages.macysassets.com/is/image/MCY/products/8/optimized/26326648_fpx.tif?op_sharpen=1&wid=500&hei=611&fit=fit,1&fmt=webp",
         });
         AddMaterialsToProduct(pantsProductOne, woolMaterial, 1);
         AddStocksToProduct(pantsProductOne, new[] { black, khaki }, 50, pantsSizes);
@@ -544,9 +540,7 @@ public static class InitDb
             Gender.Unisex, businessOccasion, Season.All);
         AddImagesToProduct(accessoriesProductOne, brown, new List<string>
         {
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61u1DkV6u8L._AC_SX679_.jpg",
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61nfdjkLWwL._AC_SX385_.jpg",
-            "https://m.media-amazon.com/images/W/MEDIAX_792452-T1/images/I/61uBafwoEGL._AC_SX342_.jpg"
+            "https://slimages.macysassets.com/is/image/MCY/products/2/optimized/26326682_fpx.tif?op_sharpen=1&wid=250&hei=306&fit=fit,1&fmt=webp",
         });
         AddMaterialsToProduct(accessoriesProductOne, leatherMaterial, 1);
         AddStocksToProduct(accessoriesProductOne, new[] { brown }, 100, beltsSizes);
