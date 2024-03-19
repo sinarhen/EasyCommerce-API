@@ -82,7 +82,7 @@ public class ProductRepository : BaseRepository, IProductRepository
                 $"Materials with the following IDs do not exist: {string.Join(", ", nonExistingMaterialIds)}");
         if (nonExistingColors.Any())
             throw new ArgumentException(
-                $"Colors with the following IDs do not exist: {string.Join(", ", nonExistingColors)}");
+                $"Colors with thPe following IDs do not exist: {string.Join(", ", nonExistingColors)}");
         if (nonExistingSizes.Any())
             throw new ArgumentException(
                 $"Sizes with the following IDs do not exist: {string.Join(", ", nonExistingSizes)}");
@@ -602,6 +602,7 @@ public class ProductRepository : BaseRepository, IProductRepository
 
         var filters = new ProductFiltersDto
         {
+            Categories = categories,
             Sizes = sizes,
             Colors = colors,
             Occasions = occasions,

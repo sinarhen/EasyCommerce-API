@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ECommerce.Config;
 using ECommerce.Data.Repositories.Product;
+using ECommerce.Models.DTOs.Category;
 using ECommerce.Models.DTOs.Product;
+using ECommerce.Models.Entities;
 using ECommerce.RequestHelpers.SearchParams;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +32,14 @@ public class ProductController : GenericController
         return Ok(new
         {
             Products = productDtos,
-            Filters = filters,
+            Filters = new
+            {
+                Categories = _mapper.Map<List<CategoryDto>>(filters.Categories),
+                Occasions = filters.Occasions,
+                Materials = filters.Materials,
+                Sizes = filters.Sizes,
+                Colors = filters.Colors
+            },
             Total = productDtos.Length,
             searchParams.PageNumber,
             searchParams.PageSize
