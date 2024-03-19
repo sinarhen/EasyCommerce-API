@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ECommerce.Models.DTOs;
+using ECommerce.Models.DTOs.Category;
 using ECommerce.Models.DTOs.Color;
 using ECommerce.Models.DTOs.Material;
 using ECommerce.Models.DTOs.Product;
@@ -22,7 +23,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProductDto>> GetProductsAsync(ProductSearchParams searchParams)
+    public async Task<(IEnumerable<ProductDto>, ProductFiltersDto)> GetProductsAsync(ProductSearchParams searchParams)
     {
         return await FilterProductsBySearchParams(searchParams);
     }
@@ -495,7 +496,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         return productDto;
     }
 
-    private async Task<List<ProductDto>> FilterProductsBySearchParams(ProductSearchParams searchParams)
+    private async Task<(List<ProductDto>, ProductFiltersDto)> FilterProductsBySearchParams(ProductSearchParams searchParams)
     {
         var query = _db.Products
             .AsNoTracking()
@@ -512,7 +513,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         query = ApplyOrderBy(query, searchParams);
         query = ApplyPaging(query, searchParams);
 
-        return await query.Select(p => new ProductDto
+        var products = await query.Select(p => new ProductDto
         {
             Id = p.Id,
             Collection = new IdNameDto
@@ -573,7 +574,41 @@ public class ProductRepository : BaseRepository, IProductRepository
             IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
             MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0
         }).ToListAsync();
-        ;
+        
+        var categories = await _db.Categories.ToListAsync();
+        var sizes = await _db.Sizes.Select(s => new SizeDto
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Value = s.Value
+        }).ToListAsync();
+        var colors = await _db.Colors.Select(c => new ColorDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            HexCode = c.HexCode
+        }).ToListAsync();
+        var occasions = await _db.Occasions.Select(o => new IdNameDto
+        {
+            Id = o.Id,
+            Name = o.Name
+        }).ToListAsync();
+        var materials = await _db.Materials.Select(m => new MaterialDto
+        {
+            Id = m.Id,
+            Name = m.Name,
+            
+        }).ToListAsync();
+
+        var filters = new ProductFiltersDto
+        {
+            Sizes = sizes,
+            Colors = colors,
+            Occasions = occasions,
+            Materials = materials
+        };
+
+        return (products, filters);
     }
     
 }

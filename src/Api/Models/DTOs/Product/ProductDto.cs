@@ -31,6 +31,7 @@ public class ProductDto : BaseEntity
     public List<ProductImageDto> Images { get; set; }
 }
 
+
 public class ProductCategoryDto
 {
     public Guid Id { get; set; }

@@ -7,9 +7,9 @@ namespace ECommerce.Models.DTOs.Product;
 
 public class ProductFiltersDto
 {
-    public List<CategoryDto> Categories;
-    public List<SizeDto> Sizes;
-    public List<ColorDto> Colors;
-    public List<IdNameDto> Occasions;
-    public List<MaterialDto> Materials;
+    public List<Entities.Category> Categories { get; set; } = new List<Entities.Category>();
+    public List<SizeDto> Sizes { get; set; } = new List<SizeDto>();
+    public List<ColorDto> Colors { get; set; } = new List<ColorDto>();
+    public List<IdNameDto> Occasions { get; set; } = new List<IdNameDto>();
+    public List<MaterialDto> Materials { get; set; } = new List<MaterialDto>();
 }
