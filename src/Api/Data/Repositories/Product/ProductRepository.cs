@@ -575,30 +575,42 @@ public class ProductRepository : BaseRepository, IProductRepository
             MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0
         }).ToListAsync();
         
-        var categories = await _db.Categories.ToListAsync();
-        var sizes = await _db.Sizes.Select(s => new SizeDto
-        {
-            Id = s.Id,
-            Name = s.Name,
-            Value = s.Value
-        }).ToListAsync();
-        var colors = await _db.Colors.Select(c => new ColorDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-            HexCode = c.HexCode
-        }).ToListAsync();
-        var occasions = await _db.Occasions.Select(o => new IdNameDto
-        {
-            Id = o.Id,
-            Name = o.Name
-        }).ToListAsync();
-        var materials = await _db.Materials.Select(m => new MaterialDto
-        {
-            Id = m.Id,
-            Name = m.Name,
-            
-        }).ToListAsync();
+        var categories = await _db.Categories
+            .AsNoTracking()
+            .Include(c => c.SubCategories)
+            .Where(c => c.ParentCategoryId == null)
+            .ToListAsync();
+        var sizes = await _db.Sizes
+            .AsNoTracking()
+            .Select(s => new SizeDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Value = s.Value
+            }).ToListAsync();
+        var colors = await _db.Colors
+            .AsNoTracking()
+            .Select(c => new ColorDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                HexCode = c.HexCode
+            }).ToListAsync();
+        var occasions = await _db.Occasions
+            .AsNoTracking()    
+            .Select(o => new IdNameDto
+            {
+                Id = o.Id,
+                Name = o.Name
+            }).ToListAsync();
+        var materials = await _db.Materials
+            .AsNoTracking()
+            .Select(m => new MaterialDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                
+            }).ToListAsync();
 
         var filters = new ProductFiltersDto
         {
