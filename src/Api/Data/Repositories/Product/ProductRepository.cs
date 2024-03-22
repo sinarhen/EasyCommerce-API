@@ -480,6 +480,7 @@ public class ProductRepository : BaseRepository, IProductRepository
                     Name = ps.Color.Name,
                     HexCode = ps.Color.HexCode
                 })
+                .Distinct()
                 .ToList(),
             Stocks = product.Stocks.Select(ps => new ProductStockDto
             {
