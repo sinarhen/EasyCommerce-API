@@ -383,25 +383,8 @@ public class ProductRepository : BaseRepository, IProductRepository
 
     private async Task<ProductDetailsDto> GetProductDtoById(Guid id)
     {
-        var product = await _db.Products
-            .AsNoTracking()
-            .Include(p => p.Stocks)
-            .ThenInclude(s => s.Color)
-            .Include(p => p.Stocks)
-            .ThenInclude(s => s.Size)
-            .Include(p => p.Materials).ThenInclude(productMaterial => productMaterial.Material)
-            .Include(p => p.Images)
-            .Include(p => p.Reviews)
-            .ThenInclude(r => r.User)
-            .Include(p => p.Categories).ThenInclude(productCategory => productCategory.Category)
-            .Include(product => product.Orders).Include(product => product.Occasion)
-            .Include(product => product.Collection)
-            .FirstOrDefaultAsync(p => p.Id == id);
-
-        if (product == null) throw new ArgumentException($"Product with ID {id} does not exist");
-
-
-        var productDto = new ProductDetailsDto
+        var productDto = await _db.Products
+        .Select(product => new ProductDetailsDto
         {
             Id = product.Id,
             Collection = new IdNameDto
@@ -492,8 +475,12 @@ public class ProductRepository : BaseRepository, IProductRepository
             }).ToList(),
             IsAvailable = product.Stocks.Any(ps => ps.Stock > 0),
             MinPrice = product.Stocks.Any() ? product.Stocks.Min(s => s.Price) : 0
-        };
+        }).FirstOrDefaultAsync(p => p.Id == id);
 
+        if (productDto == null)
+        {
+            throw new ArgumentException("No product with such id");
+        }
         return productDto;
     }
 
@@ -578,8 +565,8 @@ public class ProductRepository : BaseRepository, IProductRepository
         
         var categories = await _db.Categories
             .AsNoTracking()
-            .Include(c => c.SubCategories)
             .Where(c => c.ParentCategoryId == null)
+            .Include(c => c.SubCategories)
             .ToListAsync();
         var sizes = await _db.Sizes
             .AsNoTracking()
