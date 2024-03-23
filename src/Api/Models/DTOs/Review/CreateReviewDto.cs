@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using ECommerce.Entities.Enum;
+using ECommerce.Models.Enum;
 
 namespace ECommerce.Models.DTOs.Review;
 

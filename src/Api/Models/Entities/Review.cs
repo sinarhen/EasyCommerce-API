@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ECommerce.Entities.Enum;
+using ECommerce.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Models.Entities;
