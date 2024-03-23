@@ -449,8 +449,8 @@ public class ProductRepository : BaseRepository, IProductRepository
             Description = product.Description,
             Gender = product.Gender.ToString(),
             Season = product.Season.ToString(),
-            OrdersCount = product.Orders.Count,
-            ReviewsCount = product.Reviews.Count,
+            // OrdersCount = product.Orders.Count,
+            // ReviewsCount = product.Reviews.Count,
             AvgRating = product.Reviews.Count == 0 ? 0 : product.Reviews.Average(r => (int)r.Rating),
             IsNew = product.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
             IsBestseller = product.Orders.Count > 10,
@@ -532,20 +532,20 @@ public class ProductRepository : BaseRepository, IProductRepository
                 Id = p.Occasion.Id,
                 Name = p.Occasion.Name
             },
-            MainMaterial = new IdNameDto
-            {
-                Id = p.Materials.First().Material.Id,
-                Name = p.Materials.First().Material.Name
-            },
+            // MainMaterial = new IdNameDto
+            // {
+            //     Id = p.Materials.First().Material.Id,
+            //     Name = p.Materials.First().Material.Name
+            // },
             Name = p.Name,
             Description = p.Description,
             Gender = p.Gender.ToString(),
             Season = p.Season.ToString(),
-            OrdersCount = p.Orders.Count,
-            ReviewsCount = p.Reviews.Count,
+            // OrdersCount = p.Orders.Count,
+            // ReviewsCount = p.Reviews.Count,
             AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => (int)r.Rating),
             IsNew = p.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
-            IsOnSale = p.Stocks.Any(s => s.Discount > 0),
+            // IsOnSale = p.Stocks.Any(s => s.Discount > 0),
             IsBestseller = p.Orders.Count > 10,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt,
