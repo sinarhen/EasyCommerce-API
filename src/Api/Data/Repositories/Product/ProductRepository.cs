@@ -400,7 +400,7 @@ public class ProductRepository : BaseRepository, IProductRepository
                     Order = pc.Order
                 })
                 .OrderBy(pc => pc.Order)
-                .ToArray(),
+                .ToList(),
             Occasion = new IdNameDto
             {
                 Id = product.Occasion.Id,
@@ -518,7 +518,7 @@ public class ProductRepository : BaseRepository, IProductRepository
                     Order = pc.Order
                 })
                 .OrderBy(pc => pc.Order)
-                .ToArray(),
+                .ToList(),
             Images = p.Images
                 .Select(i => new ProductImageDto
                 {

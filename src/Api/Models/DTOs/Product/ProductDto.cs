@@ -6,7 +6,7 @@ namespace ECommerce.Models.DTOs.Product;
 public class ProductDto : BaseEntity
 {
     public Guid Id { get; set; }
-    public ProductCategoryDto[] Categories { get; set; }
+    public List<ProductCategoryDto> Categories { get; set; }
 
     public string Name { get; set; }
     public string Description { get; set; }
