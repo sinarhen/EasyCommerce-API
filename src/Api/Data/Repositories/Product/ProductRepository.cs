@@ -428,6 +428,7 @@ public class ProductRepository : BaseRepository, IProductRepository
                     Name = ps.Size.Name,
                     Value = ps.Size.Value
                 })
+                .Distinct()
                 .ToList(),
             Reviews = product.Reviews.Select(r => new ReviewDto
             {
