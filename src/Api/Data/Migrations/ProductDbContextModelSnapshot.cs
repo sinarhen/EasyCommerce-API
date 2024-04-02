@@ -1028,6 +1028,19 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
+            modelBuilder.Entity("ECommerce.Models.Entities.Wishlist", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Wishlists");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -1438,6 +1451,17 @@ namespace ECommerce.Data.Migrations
                         .HasForeignKey("SellerInfoId");
 
                     b.Navigation("SellerInfo");
+                });
+
+            modelBuilder.Entity("ECommerce.Models.Entities.Wishlist", b =>
+                {
+                    b.HasOne("ECommerce.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

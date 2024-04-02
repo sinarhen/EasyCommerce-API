@@ -28,6 +28,7 @@ public class ProductDbContext : IdentityDbContext<User, UserRole, string>
     public DbSet<Category> Categories { get; set; }
     public DbSet<CategorySize> CategorySizes { get; set; }
 
+    public DbSet<Wishlist> Wishlists { get; set; }
     public DbSet<Order> Orders { get; set; }
     
     public DbSet<OrderItem> OrderItems { get; set; }
