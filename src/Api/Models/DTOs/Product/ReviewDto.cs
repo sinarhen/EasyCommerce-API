@@ -7,7 +7,7 @@ namespace ECommerce.Models.DTOs.Product;
 
 public class ReviewDto
 {
-    // public Guid Id { get; set; }
+    public Guid Id { get; set; }
     public UserDto User { get; set; } = null;
     public string Title { get; set; }
     public string Content { get; set; }

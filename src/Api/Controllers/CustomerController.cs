@@ -4,6 +4,7 @@ using ECommerce.Models.DTOs.Cart;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Controllers;
@@ -87,5 +88,11 @@ public class CustomerController : GenericController
     {
         var res = await _repository.GetOrdersForUser(GetUserId());
         return Ok(res);
+    }
+
+    [HttpGet("wishlist")]
+    public async Task<IActionResult> GetWishlist()
+    {
+        return Ok();
     }
 }
