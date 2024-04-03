@@ -7,5 +7,5 @@ public interface IReviewRepository
     Task<Models.Entities.Review> CreateReviewForProduct(Guid productId, string userId,
         CreateReviewDto createReviewDto); // TODO: [FromBody] CreateReviewDto createReviewDto
 
-    Task DeleteReviewForCollectionAsync(Guid reviewId, string userId);
+    Task DeleteReviewForProductAsync(Guid reviewId, string userId);
 }
