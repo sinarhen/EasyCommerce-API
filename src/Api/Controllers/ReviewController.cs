@@ -32,7 +32,7 @@ public class ReviewController : GenericController
     [Authorize]
     public async Task<IActionResult> DeleteReview(Guid reviewId)
     {
-        await _repository.DeleteReviewForCollectionAsync(reviewId, GetUserId());
+        await _repository.DeleteReviewForProductAsync(reviewId, GetUserId());
         return Ok();
     }
 }

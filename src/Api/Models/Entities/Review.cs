@@ -7,11 +7,13 @@ using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Models.Entities;
 
 [PrimaryKey("Id")]
+[Index(nameof(ProductId))]
 public class Review : BaseEntity
 {
     [Key] public Guid Id { get; set; }
-
-    [Key] public Guid ProductId { get; set; }
+    
+    [Key]
+    public Guid ProductId { get; set; }
 
     [Key] public string CustomerId { get; set; }
 

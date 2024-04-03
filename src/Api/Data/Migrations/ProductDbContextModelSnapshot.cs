@@ -1036,7 +1036,7 @@ namespace ECommerce.Data.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId", "ProductId");
 
                     b.ToTable("Wishlists");
                 });

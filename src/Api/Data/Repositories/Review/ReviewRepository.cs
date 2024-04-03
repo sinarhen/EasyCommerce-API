@@ -37,7 +37,7 @@ public class ReviewRepository : BaseRepository, IReviewRepository
         return review;
     }
 
-    public async Task DeleteReviewForCollectionAsync(Guid reviewId, string userId)
+    public async Task DeleteReviewForProductAsync(Guid reviewId, string userId)
     {
         if (!await _db.Users.AnyAsync(u => u.Id == userId)) throw new ArgumentException("User not found");
 
