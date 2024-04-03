@@ -90,9 +90,17 @@ public class CustomerController : GenericController
         return Ok(res);
     }
 
-    [HttpGet("wishlist")]
-    public async Task<IActionResult> GetWishlist()
+    [HttpPost("wishlist")]
+    public async Task<IActionResult> AddToWishlist([FromBody] Guid productId)
     {
+        await _repository.AddToWishlist(GetUserId(), productId);
+        return Ok();
+    }
+    
+    [HttpDelete("wishlist")]
+    public async Task<IActionResult> RemoveFromWishlist([FromBody] Guid productId)
+    {
+        await _repository.RemoveFromWishlist(GetUserId(), productId);
         return Ok();
     }
 }

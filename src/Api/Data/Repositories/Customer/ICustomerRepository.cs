@@ -25,4 +25,7 @@ public interface ICustomerRepository
 
     Task ClearCart(string userId);
 
+    Task AddToWishlist(string userId, Guid productId);
+
+    Task RemoveFromWishlist(string userId, Guid productId);
 }
