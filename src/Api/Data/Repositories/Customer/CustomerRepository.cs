@@ -27,23 +27,22 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task AddToWishlist(string userId, Guid productId)
     {
-        var wishlistItem = await _db.Wishlists
-            .AsNoTracking()
-            .AnyAsync(w => w.UserId == userId && w.ProductId == productId);
-
-        if (!wishlistItem)
-        {
-            await _db.Wishlists.AddAsync(new Wishlist
+        await _db.Wishlists.AddAsync(new Wishlist
             {
                 UserId = userId,
                 ProductId = productId,
             });
-            await SaveChangesAsyncWithTransaction();
-        }
-        else
-        {
-            throw new ArgumentException("Already in wishlist");
-        }
+        await SaveChangesAsyncWithTransaction();
+    }
+
+    public async Task RemoveFromWishlist(string userId, Guid productId)
+    {
+        var wish = await _db.Wishlists
+            .FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
+
+        _db.Wishlists.Remove(wish);
+        
+        await SaveChangesAsyncWithTransaction();
     }
     
     public async Task<UserReviewsDto> GetReviewsForUser(string userId, IReadOnlyList<string> roles)
