@@ -25,7 +25,26 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         _orderHubContext = orderHubContext;
     }
 
-    // public async Task<WishlistDto> GetWishlistForUser(string )
+    public async Task AddToWishlist(string userId, Guid productId)
+    {
+        var wishlistItem = await _db.Wishlists
+            .AsNoTracking()
+            .AnyAsync(w => w.UserId == userId && w.ProductId == productId);
+
+        if (!wishlistItem)
+        {
+            await _db.Wishlists.AddAsync(new Wishlist
+            {
+                UserId = userId,
+                ProductId = productId,
+            });
+            await SaveChangesAsyncWithTransaction();
+        }
+        else
+        {
+            throw new ArgumentException("Already in wishlist");
+        }
+    }
     
     public async Task<UserReviewsDto> GetReviewsForUser(string userId, IReadOnlyList<string> roles)
     {
