@@ -1,6 +1,7 @@
 using AutoMapper;
 using ECommerce.Data.Repositories.Customer;
 using ECommerce.Models.DTOs.Cart;
+using ECommerce.Models.DTOs.Product;
 using ECommerce.Models.DTOs.User;
 using ECommerce.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -91,16 +92,19 @@ public class CustomerController : GenericController
     }
 
     [HttpPost("wishlist")]
-    public async Task<IActionResult> AddToWishlist([FromBody] Guid productId)
+    public async Task<IActionResult> AddToWishlist([FromBody] WishlistProductDto dto)
     {
-        await _repository.AddToWishlist(GetUserId(), productId);
+        await _repository.AddToWishlist(GetUserId(), dto.ProductId);
         return Ok();
     }
     
     [HttpDelete("wishlist")]
-    public async Task<IActionResult> RemoveFromWishlist([FromBody] Guid productId)
+    public async Task<IActionResult> RemoveFromWishlist([FromBody] WishlistProductDto dto)
     {
-        await _repository.RemoveFromWishlist(GetUserId(), productId);
+        await _repository.RemoveFromWishlist(GetUserId(), dto.ProductId);
         return Ok();
     }
+
+    
+
 }

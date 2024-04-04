@@ -27,6 +27,17 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task AddToWishlist(string userId, Guid productId)
     {
+        await GetAuthorizedUserAsync(userId);
+        var product = await _db.Products
+            .AsNoTracking()
+            .AnyAsync(p => p.Id == productId);
+        
+        if (!product) throw new ArgumentException("Product not found");
+
+        var wish = await _db.Wishlists
+            .AnyAsync(w => w.ProductId == productId && w.UserId == userId);
+        
+        if (wish) throw new ArgumentException("Product already in wishlist");
         await _db.Wishlists.AddAsync(new Wishlist
             {
                 UserId = userId,
@@ -37,9 +48,18 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task RemoveFromWishlist(string userId, Guid productId)
     {
+        await GetAuthorizedUserAsync(userId);
+
+        var product = await _db.Products.AsNoTracking()
+            .AnyAsync(p => p.Id == productId);
+        
+        if (!product) throw new ArgumentException("Product not found");
+        
         var wish = await _db.Wishlists
             .FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
-
+        
+        if (wish == null) throw new ArgumentException("Product not in wishlist");
+        
         _db.Wishlists.Remove(wish);
         
         await SaveChangesAsyncWithTransaction();
