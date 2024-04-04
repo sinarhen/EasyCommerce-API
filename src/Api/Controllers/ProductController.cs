@@ -25,9 +25,10 @@ public class ProductController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] ProductSearchParams searchParams)
     {
-        var (products, filters) = await _repository.GetProductsAsync(searchParams);
+        var (products, filters) = await _repository.GetProductsAsync(searchParams, GetUserId());
         
         if (products == null) return NotFound();
+        
         var productDtos = products as ProductDto[] ?? products.ToArray();
         return Ok(new
         {

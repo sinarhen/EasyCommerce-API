@@ -23,9 +23,9 @@ public class ProductRepository : BaseRepository, IProductRepository
         _mapper = mapper;
     }
 
-    public async Task<(IEnumerable<ProductDto>, ProductFiltersDto)> GetProductsAsync(ProductSearchParams searchParams)
+    public async Task<(IEnumerable<ProductDto>, ProductFiltersDto)> GetProductsAsync(ProductSearchParams searchParams, string userId)
     {
-        return await FilterProductsBySearchParams(searchParams);
+        return await FilterProductsBySearchParams(searchParams, userId);
     }
 
 
@@ -485,7 +485,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         return productDto;
     }
 
-    private async Task<(List<ProductDto>, ProductFiltersDto)> FilterProductsBySearchParams(ProductSearchParams searchParams)
+    private async Task<(List<ProductDto>, ProductFiltersDto)> FilterProductsBySearchParams(ProductSearchParams searchParams, string userId)
     {
         var query = _db.Products
             .AsNoTracking()
@@ -544,6 +544,8 @@ public class ProductRepository : BaseRepository, IProductRepository
             Season = p.Season.ToString(),
             // OrdersCount = p.Orders.Count,
             // ReviewsCount = p.Reviews.Count,
+            IsFavorite = !string.IsNullOrEmpty(userId) 
+                         && _db.Wishlists.Any(w => w.UserId == userId && w.ProductId == p.Id),
             AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => (int)r.Rating),
             IsNew = p.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
             // IsOnSale = p.Stocks.Any(s => s.Discount > 0),

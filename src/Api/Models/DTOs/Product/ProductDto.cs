@@ -17,7 +17,7 @@ public class ProductDto : BaseEntity
     public string Gender { get; set; }
     public string Season { get; set; }
     
-    public bool isFavorite { get; set; }
+    public bool IsFavorite { get; set; }
     // public int OrdersCount { get; set; }
     // public int ReviewsCount { get; set; }
     public double AvgRating { get; set; }
