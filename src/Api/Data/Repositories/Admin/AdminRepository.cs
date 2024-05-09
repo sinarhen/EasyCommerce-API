@@ -21,30 +21,20 @@ public class AdminRepository : BaseRepository, IAdminRepository
     {
         var users = await _userManager.Users
             .AsNoTracking()
-            .ToListAsync();
-
-        var userDtos = new List<UserDto>();
-
-        foreach (var user in users)
-        {
-            var roles = await GetUserRoles(user);
-            var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
-
-            var userDto = new UserDto
+            .Include(b => b.BannedUser)
+            .Select(user => new UserDto
             {
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                Role = UserRoles.GetHighestUserRole(roles),
-                IsBanned = isBanned,
+                Role = user., // TODO
+                IsBanned = user.BannedUser != null,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
-            };
+            })
+            .ToListAsync();
 
-            userDtos.Add(userDto);
-        }
-
-        return userDtos;
+        return users;
     }
 
     public async Task<UserDto> GetUserById(string id)
@@ -52,7 +42,6 @@ public class AdminRepository : BaseRepository, IAdminRepository
         var user = await FindUser(id) ?? throw new ArgumentException("User not found");
 
         var roles = await GetUserRoles(user);
-        var isBanned = await _db.BannedUsers.AnyAsync(b => b.UserId == user.Id);
 
         var userDto = new UserDto
         {
@@ -60,7 +49,7 @@ public class AdminRepository : BaseRepository, IAdminRepository
             Username = user.UserName,
             Email = user.Email,
             Role = UserRoles.GetHighestUserRole(roles),
-            IsBanned = isBanned,
+            IsBanned = user.BannedUser != null,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt
         };

@@ -50,6 +50,7 @@ public class Product : BaseEntity
     public ICollection<OrderItem> Orders { get; set; } = new List<OrderItem>();
     public ICollection<ProductCategory> Categories { get; set; } = new List<ProductCategory>();
 
+    public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
     // public ICollectiion<CartProduct> Carts { get; set; } = new List<CartProduct>();
     // Unnecessary because we don't need to know which carts a product is in and how many of them   
 }

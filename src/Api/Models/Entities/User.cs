@@ -40,5 +40,6 @@ public class User : IdentityUser
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public ICollection<Store> Stores { get; set; } = new List<Store>();
-
+    
+    // public ICollection<IdentityRole>
 }

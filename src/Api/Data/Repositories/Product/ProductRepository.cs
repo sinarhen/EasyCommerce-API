@@ -25,13 +25,230 @@ public class ProductRepository : BaseRepository, IProductRepository
 
     public async Task<(IEnumerable<ProductDto>, ProductFiltersDto)> GetProductsAsync(ProductSearchParams searchParams, string userId)
     {
-        return await FilterProductsBySearchParams(searchParams, userId);
+        var query = _db.Products
+            .AsNoTracking()
+            .AsSplitQuery();
+
+        query = ApplyFilterBy(query, searchParams);
+        query = ApplyCategoryFilter(query, searchParams);
+        query = ApplySizeFilter(query, searchParams);
+        query = ApplyCollectionFilter(query, searchParams);
+        query = ApplyColorFilter(query, searchParams);
+        query = ApplyOccasionFilter(query, searchParams);
+        query = ApplyMaterialFilter(query, searchParams);
+        query = ApplySearchTermFilter(query, searchParams);
+        query = ApplyOrderBy(query, searchParams);
+        query = ApplyPaging(query, searchParams);
+
+        var products = await query.Select(p => new ProductDto
+        {
+            Id = p.Id,
+            Collection = new IdNameDto
+            {
+                Id = p.Collection.Id,
+                Name = p.Collection.Name
+            },
+
+            Categories = p.Categories
+                .Select(pc => new ProductCategoryDto
+                {
+                    Id = pc.Category.Id,
+                    Name = pc.Category.Name,
+                    Order = pc.Order
+                })
+                .OrderBy(pc => pc.Order)
+                .ToList(),
+            Images = p.Images
+                .Select(i => new ProductImageDto
+                {
+                    ColorId = i.ColorId,
+                    ImageUrls = i.ImageUrls
+                })
+                .ToList(),
+
+            Occasion = new IdNameDto
+            {
+                Id = p.Occasion.Id,
+                Name = p.Occasion.Name
+            },
+            Name = p.Name,
+            Description = p.Description,
+            Gender = p.Gender.ToString(),
+            Season = p.Season.ToString(),
+            IsFavorite = p.Wishlists.Any(wishlist => wishlist.UserId == userId),
+            AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => (int)r.Rating),
+            IsNew = p.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
+            IsBestseller = p.Orders.Count > 10,
+            CreatedAt = p.CreatedAt,
+            UpdatedAt = p.UpdatedAt,
+            // Select only unique colors
+            Colors = p.Stocks
+                .Select(ps => new ColorDto
+                {
+                    Id = ps.Color.Id,
+                    Name = ps.Color.Name,
+                    HexCode = ps.Color.HexCode
+                })
+                .Distinct()
+                .ToList(),
+            IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
+            MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0
+        }).ToListAsync();
+        
+        var categories = await _db.Categories
+            .AsNoTracking()
+            .Where(c => c.ParentCategoryId == null)
+            .Include(c => c.SubCategories)
+            .ToListAsync();
+        var sizes = await _db.Sizes
+            .AsNoTracking()
+            .Select(s => new SizeDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Value = s.Value
+            }).ToListAsync();
+        var colors = await _db.Colors
+            .AsNoTracking()
+            .Select(c => new ColorDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                HexCode = c.HexCode
+            }).ToListAsync();
+        var occasions = await _db.Occasions
+            .AsNoTracking()    
+            .Select(o => new IdNameDto
+            {
+                Id = o.Id,
+                Name = o.Name
+            }).ToListAsync();
+        var materials = await _db.Materials
+            .AsNoTracking()
+            .Select(m => new MaterialDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                
+            }).ToListAsync();
+
+        var filters = new ProductFiltersDto
+        {
+            Categories = categories,
+            Sizes = sizes,
+            Colors = colors,
+            Occasions = occasions,
+            Materials = materials
+        };
+
+        return (products, filters);
+    
     }
 
 
-    public async Task<ProductDetailsDto> GetProductAsync(Guid id)
+    public async Task<ProductDetailsDto> GetProductAsync(Guid id, string userId)
     {
-        return await GetProductDtoById(id);
+        var productDto = await _db.Products
+        .Select(product => new ProductDetailsDto
+        {
+            Id = product.Id,
+            Collection = new IdNameDto
+            {
+                Id = product.Collection.Id,
+                Name = product.Collection.Name
+            },
+            Categories = product.Categories
+                .Select(pc => new ProductCategoryDto
+                {
+                    Id = pc.Category.Id,
+                    Name = pc.Category.Name,
+                    Order = pc.Order
+                })
+                .OrderBy(pc => pc.Order)
+                .ToList(),
+            Occasion = new IdNameDto
+            {
+                Id = product.Occasion.Id,
+                Name = product.Occasion.Name
+            },
+            Images = product.Images
+                .Select(i => new ProductImageDto
+                {
+                    ColorId = i.ColorId,
+                    ImageUrls = i.ImageUrls
+                })
+                .ToList(),
+            Materials = product.Materials
+                .Select(pm => new MaterialDto
+                {
+                    Id = pm.Material.Id,
+                    Name = pm.Material.Name,
+                    Percentage = pm.Percentage
+                })
+                .ToList(),
+            Sizes = product.Stocks
+                .Select(ps => new SizeDto
+                {
+                    Id = ps.Size.Id,
+                    Name = ps.Size.Name,
+                    Value = ps.Size.Value
+                })
+                .Distinct()
+                .ToList(),
+            Reviews = product.Reviews.Select(r => new ReviewDto
+            {
+                User = new UserDto
+                {
+                    Id = r.User.Id,
+                    Username = r.User.UserName,
+                    ImageUrl = r.User.ImageUrl
+                },
+                Title = r.Title,
+                Content = r.Content,
+                Rating = r.Rating,
+                CreatedAt = r.CreatedAt
+            }).ToList(),
+
+            SizeChartImageUrl = product.SizeChartImageUrl,
+
+            Name = product.Name,
+            Description = product.Description,
+            Gender = product.Gender.ToString(),
+            Season = product.Season.ToString(),
+            // OrdersCount = product.Orders.Count,
+            // ReviewsCount = product.Reviews.Count,
+            AvgRating = product.Reviews.Count == 0 ? 0 : product.Reviews.Average(r => (int)r.Rating),
+            IsNew = product.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
+            IsBestseller = product.Orders.Count > 10,
+            CreatedAt = product.CreatedAt,
+            UpdatedAt = product.UpdatedAt,
+            Colors = product.Stocks
+                .Select(ps => new ColorDto
+                {
+                    Id = ps.Color.Id,
+                    Name = ps.Color.Name,
+                    HexCode = ps.Color.HexCode
+                })
+                .Distinct()
+                .ToList(),
+            Stocks = product.Stocks.Select(ps => new ProductStockDto
+            {
+                ColorId = ps.ColorId,
+                SizeId = ps.SizeId,
+                Stock = ps.Stock,
+                Price = ps.Price,
+                Discount = ps.Discount
+            }).ToList(),
+            IsFavorite = !string.IsNullOrEmpty(userId) && product.Wishlists.Any(w => w.UserId == userId),
+            IsAvailable = product.Stocks.Any(ps => ps.Stock > 0),
+            MinPrice = product.Stocks.Any() ? product.Stocks.Min(s => s.Price) : 0
+        }).FirstOrDefaultAsync(p => p.Id == id);
+
+        if (productDto == null)
+        {
+            throw new ArgumentException("No product with such id");
+        }
+        return productDto;
     }
 
     public async Task<Models.Entities.Product> CreateProductAsync(CreateProductDto productDto, string userId,
@@ -379,240 +596,6 @@ public class ProductRepository : BaseRepository, IProductRepository
         return query
             .Skip(searchParams.PageSize * (searchParams.PageNumber - 1))
             .Take(searchParams.PageSize);
-    }
-
-    private async Task<ProductDetailsDto> GetProductDtoById(Guid id)
-    {
-        var productDto = await _db.Products
-        .Select(product => new ProductDetailsDto
-        {
-            Id = product.Id,
-            Collection = new IdNameDto
-            {
-                Id = product.Collection.Id,
-                Name = product.Collection.Name
-            },
-            Categories = product.Categories
-                .Select(pc => new ProductCategoryDto
-                {
-                    Id = pc.Category.Id,
-                    Name = pc.Category.Name,
-                    Order = pc.Order
-                })
-                .OrderBy(pc => pc.Order)
-                .ToList(),
-            Occasion = new IdNameDto
-            {
-                Id = product.Occasion.Id,
-                Name = product.Occasion.Name
-            },
-            Images = product.Images
-                .Select(i => new ProductImageDto
-                {
-                    ColorId = i.ColorId,
-                    ImageUrls = i.ImageUrls
-                })
-                .ToList(),
-            Materials = product.Materials
-                .Select(pm => new MaterialDto
-                {
-                    Id = pm.Material.Id,
-                    Name = pm.Material.Name,
-                    Percentage = pm.Percentage
-                })
-                .ToList(),
-            Sizes = product.Stocks
-                .Select(ps => new SizeDto
-                {
-                    Id = ps.Size.Id,
-                    Name = ps.Size.Name,
-                    Value = ps.Size.Value
-                })
-                .Distinct()
-                .ToList(),
-            Reviews = product.Reviews.Select(r => new ReviewDto
-            {
-                User = new UserDto
-                {
-                    Id = r.User.Id,
-                    Username = r.User.UserName,
-                    ImageUrl = r.User.ImageUrl
-                },
-                Title = r.Title,
-                Content = r.Content,
-                Rating = r.Rating,
-                CreatedAt = r.CreatedAt
-            }).ToList(),
-
-            SizeChartImageUrl = product.SizeChartImageUrl,
-
-            Name = product.Name,
-            Description = product.Description,
-            Gender = product.Gender.ToString(),
-            Season = product.Season.ToString(),
-            // OrdersCount = product.Orders.Count,
-            // ReviewsCount = product.Reviews.Count,
-            AvgRating = product.Reviews.Count == 0 ? 0 : product.Reviews.Average(r => (int)r.Rating),
-            IsNew = product.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
-            IsBestseller = product.Orders.Count > 10,
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt,
-            Colors = product.Stocks
-                .Select(ps => new ColorDto
-                {
-                    Id = ps.Color.Id,
-                    Name = ps.Color.Name,
-                    HexCode = ps.Color.HexCode
-                })
-                .Distinct()
-                .ToList(),
-            Stocks = product.Stocks.Select(ps => new ProductStockDto
-            {
-                ColorId = ps.ColorId,
-                SizeId = ps.SizeId,
-                Stock = ps.Stock,
-                Price = ps.Price,
-                Discount = ps.Discount
-            }).ToList(),
-            IsAvailable = product.Stocks.Any(ps => ps.Stock > 0),
-            MinPrice = product.Stocks.Any() ? product.Stocks.Min(s => s.Price) : 0
-        }).FirstOrDefaultAsync(p => p.Id == id);
-
-        if (productDto == null)
-        {
-            throw new ArgumentException("No product with such id");
-        }
-        return productDto;
-    }
-
-    private async Task<(List<ProductDto>, ProductFiltersDto)> FilterProductsBySearchParams(ProductSearchParams searchParams, string userId)
-    {
-        var query = _db.Products
-            .AsNoTracking()
-            .AsSplitQuery();
-
-        query = ApplyFilterBy(query, searchParams);
-        query = ApplyCategoryFilter(query, searchParams);
-        query = ApplySizeFilter(query, searchParams);
-        query = ApplyCollectionFilter(query, searchParams);
-        query = ApplyColorFilter(query, searchParams);
-        query = ApplyOccasionFilter(query, searchParams);
-        query = ApplyMaterialFilter(query, searchParams);
-        query = ApplySearchTermFilter(query, searchParams);
-        query = ApplyOrderBy(query, searchParams);
-        query = ApplyPaging(query, searchParams);
-
-        var products = await query.Select(p => new ProductDto
-        {
-            Id = p.Id,
-            Collection = new IdNameDto
-            {
-                Id = p.Collection.Id,
-                Name = p.Collection.Name
-            },
-
-            Categories = p.Categories
-                .Select(pc => new ProductCategoryDto
-                {
-                    Id = pc.Category.Id,
-                    Name = pc.Category.Name,
-                    Order = pc.Order
-                })
-                .OrderBy(pc => pc.Order)
-                .ToList(),
-            Images = p.Images
-                .Select(i => new ProductImageDto
-                {
-                    ColorId = i.ColorId,
-                    ImageUrls = i.ImageUrls
-                })
-                .ToList(),
-
-            Occasion = new IdNameDto
-            {
-                Id = p.Occasion.Id,
-                Name = p.Occasion.Name
-            },
-            // MainMaterial = new IdNameDto
-            // {
-            //     Id = p.Materials.First().Material.Id,
-            //     Name = p.Materials.First().Material.Name
-            // },
-            Name = p.Name,
-            Description = p.Description,
-            Gender = p.Gender.ToString(),
-            Season = p.Season.ToString(),
-            // OrdersCount = p.Orders.Count,
-            // ReviewsCount = p.Reviews.Count,
-            IsFavorite = !string.IsNullOrEmpty(userId) 
-                         && _db.Wishlists.Any(w => w.UserId == userId && w.ProductId == p.Id),
-            AvgRating = p.Reviews.Count == 0 ? 0 : p.Reviews.Average(r => (int)r.Rating),
-            IsNew = p.CreatedAt > DateTimeOffset.UtcNow - TimeSpan.FromDays(30),
-            // IsOnSale = p.Stocks.Any(s => s.Discount > 0),
-            IsBestseller = p.Orders.Count > 10,
-            CreatedAt = p.CreatedAt,
-            UpdatedAt = p.UpdatedAt,
-            // Select only unique colors
-            Colors = p.Stocks
-                .Select(ps => new ColorDto
-                {
-                    Id = ps.Color.Id,
-                    Name = ps.Color.Name,
-                    HexCode = ps.Color.HexCode
-                })
-                .Distinct()
-                .ToList(),
-            IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
-            MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0
-        }).ToListAsync();
-        
-        var categories = await _db.Categories
-            .AsNoTracking()
-            .Where(c => c.ParentCategoryId == null)
-            .Include(c => c.SubCategories)
-            .ToListAsync();
-        var sizes = await _db.Sizes
-            .AsNoTracking()
-            .Select(s => new SizeDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Value = s.Value
-            }).ToListAsync();
-        var colors = await _db.Colors
-            .AsNoTracking()
-            .Select(c => new ColorDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                HexCode = c.HexCode
-            }).ToListAsync();
-        var occasions = await _db.Occasions
-            .AsNoTracking()    
-            .Select(o => new IdNameDto
-            {
-                Id = o.Id,
-                Name = o.Name
-            }).ToListAsync();
-        var materials = await _db.Materials
-            .AsNoTracking()
-            .Select(m => new MaterialDto
-            {
-                Id = m.Id,
-                Name = m.Name,
-                
-            }).ToListAsync();
-
-        var filters = new ProductFiltersDto
-        {
-            Categories = categories,
-            Sizes = sizes,
-            Colors = colors,
-            Occasions = occasions,
-            Materials = materials
-        };
-
-        return (products, filters);
     }
     
 }
