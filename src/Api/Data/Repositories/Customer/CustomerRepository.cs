@@ -190,6 +190,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
 
     public async Task AddProductToCart(string userId, CreateCartItemDto cartProduct)
     {
+        // TODO:FIX THIS SHIT
         var lastOrderAndProduct = await _db.Orders
             .Include(o => o.OrderItems)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
@@ -260,7 +261,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         var lastOrder = await _db.Orders
             .Include(o => o.OrderItems)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
-            .OrderByDescending(o => o.CreatedAt)
             .FirstOrDefaultAsync();
 
         if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
@@ -277,7 +277,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         var lastOrder = await _db.Orders
             .Include(o => o.OrderItems)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
-            .OrderByDescending(o => o.CreatedAt)
             .FirstOrDefaultAsync();
 
         if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
@@ -295,7 +294,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         var lastOrder = await _db.Orders
             .Include(o => o.OrderItems)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
-            .OrderByDescending(o => o.CreatedAt)
             .FirstOrDefaultAsync();
         
         if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
@@ -312,7 +310,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             .ThenInclude(oi => oi.Product)
             .ThenInclude(p => p.Stocks)
             .Where(o => o.CustomerId == userId && o.Status == OrderStatus.Pending)
-            .OrderByDescending(o => o.CreatedAt)
+            // .OrderByDescending(o => o.CreatedAt)
             .FirstOrDefaultAsync();
         
         if (lastOrder == null) throw new ArgumentException("No pending order found for the user");
@@ -329,7 +327,6 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
             .AsNoTracking()
             .Include(o => o.OrderItems)
             .ThenInclude(orderItem => orderItem.Product)
-            .ThenInclude(product => product.Stocks)
             .Include(o => o.OrderItems)
             .ThenInclude(orderItem => orderItem.Product)
             .ThenInclude(product => product.Images)
