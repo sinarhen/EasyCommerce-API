@@ -149,6 +149,7 @@ public class ProductRepository : BaseRepository, IProductRepository
     public async Task<ProductDetailsDto> GetProductAsync(Guid id, string userId)
     {
         var productDto = await _db.Products
+        .AsNoTracking()
         .Select(product => new ProductDetailsDto
         {
             Id = product.Id,

@@ -21,13 +21,12 @@ public class AdminRepository : BaseRepository, IAdminRepository
     {
         var users = await _userManager.Users
             .AsNoTracking()
-            .Include(b => b.BannedUser)
             .Select(user => new UserDto
             {
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                Role = user., // TODO
+                Role = UserRoles.GetHighestUserRole(user.Roles.AsEnumerable().Select(r => r.Name)), // TODO
                 IsBanned = user.BannedUser != null,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt

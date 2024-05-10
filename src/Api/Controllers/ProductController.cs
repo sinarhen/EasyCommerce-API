@@ -49,9 +49,9 @@ public class ProductController : GenericController
 
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ProductDto>> GetProduct(Guid id, Guid? sizeId = null, Guid? colorId = null)
+    public async Task<ActionResult<ProductDto>> GetProduct(Guid id)
     {
-        var product = await _repository.GetProductAsync(id);
+        var product = await _repository.GetProductAsync(id, GetUserId());
         if (product == null) return NotFound();
         return Ok(product);
     }
