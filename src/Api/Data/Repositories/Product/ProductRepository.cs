@@ -23,7 +23,55 @@ public class ProductRepository : BaseRepository, IProductRepository
         _mapper = mapper;
     }
 
-    public async Task<(IEnumerable<ProductDto>, ProductFiltersDto)> GetProductsAsync(ProductSearchParams searchParams, string userId)
+    public async Task<ProductFiltersDto> GetFiltersAsync()
+    {
+        var categories = await _db.Categories
+            .AsNoTracking()
+            .Where(c => c.ParentCategoryId == null)
+            .Include(c => c.SubCategories)
+            .ToListAsync();
+        var sizes = await _db.Sizes
+            .AsNoTracking()
+            .Select(s => new SizeDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Value = s.Value
+            }).ToListAsync();
+        var colors = await _db.Colors
+            .AsNoTracking()
+            .Select(c => new ColorDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                HexCode = c.HexCode
+            }).ToListAsync();
+        var occasions = await _db.Occasions
+            .AsNoTracking()    
+            .Select(o => new IdNameDto
+            {
+                Id = o.Id,
+                Name = o.Name
+            }).ToListAsync();
+        var materials = await _db.Materials
+            .AsNoTracking()
+            .Select(m => new MaterialDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                
+            }).ToListAsync();
+
+        return new ProductFiltersDto
+        {
+            Categories = categories,
+            Sizes = sizes,
+            Colors = colors,
+            Occasions = occasions,
+            Materials = materials
+        };
+    }
+    public async Task<IEnumerable<ProductDto>> GetProductsAsync(ProductSearchParams searchParams, string userId)
     {
         var query = _db.Products
             .AsNoTracking()
@@ -40,7 +88,7 @@ public class ProductRepository : BaseRepository, IProductRepository
         query = ApplyOrderBy(query, searchParams);
         query = ApplyPaging(query, searchParams);
 
-        var products = await query.Select(p => new ProductDto
+        return await query.Select(p => new ProductDto
         {
             Id = p.Id,
             Collection = new IdNameDto
@@ -94,54 +142,6 @@ public class ProductRepository : BaseRepository, IProductRepository
             IsAvailable = p.Stocks.Any(ps => ps.Stock > 0),
             MinPrice = p.Stocks.Any() ? p.Stocks.Min(s => s.Price) : 0
         }).ToListAsync();
-        
-        var categories = await _db.Categories
-            .AsNoTracking()
-            .Where(c => c.ParentCategoryId == null)
-            .Include(c => c.SubCategories)
-            .ToListAsync();
-        var sizes = await _db.Sizes
-            .AsNoTracking()
-            .Select(s => new SizeDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Value = s.Value
-            }).ToListAsync();
-        var colors = await _db.Colors
-            .AsNoTracking()
-            .Select(c => new ColorDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                HexCode = c.HexCode
-            }).ToListAsync();
-        var occasions = await _db.Occasions
-            .AsNoTracking()    
-            .Select(o => new IdNameDto
-            {
-                Id = o.Id,
-                Name = o.Name
-            }).ToListAsync();
-        var materials = await _db.Materials
-            .AsNoTracking()
-            .Select(m => new MaterialDto
-            {
-                Id = m.Id,
-                Name = m.Name,
-                
-            }).ToListAsync();
-
-        var filters = new ProductFiltersDto
-        {
-            Categories = categories,
-            Sizes = sizes,
-            Colors = colors,
-            Occasions = occasions,
-            Materials = materials
-        };
-
-        return (products, filters);
     
     }
 

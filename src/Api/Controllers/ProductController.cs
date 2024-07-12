@@ -25,7 +25,7 @@ public class ProductController : GenericController
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] ProductSearchParams searchParams)
     {
-        var (products, filters) = await _repository.GetProductsAsync(searchParams, GetUserId());
+        var products = await _repository.GetProductsAsync(searchParams, GetUserId());
         
         if (products == null) return NotFound();
         
@@ -33,19 +33,27 @@ public class ProductController : GenericController
         return Ok(new
         {
             Products = productDtos,
-            Filters = new
-            {
-                Categories = _mapper.Map<List<CategoryDto>>(filters.Categories),
-                Occasions = filters.Occasions,
-                Materials = filters.Materials,
-                Sizes = filters.Sizes,
-                Colors = filters.Colors
-            },
             Total = productDtos.Length,
             searchParams.PageNumber,
             searchParams.PageSize
         });
     }
+
+    [HttpGet]
+    public async Task<ActionResult<ProductFiltersDto>> GetFilters()
+    {
+        var filters = await _repository.GetFiltersAsync();
+        
+        return Ok(new
+        {
+            Categories = _mapper.Map<List<CategoryDto>>(filters.Categories),
+            Occasions = filters.Occasions,
+            Materials = filters.Materials,
+            Sizes = filters.Sizes,
+            Colors = filters.Colors
+        });
+    }
+
 
 
     [HttpGet("{id:guid}")]
