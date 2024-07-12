@@ -39,7 +39,7 @@ public class ProductController : GenericController
         });
     }
 
-    [HttpGet]
+    [HttpGet("filters")]
     public async Task<ActionResult<ProductFiltersDto>> GetFilters()
     {
         var filters = await _repository.GetFiltersAsync();
