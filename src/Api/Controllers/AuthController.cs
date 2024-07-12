@@ -34,7 +34,7 @@ public class AuthController : GenericController
 
     [HttpPost("register")]
     [ServiceFilter(typeof(ValidationService))]
-    public async Task<ActionResult> Register([FromBody] RegisterDto dto)
+    public async Task<ActionResult<string>> Register([FromBody] RegisterDto dto)
     {
         // Check if a user with the same email exists
         var userExistsTask = _userManager.Users.AnyAsync(x => x.Email == dto.Email);
@@ -43,12 +43,7 @@ public class AuthController : GenericController
         var user = _mapper.Map<User>(dto);
 
         // Wait for the userExistsTask to complete
-        if (await userExistsTask) return BadRequest(new
-        {
-            Message = "User with such email already exists",
-            Field = "email",
-            StatusCode = StatusCodes.Status400BadRequest
-        });
+        if (await userExistsTask) return BadRequest("User with such email already exists");
 
         // Create the user and add to role in parallel
         var createUserTask = _userManager.CreateAsync(user, dto.Password);
@@ -67,19 +62,13 @@ public class AuthController : GenericController
 
         return CreatedAtAction(
             nameof(Register),
-            new
-            {
-                id = user.Id,
-                email = user.Email,
-                token = tokenAsString,
-                expiresTo = token.ValidTo
-            }
+            tokenAsString
         );
     }
 
     [HttpPost("login")]
     [ServiceFilter(typeof(ValidationService))]
-    public async Task<ActionResult<JwtSecurityToken>> Login([FromBody] LoginDto dto)
+    public async Task<ActionResult<string>> Login([FromBody] LoginDto dto)
     {
         if (dto == null) return UnprocessableEntity(new
         {
@@ -89,30 +78,18 @@ public class AuthController : GenericController
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
-        if (user == null) return Unauthorized(new
-        {
-            Message = "User with such email does not exist",
-            Field = "email",
-            StatusCode = StatusCodes.Status401Unauthorized
-        });
+        if (user == null) return Unauthorized(
+            "User with such email does not exist"
+         );
 
         var passwordIsCorrect = await _userManager.CheckPasswordAsync(user, dto.Password);
-        if (!passwordIsCorrect) return Unauthorized(new
-        {
-            Field = "password",
-            Message = "Password is incorrect",
-            StatusCode = StatusCodes.Status401Unauthorized
-        });
+        if (!passwordIsCorrect) return Unauthorized("Email or password is incorrect");
 
         var roles = await _userManager.GetRolesAsync(user);
 
         var token = _jwtService.GenerateToken(user.Id, user.UserName, roles);
         var tokenAsString = _jwtService.WriteToken(token);
-        return Ok(new
-        {
-            token = tokenAsString,
-            expiration = token.ValidTo
-        });
+        return Ok(tokenAsString);
     }
 
     [HttpGet("validate-token")]
