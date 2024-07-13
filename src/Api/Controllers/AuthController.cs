@@ -37,25 +37,29 @@ public class AuthController : GenericController
     public async Task<ActionResult<string>> Register([FromBody] RegisterDto dto)
     {
         // Check if a user with the same email exists
-        var userExistsTask = _userManager.Users.AnyAsync(x => x.Email == dto.Email);
+        var userExists = await _userManager.Users.AnyAsync(x => x.Email == dto.Email);
 
         // Map the DTO to a User object
         var user = _mapper.Map<User>(dto);
 
-        // Wait for the userExistsTask to complete
-        if (await userExistsTask) return BadRequest("User with such email already exists");
+        if (userExists) return BadRequest("User with such email already exists");
 
-        // Create the user and add to role in parallel
-        var createUserTask = _userManager.CreateAsync(user, dto.Password);
-        var addToRoleTask = createUserTask.ContinueWith(t => _userManager.AddToRoleAsync(user, UserRoles.Customer),
-            TaskContinuationOptions.OnlyOnRanToCompletion);
-
+        var createdUser = await _userManager.CreateAsync(user, dto.Password);
+        
+        if (!createdUser.Succeeded)
+        {
+            Console.WriteLine(createdUser.Errors);
+            return BadRequest("User was not created");
+        }
+        
         // Wait for both tasks to complete
-        var result = await createUserTask;
-        var roleResult = await addToRoleTask;
+        var roleResult = await _userManager.AddToRoleAsync(user, UserRoles.Customer);
 
-        if (!result.Succeeded || !roleResult.Result.Succeeded) return BadRequest(result.Errors);
-
+        if (!createdUser.Succeeded || !roleResult.Succeeded)
+        {
+            Console.WriteLine(createdUser.Errors);
+            return BadRequest("User was not created");
+        }
         // Generate the JWT token
         var token = _jwtService.GenerateToken(user.Id, user.UserName, new List<string> { UserRoles.Customer });
         var tokenAsString = _jwtService.WriteToken(token);
