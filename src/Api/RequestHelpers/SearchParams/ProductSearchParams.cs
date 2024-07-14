@@ -4,7 +4,6 @@ namespace ECommerce.RequestHelpers.SearchParams;
 
 public class ProductSearchParams
 {
-    public Guid? ProductId { get; set; }
     public ProductsOrderBy OrderBy { get; set; }
 
     public string FilterBy { get; set; }
